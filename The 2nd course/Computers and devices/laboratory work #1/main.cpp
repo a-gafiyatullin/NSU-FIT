@@ -1,5 +1,9 @@
 #include <iostream>
 #include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <sys/times.h>
+#include <unistd.h>
 using namespace std;
 
 template<typename T>
@@ -13,13 +17,21 @@ void bubble_sort(vector<T> &v)
 
 int main()
 {
-        vector<int> v(10);
+        srand(time(NULL));
+        long long int size;
+        cin >> size;
+        vector<int> v(size);
         for(auto &element : v)
-                cin >> element;
+                element = rand();
 
+        struct tms start, finish;
+        long clocks_per_sec = sysconf(_SC_CLK_TCK);
+        times(&start);
         bubble_sort(v);
+        times(&finish);
+        double clocks = finish.tms_utime - start.tms_utime;
+        cout << "Total process time: " << (double)clocks / clocks_per_sec
+                << "s" << endl;
 
-        for(auto &element : v)
-                cout << element << " ";
         return 0;
 }
