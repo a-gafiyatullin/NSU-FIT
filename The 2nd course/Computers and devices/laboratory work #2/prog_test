@@ -1,0 +1,6 @@
+#!/bin/bash
+for (( in = 0; in <= 50650; in += 5065 ))
+do
+        ./test $in >> results
+        echo "-------------------------------------------------" >> results
+done
