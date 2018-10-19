@@ -46,8 +46,8 @@ bubble_sort:
 	ldr	r2, [r3]
 	ldr	r4, [r3, #4]
 	cmp	r2, r4
-	itt	gt
-	strgt	r4, [r3]
+	itt	gt		//используетя условный переход (пропуск 2-х следующих команд, если r2 < r4 (*in_iter < *(in_iter + 1))
+	strgt	r4, [r3]	//swap не вызывается, заменен более коротким кодом, выполняющим ту же задачу
 	strgt	r2, [r3, #4]
 	adds	r3, r3, #4
 	cmp	r3, r1
@@ -61,9 +61,9 @@ bubble_sort:
 	push	{r4}
 .L10:
 	cmp	r0, r1
-	it	ne
+	it	ne	//используетя условный переход (пропуск следующей команды, если r0 == r1 (in_iter == out_iter))
 	movne	r3, r0
-	bne	.L6
+	bne	.L6	//если in_iter != out_iter, то входим в тело цикла
 	b	.L7
 .L2:
 	ldr	r4, [sp], #4
@@ -78,7 +78,7 @@ bubble_sort:
 main:
 	@ args = 0, pretend = 0, frame = 8
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, r5, r6, r7, r8, lr}
+	push	{r4, r5, r6, r7, r8, lr}	//больше данных держится на регистрах
 	sub	sp, sp, #8
 	movw	r3, #:lower16:__stack_chk_guard
 	movt	r3, #:upper16:__stack_chk_guard
@@ -127,7 +127,7 @@ main:
 	ldr	r2, [r6, #4]!
 	mov	r1, r7
 	mov	r0, r8
-	bl	__printf_chk
+	bl	__printf_chk		//использование защищенных версий стандартных библиотечных функций
 	adds	r4, r4, #1
 	adc	r5, r5, #0
 	ldr	r2, [sp]

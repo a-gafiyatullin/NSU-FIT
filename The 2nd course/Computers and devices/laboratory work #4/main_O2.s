@@ -78,7 +78,7 @@ main:
 	movs	r6, #0
 	ldr	r3, [r4]
 	movw	r0, #:lower16:.LC0
-	str	r6, [r1, #-8]!
+	str	r6, [r1, #-8]!		//инструкции располагаются немного в другом порядке
 	movt	r0, #:upper16:.LC0
 	str	r3, [sp, #4]
 	bl	__isoc99_scanf
@@ -88,7 +88,7 @@ main:
 	ldr	lr, [sp]
 	cmp	lr, r6
 	mov	r5, r0
-	ble	.L15
+	ble	.L15			//старается при возможности избегать входа в циклы
 	movw	r8, #:lower16:.LC0
 	movt	r8, #:upper16:.LC0
 	mov	r7, r0
@@ -109,7 +109,7 @@ main:
 .L22:
 	mov	r3, r5
 .L21:
-	ldr	r2, [r3]
+	ldr	r2, [r3]		//функции были заинлайнены
 	ldr	r1, [r3, #4]
 	cmp	r2, r1
 	it	gt
