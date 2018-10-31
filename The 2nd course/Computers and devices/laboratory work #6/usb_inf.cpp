@@ -6,6 +6,7 @@ using namespace std;
 
 class Device{
 private:
+    libusb_device *dev;
     libusb_device_descriptor desc;      //дескриптор устройства
     libusb_config_descriptor *config;   //дескриптор конфигурации объекта
 public:
@@ -13,10 +14,12 @@ public:
     static const string get_device_class(int bDeviceClass);
     const string get_interfaces_info() const;
     friend ostream& operator<<(ostream &s, const Device &dev);
+    const string get_serial_number() const;
     ~Device();
 };
 
 Device::Device(libusb_device *dev){
+    this->dev = dev;
     int error_code = libusb_get_device_descriptor(dev, &desc);
     if (error_code < 0)
         throw domain_error("Error: haven't got device descriptor, code: " +
@@ -70,12 +73,24 @@ const string Device::get_interfaces_info() const{
     return interfaces_info.str();
 }
 
+const string Device::get_serial_number() const {
+    libusb_device_handle *handle;
+    int error_code = libusb_open(dev, &handle);
+    unsigned char serial_number[255];
+    error_code = libusb_get_string_descriptor_ascii(handle, desc.iSerialNumber,
+         serial_number, 255);
+    libusb_close(handle);
+    return string(reinterpret_cast<char*>(serial_number));
+}
+
 ostream& operator << (ostream &s, const Device &dev){
-    s << left << setw(14) << setfill(' ') << hex
+    s << left << setw(15) << setfill(' ') << hex
         << "Device class: " << Device::get_device_class(dev.desc.bDeviceClass)
-                            << endl << left << setfill(' ') << setw(14)
+                            << endl << left << setfill(' ') << setw(15)
+        << "Serial number: " << dev.get_serial_number() << endl << left
+                            << setfill(' ') << setw(15)
         << "Vendor ID: " << right << setfill('0') << setw(4) << dev.desc.idVendor
-                            << endl << left << setfill(' ') << setw(14)
+                            << endl << left << setfill(' ') << setw(15)
         << "Product ID: " << right << setw(4) << setfill('0')
                             << dev.desc.idProduct << endl << right
                             << setfill(' ') << setw(28)
