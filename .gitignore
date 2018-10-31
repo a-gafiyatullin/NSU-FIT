@@ -1,0 +1,10 @@
+# Ignore executable files
+*.out
+# Ignore object files
+*.o
+# Ignore files generatied by the coverage test
+*.gcda
+*.gcno
+*.info
+*input*
+*output*

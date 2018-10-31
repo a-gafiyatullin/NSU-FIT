@@ -10,7 +10,8 @@ private:
     libusb_config_descriptor *config;   //дескриптор конфигурации объекта
 public:
     Device(libusb_device *dev);
-    const string get_device_class() const;
+    static const string get_device_class(int bDeviceClass);
+    const string get_interfaces_info() const;
     friend ostream& operator<<(ostream &s, const Device &dev);
     ~Device();
 };
@@ -24,39 +25,61 @@ Device::Device(libusb_device *dev){
     libusb_get_config_descriptor(dev, 0, &config);
 }
 
-const string Device::get_device_class() const{
-    switch(desc.bDeviceClass){
-        case 0x00 : return string(" ");
-        case 0x01 : return string("Audio device");
-        case 0x02 : return string("Network adapter");
-        case 0x03 : return string("User interface device");
-        case 0x05 : return string("Physical device");
-        case 0x06 : return string("Images");
-        case 0x07 : return string("Printer");
-        case 0x08 : return string("Data storage device");
-        case 0x09 : return string("Concentrator");
-        case 0x0A : return string("CDC-Data");
-        case 0x0B : return string("Smart Card");
-        case 0x0D : return string("Content Security");
-        case 0x0E : return string("Video device");
-        case 0x0F : return string("Personal medical device");
-        case 0x10 : return string("Audio and Video devices");
-        case 0xdc : return string("Diagnostic device");
-        case 0xe0 : return string("Wireless controller");
-        case 0xef : return string("Various devices");
-        case 0xfe : return string("Special devices");
-        default   : return string(" ");
+const string Device::get_device_class(int bDeviceClass){
+    switch(bDeviceClass){
+        case LIBUSB_CLASS_PER_INTERFACE :
+            return string("Each interface specifies its own class information");
+        case LIBUSB_CLASS_AUDIO : return string("Audio class");
+        case LIBUSB_CLASS_COMM : return string("Communications class");
+        case LIBUSB_CLASS_HID  : return string("Human Interface Device class");
+        case LIBUSB_CLASS_PHYSICAL  : return string("Physical");
+        case LIBUSB_CLASS_PTP : return string("Image class");
+        case LIBUSB_CLASS_PRINTER : return string("Printer class");
+        case LIBUSB_CLASS_MASS_STORAGE : return string("Mass storage class");
+        case LIBUSB_CLASS_HUB : return string("Hub class");
+        case LIBUSB_CLASS_DATA : return string("Data class");
+        case LIBUSB_CLASS_SMART_CARD : return string("Smart Card");
+        case LIBUSB_CLASS_CONTENT_SECURITY : return string("Content Security");
+        case LIBUSB_CLASS_VIDEO : return string("Video");
+        case LIBUSB_CLASS_PERSONAL_HEALTHCARE : return string("Personal Healtcare");
+        case LIBUSB_CLASS_DIAGNOSTIC_DEVICE : return string("Diagnostic Device");
+        case LIBUSB_CLASS_WIRELESS  : return string("Wireless class");
+        case LIBUSB_CLASS_APPLICATION : return string("Application class");
+        case LIBUSB_CLASS_VENDOR_SPEC : return string("Class is vendor-specific");
+        default : return string(" ");
     }
+}
+
+const string Device::get_interfaces_info() const{
+    const libusb_interface *inter;
+    const libusb_interface_descriptor *interdesc;
+    stringstream interfaces_info;
+    interfaces_info << right << setw(30) << "Number of interfaces: "
+        << to_string(config->bNumInterfaces) << endl;
+    for(int i = 0; i < (int)config->bNumInterfaces; i++){
+        inter = &config->interface[i];
+        interfaces_info << right << setw(15) << i + 1 << ") "
+            << "Number of alternate settings:  " << inter->num_altsetting << endl;
+        for(int j = 0; j < inter->num_altsetting; j++) {
+            interdesc = &inter->altsetting[j];
+            interfaces_info << right << setw(20) << j + 1 << ") "
+                << "Interface class: "
+                << get_device_class(interdesc->bInterfaceClass) << endl;
+        }
+    }
+    return interfaces_info.str();
 }
 
 ostream& operator << (ostream &s, const Device &dev){
     s << left << setw(14) << setfill(' ') << hex
-        << "Device class: " << dev.get_device_class() << endl << left
-                            << setfill(' ') << setw(14) 
+        << "Device class: " << Device::get_device_class(dev.desc.bDeviceClass)
+                            << endl << left << setfill(' ') << setw(14)
         << "Vendor ID: " << right << setfill('0') << setw(4) << dev.desc.idVendor
                             << endl << left << setfill(' ') << setw(14)
         << "Product ID: " << right << setw(4) << setfill('0')
-                            << dev.desc.idProduct << endl;
+                            << dev.desc.idProduct << endl << right
+                            << setfill(' ') << setw(28)
+        << "Interfaces information: " << endl << dev.get_interfaces_info() << endl;
     return s;
 }
 
@@ -86,7 +109,7 @@ int main(){
         throw domain_error("Error: haven't got device list, code: " +
             to_string(error_code));
     for(i = 0; i < cnt; i++){              //цикл перебора всех устройств
-        cout << Device(devs[i]) << endl;   //печать параметров устройства
+        cout << i + 1 << ") " << endl << Device(devs[i]) << endl;//печать параметров устройства
     }
     //printf("===========================================================\n");
     //освободить память, выделенную функцией получения списка устройств
