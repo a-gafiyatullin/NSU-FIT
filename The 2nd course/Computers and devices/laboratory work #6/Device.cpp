@@ -5,34 +5,34 @@ using namespace std;
 
 class Device {
 private:
-    libusb_device *dev;
-    libusb_device_descriptor desc;
-    libusb_config_descriptor *config;
+    libusb_device* dev_;
+    libusb_device_descriptor desc_;
+    libusb_config_descriptor* config_;
 public:
-    Device(libusb_device *dev);
+    Device(libusb_device* dev);
 
-    static string getDeviceClass(int DeviceClass);
+    static string getDeviceClass(int deviceClass);
 
     string getInterfacesInfo() const;
 
-    friend ostream& operator<<(ostream &s, const Device &dev);
+    friend ostream& operator<<(ostream& s, const Device& dev);
 
     string getSerialNumber() const;
 
     ~Device();
 };
 
-Device::Device(libusb_device *dev){
-    this->dev = dev;
-    int error_code = libusb_get_device_descriptor(dev, &desc);
-    if (error_code < 0)
+Device::Device(libusb_device* dev){
+    dev_ = dev;
+    int errorCode = libusb_get_device_descriptor(dev_, &desc_);
+    if(errorCode < 0)
         throw domain_error("Error: can't get a device descriptor, code: "
-            + to_string(error_code));
-    libusb_get_config_descriptor(dev, 0, &config);
+            + to_string(errorCode));
+    libusb_get_config_descriptor(dev_, 0, &config_);
 }
 
-string Device::getDeviceClass(int DeviceClass){
-    switch(DeviceClass){
+string Device::getDeviceClass(int deviceClass){
+    switch(deviceClass){
     case LIBUSB_CLASS_PER_INTERFACE :
         return string("Each interface specifies its own class information");
     case LIBUSB_CLASS_AUDIO :
@@ -75,71 +75,71 @@ string Device::getDeviceClass(int DeviceClass){
 }
 
 string Device::getInterfacesInfo() const {
-    const libusb_interface *inter;
-    const libusb_interface_descriptor *interdesc;
-    stringstream interfaces_info;
-    interfaces_info << right << setw(30) << "Number of interfaces: "
-            << to_string(config->bNumInterfaces) << endl;
-    for(int i = 0; i < config->bNumInterfaces; i++){
-        inter = &config->interface[i];
-        interfaces_info << right << setw(15) << i + 1 << ") "
+    const libusb_interface* inter;
+    const libusb_interface_descriptor* interdesc;
+    stringstream interfacesInfo;
+    interfacesInfo << right << setw(30) << "Number of interfaces: "
+            << config_->bNumInterfaces << endl;
+    for(int i = 0; i < config_->bNumInterfaces; i++){
+        inter = &config_->interface[i];
+        interfacesInfo << right << setw(15) << i + 1 << ") "
             << "Number of alternate settings:  "
             << inter->num_altsetting << endl;
         for(int j = 0; j < inter->num_altsetting; j++){
             interdesc = &inter->altsetting[j];
-            interfaces_info << right << setw(20) << j + 1 << ") "
+            interfacesInfo << right << setw(20) << j + 1 << ") "
                 << "Interface class: "
                 << getDeviceClass(interdesc->bInterfaceClass) << endl;
         }
     }
-    return interfaces_info.str();
+    return interfacesInfo.str();
 }
 
 string Device::getSerialNumber() const {
-    libusb_device_handle *handle;
-    int error_code = libusb_open(dev, &handle);
-    if(error_code < 0)
+    libusb_device_handle* handle;
+    int errorCode = libusb_open(dev_, &handle);
+    if(errorCode < 0)
         throw domain_error("Error: can't open device, code: " +
-            to_string(error_code));
-    unsigned char serial_number[255];
-    libusb_get_string_descriptor_ascii(handle, desc.iSerialNumber,
-        serial_number, 255);
+            to_string(errorCode));
+    unsigned char serialNumber[255];
+    libusb_get_string_descriptor_ascii(handle, desc_.iSerialNumber,
+        serialNumber, 255);
     libusb_close(handle);
-    return string(reinterpret_cast<char*>(serial_number));
+    return string(reinterpret_cast<char*>(serialNumber));
 }
 
-ostream& operator << (ostream &s, const Device &dev){
+ostream& operator << (ostream& s, const Device& dev){
     s << left << setw(15) << setfill(' ') << hex
-        << "Device class: " << Device::getDeviceClass(dev.desc.bDeviceClass)
+        << "Device class: " << Device::getDeviceClass(dev.desc_.bDeviceClass)
             << endl << left << setfill(' ') << setw(15)
         << "Serial number: " << dev.getSerialNumber() << endl << left
             << setfill(' ') << setw(15)
         << "Vendor ID: " << right << setfill('0') << setw(4)
-            << dev.desc.idVendor << endl << left << setfill(' ') << setw(15)
+            << dev.desc_.idVendor << endl << left << setfill(' ') << setw(15)
         << "Product ID: " << right << setw(4) << setfill('0')
-            << dev.desc.idProduct << endl << right << setfill(' ') << setw(28)
+            << dev.desc_.idProduct << endl << right << setfill(' ') << setw(28)
         << "Interfaces information: " << endl << dev.getInterfacesInfo() << endl;
     return s;
 }
 
 Device::~Device(){
-        libusb_free_config_descriptor(config);
+        libusb_free_config_descriptor(config_);
 }
 
 int main(){
-    libusb_device **devs;
-    libusb_context *ctx = nullptr; //session context
-    int error_code;
+    libusb_device** devs;
+    libusb_context* ctx = nullptr; //session context
+    int errorCode;
     ssize_t cnt;        //amount of devices
-    error_code = libusb_init(&ctx);
-    if(error_code < 0)
+    errorCode = libusb_init(&ctx);
+    if(errorCode < 0)
         throw domain_error("Error: can't initialize session, code: " +
-            to_string(error_code));
+            to_string(errorCode));
     libusb_set_debug(ctx, 3);
     cnt = libusb_get_device_list(ctx, &devs);
     if(cnt < 0)
         throw domain_error("Error: can't get device list, code: " +
-            to_string(error_code));
+            to_string(errorCode));
     for(ssize_t i = 0; i < cnt; i++){
         cout << i + 1 << ") " << endl << Device(devs[i]) << endl;
     }
