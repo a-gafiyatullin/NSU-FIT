@@ -79,7 +79,7 @@ string Device::getInterfacesInfo() const {
     const libusb_interface_descriptor* interdesc;
     stringstream interfacesInfo;
     interfacesInfo << right << setw(30) << "Number of interfaces: "
-            << config_->bNumInterfaces << endl;
+            << (int)config_->bNumInterfaces << endl;
     for(int i = 0; i < config_->bNumInterfaces; i++){
         inter = &config_->interface[i];
         interfacesInfo << right << setw(15) << i + 1 << ") "
