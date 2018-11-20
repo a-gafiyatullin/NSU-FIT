@@ -4,7 +4,7 @@
 
 //-------------------------------Matrix creation--------------------------------
 struct matrix {
-    float** matrix_;
+    float* matrix_;
     int order_;
 };
 
@@ -13,9 +13,6 @@ struct matrix* create_matrix(int order);
 
 //get a matrix from input stream
 void get_matrix(struct matrix* m, FILE* in);
-
-//get a zero matrix
-struct matrix* get_zero_matrix(int order);
 
 //get a get identity matrix
 struct matrix* get_identity_matrix(int order);
