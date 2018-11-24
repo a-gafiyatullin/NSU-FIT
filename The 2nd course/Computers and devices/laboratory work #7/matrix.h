@@ -1,6 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdio.h>  //for fscanf/fprintf
+#include <stdlib.h> //for calloc/malloc
+#include <string.h> //for memcpy
+#include <time.h>   //for time
+#include <unistd.h> //for sysconf
+#include <sys/times.h>//for times
 
 //-------------------------------Matrix creation--------------------------------
 struct matrix {
@@ -13,6 +16,9 @@ struct matrix* create_matrix(int order);
 
 //get a matrix from input stream
 void get_matrix(struct matrix* m, FILE* in);
+
+//generate a random matrix
+struct matrix* gen_matrix(int order, float range);
 
 //get a get identity matrix
 struct matrix* get_identity_matrix(int order);

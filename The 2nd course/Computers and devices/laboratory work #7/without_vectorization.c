@@ -7,11 +7,21 @@ struct matrix* create_matrix(int order){
     return m;
 }
 
-void get_matrix(struct matrix* m, FILE* in){
-    register int order = m->order_;
+struct matrix* gen_matrix(int order, float range){
+    struct matrix* m = malloc(sizeof(struct matrix));
+    m->order_ = order;
+    m->matrix_ = calloc(order * order, sizeof(float));
+    order *= order;
+    srand(time(NULL));
     for(int i = 0; i < order; i++)
-        for(int j = 0; j < order; j++)
-            fscanf(in, "%f", &m->matrix_[i * order + j]);
+        m->matrix_[i] = ((float)rand()/(float)(RAND_MAX)) * range;
+    return m;
+}
+
+void get_matrix(struct matrix* m, FILE* in){
+    register int order = m->order_ * m->order_;
+    for(int i = 0; i < order; i++)
+        fscanf(in, "%f", &m->matrix_[i]);
 }
 
 struct matrix* get_identity_matrix(int order){
@@ -56,17 +66,15 @@ void transpose_matrix(struct matrix* m){
 }
 
 void sum_matrices(struct matrix* a, struct matrix* b){
-    register int order = a->order_;
+    register int order = a->order_ * a->order_;
     for(int i = 0; i < order; i++)
-        for(int j = 0; j < order; j++)
-            a->matrix_[i * order + j] += b->matrix_[i * order + j];
+        a->matrix_[i] += b->matrix_[i];
 }
 
 void sub_matrices(struct matrix* a, struct matrix* b){
-    register int order = a->order_;
+    register int order = a->order_ * a->order_;
     for(int i = 0; i < order; i++)
-        for(int j = 0; j < order; j++)
-            a->matrix_[i * order + j] -= b->matrix_[i * order + j];
+        a->matrix_[i] -= b->matrix_[i];
 }
 
 struct matrix* mul_matrices(struct matrix* a, struct matrix* b){
@@ -81,10 +89,9 @@ struct matrix* mul_matrices(struct matrix* a, struct matrix* b){
 }
 
 void mul_matrix_on_scalar(struct matrix* m, float scalar){
-    register int order = m->order_;
+    register int order = m->order_ * m->order_;
     for(int i = 0; i < order; i++)
-        for(int j = 0; j < order; j++)
-            m->matrix_[i * order + j] *= scalar;
+        m->matrix_[i] *= scalar;
 }
 
 void get_matrix_norms(struct matrix* m, float* l1_norm, float* max_norm){

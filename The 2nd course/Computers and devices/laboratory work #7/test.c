@@ -1,11 +1,21 @@
 #include "matrix.h"
 
 int main(){
+    struct tms start, finish;
+    long long int clocks_per_sec = sysconf(_SC_CLK_TCK);
     FILE* input = fopen("input.txt", "r");
-    int order = 0;
-    fscanf(input, "%d", &order);
-    struct matrix* A = create_matrix(order);
-    get_matrix(A, input);
-    print_matrix(invert_matrix(A, 100), stdout);
+    FILE* output = fopen("output.txt", "w");
+    int N = 0, M = 0;
+    fscanf(input, "%d%d", &N, &M);
+    struct matrix* A = gen_matrix(N, 5.0);
+    time_t start_real = time(NULL);
+    times(&start);
+    struct matrix* inv_A = invert_matrix(A, M);
+    times(&finish);
+    time_t finish_real = time(NULL);
+    double total_process_time = finish.tms_utime - start.tms_utime;
+    print_matrix(mul_matrices(inv_A, A), output);
+    printf("Total process time: %lf sec.\n", total_process_time / clocks_per_sec);
+    printf("Total real time: %ld sec.\n", finish_real - start_real);
     return 0;
 }
