@@ -52,8 +52,7 @@ void get_matrix_norms(float* m, int order, float* l1_norm, float* max_norm){
 }
 
 float* get_identity_matrix(int order){
-    float* m = malloc(order * order * sizeof(float));
-    memset(m, 0, order * order * sizeof(float));
+    float* m = calloc(order * order, sizeof(float));
     for(int i = 0; i < order; i++)
         m[i * order + i] = 1;
     return m;
