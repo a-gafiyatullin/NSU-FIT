@@ -50,8 +50,7 @@ void free_matrix(struct matrix* m){
 }
 
 void copy_matrix(struct matrix* dst, struct matrix* src){
-    memcpy(dst->matrix_, src->matrix_, sizeof(float)
-        * src->order_ * src->order_);
+    memcpy(dst->matrix_, src->matrix_, sizeof(float) * src->order_ * src->order_);
     dst->order_ = src->order_;
 }
 
@@ -102,8 +101,8 @@ void get_matrix_norms(struct matrix* m, float* l1_norm, float* max_norm){
         float row_sum = 0;
         float col_sum = 0;
         for(int j = 0; j < order; j++){
-            row_sum += m->matrix_[i * order + j];
-            col_sum += m->matrix_[j * order + i];
+            row_sum += fabsf(m->matrix_[i * order + j]);
+            col_sum += fabsf(m->matrix_[j * order + i]);
         }
         if(*l1_norm < col_sum)
             *l1_norm = col_sum;
@@ -118,22 +117,22 @@ struct matrix* invert_matrix(struct matrix* A, int iter_number){
     transpose_matrix(B);
     float l1_norm, max_norm;
     get_matrix_norms(A, &l1_norm, &max_norm);
-    mul_matrix_on_scalar(B, 1.0 / (l1_norm * max_norm));
+    mul_matrix_on_scalar(B, 1.0 / (l1_norm * max_norm));    //A^(T) / (l1 * max) = B
     struct matrix* R = get_identity_matrix(A->order_);
     struct matrix* BA = mul_matrices(B, A);
-    sub_matrices(R, BA);
+    sub_matrices(R, BA);    //R = I - BA
     free_matrix(BA);
     struct matrix* R_1_deg = create_matrix(A->order_);
     copy_matrix(R_1_deg, R);
     struct matrix* inv_A = get_identity_matrix(A->order_);
     struct matrix* tmp;
     for(int i = 0; i < iter_number; i++){
-        sum_matrices(inv_A, R);
-        tmp = mul_matrices(R, R_1_deg);
+        sum_matrices(inv_A, R); //I + R^2 + ... + R^(i)
+        tmp = mul_matrices(R, R_1_deg); //R^(i)*R = R^(i+1)
         free_matrix(R);
         R = tmp;
     }
-    tmp = mul_matrices(inv_A, B);
+    tmp = mul_matrices(inv_A, B);   //(I + R^2 + R^3 + ...)*B
     free_matrix(inv_A);
     inv_A = tmp;
     free_matrix(B);

@@ -1,14 +1,17 @@
-#include <stdio.h>  //for fscanf/fprintf
-#include <stdlib.h> //for calloc/malloc
-#include <string.h> //for memcpy
-#include <time.h>   //for time
-#include <unistd.h> //for sysconf
-#include <sys/times.h>//for times
-
+#include <stdio.h>  //fscanf, fprintf
+#include <stdlib.h> //calloc, malloc
+#include <string.h> //memcpy
+#include <time.h>   //time
+#include <unistd.h> //sysconf
+#include <sys/times.h>//times
+#include <xmmintrin.h>  //operations with vectors
+#include <math.h>   // fabsf
+#define  ALIGN 16
 //-------------------------------Matrix creation--------------------------------
-struct matrix {
+struct matrix{
     float* matrix_;
     int order_;
+    int align_; //align matrix_'s ending to 16 bytes
 };
 
 //create an uninitialized matrix

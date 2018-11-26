@@ -14,8 +14,14 @@ int main(){
     times(&finish);
     time_t finish_real = time(NULL);
     double total_process_time = finish.tms_utime - start.tms_utime;
-    print_matrix(mul_matrices(inv_A, A), output);
+    struct matrix* rez = mul_matrices(inv_A, A);
+    print_matrix(rez, output);
     printf("Total process time: %lf sec.\n", total_process_time / clocks_per_sec);
     printf("Total real time: %ld sec.\n", finish_real - start_real);
+    free_matrix(A);
+    free_matrix(inv_A);
+    free_matrix(rez);
+    fclose(input);
+    fclose(output);
     return 0;
 }

@@ -8,3 +8,6 @@
 *.info
 *input*
 *output*
+# Ignore IDE files
+*.idea*
+*-build-*
