@@ -5,9 +5,11 @@
 #include <unistd.h> //sysconf
 #include <sys/times.h>//times
 #include <math.h>   //fabsf
+#include <xmmintrin.h>  //_mm_malloc
+#define ALIGN 16
 
 //-------------------------------Matrix creation--------------------------------
-struct matrix {
+struct matrix{
     float* matrix_;
     int order_;
 };
@@ -46,6 +48,9 @@ void sub_matrices(struct matrix* a, struct matrix* b);
 
 //matrix multiplication
 struct matrix* mul_matrices(struct matrix* a, struct matrix* b);
+
+//matrix multiplication if b is transposed
+struct matrix* mul_matrices_tr_b(struct matrix* a, struct matrix* b);
 
 //matrix multiplication by a scalar
 void mul_matrix_on_scalar(struct matrix* m, float scalar);

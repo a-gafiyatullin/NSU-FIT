@@ -9,9 +9,9 @@
 #define  ALIGN 16
 //-------------------------------Matrix creation--------------------------------
 struct matrix{
-    float* matrix_;
     int order_;
     int align_; //align matrix_'s ending to 16 bytes
+    float* matrix_;
 };
 
 //create an uninitialized matrix
@@ -30,7 +30,7 @@ struct matrix* get_identity_matrix(int order);
 void print_matrix(struct matrix* m, FILE* out);
 
 //free the memory allocated for the matrix
-void free_matrix(struct matrix* m);
+inline void free_matrix(struct matrix* m);
 
 //-----------------------------Matrix operations--------------------------------
 //copy matrix from src to dest
@@ -40,17 +40,20 @@ void copy_matrix(struct matrix* dst, struct matrix* src);
 void transpose_matrix(struct matrix* m);
 
 //summarize two matrices and assign the result to the first operand
-void sum_matrices(struct matrix* a, struct matrix* b);
+inline void sum_matrices(struct matrix* a, struct matrix* b);
 
 //subtract the second operand from the first
 //and assign the result to the first operand
-void sub_matrices(struct matrix* a, struct matrix* b);
+inline void sub_matrices(struct matrix* a, struct matrix* b);
 
 //matrix multiplication
 struct matrix* mul_matrices(struct matrix* a, struct matrix* b);
 
 //matrix multiplication by a scalar
 void mul_matrix_on_scalar(struct matrix* m, float scalar);
+
+//matrix multiplication optimized for pre-transposed b
+struct matrix* mul_matrices_tr_b(struct matrix* a, struct matrix* b);
 
 //get l1 and maximal matrix norms
 void get_matrix_norms(struct matrix* m, float* l1_norm, float* max_norm);

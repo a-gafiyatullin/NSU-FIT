@@ -1,23 +1,24 @@
 #include <stdio.h>  //printf
-#include <stdlib.h> //malloc, calloc, free
 #include <string.h> //memset
 #include <time.h>   //time
 #include <cblas.h>  //cblas_scopy, cblas_sscal, cblas_sgemm
 #include <sys/times.h>  //times
 #include <unistd.h> //sysconf
 #include <math.h>   //fabsf
+#include <xmmintrin.h>  //_mm_malloc
+#define  ALIGN 16
 
 float* gen_matrix(int order, float range){
-    float* m = malloc(order * order * sizeof(float));
+    float* m = _mm_malloc(order * order * sizeof(float), ALIGN);
     srand(time(NULL));
-    for(int i = 0; i < order * order; i++)
+    for(int i = 0; i < order * order; ++i)
         m[i] = ((float)rand() / (float)(RAND_MAX)) * range;
     return m;
 }
 
 void transpose_matrix(float* m, int order){
-    for(int i = 0; i < order; i++)
-        for(int j = i; j < order; j++){
+    for(int i = 0; i < order; ++i)
+        for(int j = i; j < order; ++j){
             float tmp = m[i * order + j];
             m[i * order + j] = m[j * order + i];
             m[j * order + i] = tmp;
@@ -26,8 +27,8 @@ void transpose_matrix(float* m, int order){
 
 void print_matrix(float* m, int order, FILE* out){
     fprintf(out, "Order: %d\n", order);
-    for(int i = 0; i < order; i++){
-        for(int j = 0; j < order; j++)
+    for(int i = 0; i < order; ++i){
+        for(int j = 0; j < order; ++j)
             fprintf(out, "%.4f ", m[i * order + j]);
         fprintf(out, "\n");
     }
@@ -37,10 +38,10 @@ void print_matrix(float* m, int order, FILE* out){
 void get_matrix_norms(float* m, int order, float* l1_norm, float* max_norm){
     *l1_norm = 0;
     *max_norm = 0;
-    for(int i = 0; i < order; i++){
+    for(int i = 0; i < order; ++i){
         float row_sum = 0;
         float col_sum = 0;
-        for(int j = 0; j < order; j++){
+        for(int j = 0; j < order; ++j){
             row_sum += fabs(m[i * order + j]);
             col_sum += fabs(m[j * order + i]);
         }
@@ -52,14 +53,15 @@ void get_matrix_norms(float* m, int order, float* l1_norm, float* max_norm){
 }
 
 float* get_identity_matrix(int order){
-    float* m = calloc(order * order, sizeof(float));
-    for(int i = 0; i < order; i++)
+    float* m = _mm_malloc(order * order * sizeof(float), ALIGN);
+    memset(m, 0, order * order * sizeof(float));
+    for(int i = 0; i < order; ++i)
         m[i * order + i] = 1;
     return m;
 }
 
 float* invert_matrix(float* A, int order, int iter_number){
-    float* B = malloc(order * order * sizeof(float));
+    float* B = _mm_malloc(order * order * sizeof(float), ALIGN);
     cblas_scopy(order * order, A, 1, B, 1);
     transpose_matrix(B, order);
     float l1_norm, max_norm;
@@ -67,12 +69,12 @@ float* invert_matrix(float* A, int order, int iter_number){
     cblas_sscal(order * order, 1.0 / (l1_norm * max_norm), B, 1);
     float* R = get_identity_matrix(order);
     cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, order, order, order, -1, B, order, A, order, 1, R, order);
-    float* R_1_deg = malloc(order * order * sizeof(float));
+    float* R_1_deg = _mm_malloc(order * order * sizeof(float), ALIGN);
     cblas_scopy(order * order, R, 1, R_1_deg, 1);
     float* tmp = NULL;
     float* inv_A = get_identity_matrix(order);
-    for(int i = 0; i < iter_number; i++){
-        tmp = malloc(order * order * sizeof(float));
+    for(int i = 0; i < iter_number; ++i){
+        tmp = _mm_malloc(order * order * sizeof(float), ALIGN);
         cblas_saxpy(order * order, 1, R, 1, inv_A, 1);
         cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, order, order, order, 1, R, order, R_1_deg, order, 0, tmp,
                     order);
@@ -102,7 +104,7 @@ int main(){
     times(&finish);
     time_t finish_real = time(NULL);
     double total_process_time = finish.tms_utime - start.tms_utime;
-    float* rez = malloc(N * N * sizeof(float));
+    float* rez = _mm_malloc(N * N * sizeof(float), ALIGN);
     cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, N, N, N, 1, inv_A, N, A, N, 0, rez, N);
     print_matrix(rez, N, output);
     printf("Total process time: %lf sec.\n", total_process_time / clocks_per_sec);

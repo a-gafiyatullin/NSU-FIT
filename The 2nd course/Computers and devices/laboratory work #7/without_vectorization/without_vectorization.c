@@ -3,32 +3,34 @@
 struct matrix* create_matrix(int order){
     struct matrix* m = malloc(sizeof(struct matrix));
     m->order_ = order;
-    m->matrix_ = calloc(order * order, sizeof(float));
+    m->matrix_ = _mm_malloc(order * order * sizeof(float), ALIGN);
+    memset(m->matrix_, 0, order * order * sizeof(float));
     return m;
 }
 
 struct matrix* gen_matrix(int order, float range){
     struct matrix* m = malloc(sizeof(struct matrix));
     m->order_ = order;
-    m->matrix_ = calloc(order * order, sizeof(float));
+    m->matrix_ = _mm_malloc(order * order * sizeof(float), ALIGN);
     order *= order;
     srand(time(NULL));
-    for(int i = 0; i < order; i++)
+    for(int i = 0; i < order; ++i)
         m->matrix_[i] = ((float)rand()/(float)(RAND_MAX)) * range;
     return m;
 }
 
 void get_matrix(struct matrix* m, FILE* in){
     register int order = m->order_ * m->order_;
-    for(int i = 0; i < order; i++)
+    for(int i = 0; i < order; ++i)
         fscanf(in, "%f", &m->matrix_[i]);
 }
 
 struct matrix* get_identity_matrix(int order){
     struct matrix* m = malloc(sizeof(struct matrix));
     m->order_ = order;
-    m->matrix_ = calloc(order * order, sizeof(float));
-    for(int i = 0; i < order; i++)
+    m->matrix_ = _mm_malloc(order * order * sizeof(float), ALIGN);
+    memset(m->matrix_, 0, order * order * sizeof(float));
+    for(int i = 0; i < order; ++i)
         m->matrix_[i * order + i] = 1;
     return m;
 }
@@ -36,8 +38,8 @@ struct matrix* get_identity_matrix(int order){
 void print_matrix(struct matrix* m, FILE* out){
     register int order = m->order_;
     fprintf(out, "Order: %d\n", m->order_);
-    for(int i = 0; i < order; i++){
-        for(int j = 0; j < order; j++)
+    for(int i = 0; i < order; ++i){
+        for(int j = 0; j < order; ++j)
             fprintf(out, "%.4f ", m->matrix_[i * order + j]);
         fprintf(out, "\n");
     }
@@ -56,8 +58,8 @@ void copy_matrix(struct matrix* dst, struct matrix* src){
 
 void transpose_matrix(struct matrix* m){
     register int order = m->order_;
-    for(int i = 0; i < order; i++)
-        for(int j = i; j < order; j++){
+    for(int i = 0; i < order; ++i)
+        for(int j = i; j < order; ++j){
             float tmp = m->matrix_[i * order + j];
             m->matrix_[i * order + j] = m->matrix_[j * order + i];
             m->matrix_[j * order + i] = tmp;
@@ -66,30 +68,41 @@ void transpose_matrix(struct matrix* m){
 
 void sum_matrices(struct matrix* a, struct matrix* b){
     register int order = a->order_ * a->order_;
-    for(int i = 0; i < order; i++)
+    for(int i = 0; i < order; ++i)
         a->matrix_[i] += b->matrix_[i];
 }
 
 void sub_matrices(struct matrix* a, struct matrix* b){
     register int order = a->order_ * a->order_;
-    for(int i = 0; i < order; i++)
+    for(int i = 0; i < order; ++i)
         a->matrix_[i] -= b->matrix_[i];
 }
 
 struct matrix* mul_matrices(struct matrix* a, struct matrix* b){
     register int order = a->order_;
     struct matrix* tmp = create_matrix(order);
-    for(int i = 0; i < order; i++)
-        for(int j = 0; j < order; j++)
-            for(int k = 0; k < order; k++)
-                tmp->matrix_[i * order + j] += a->matrix_[i * order + k]
-                    * b->matrix_[k * order + j];
+    for(int i = 0; i < order; ++i)
+        for(int j = 0; j < order; ++j)
+            for(int k = 0; k < order; ++k)
+                tmp->matrix_[i * order + j] += a->matrix_[i * order + k] * b->matrix_[k * order + j];
     return tmp;
 }
 
+struct matrix* mul_matrices_tr_b(struct matrix* a, struct matrix* b){
+    register int order = a->order_;
+    struct matrix* tmp = create_matrix(order);
+    for(int i = 0; i < order; ++i){
+        for (int j = 0; j < order; ++j)
+            for (int k = 0; k < order; ++k)
+                tmp->matrix_[i * order + j] += a->matrix_[i * order + k] * b->matrix_[j * order + k];
+    }
+    return tmp;
+}
+
+
 void mul_matrix_on_scalar(struct matrix* m, float scalar){
     register int order = m->order_ * m->order_;
-    for(int i = 0; i < order; i++)
+    for(int i = 0; i < order; ++i)
         m->matrix_[i] *= scalar;
 }
 
@@ -97,10 +110,10 @@ void get_matrix_norms(struct matrix* m, float* l1_norm, float* max_norm){
     register int order = m->order_;
     *l1_norm = 0;
     *max_norm = 0;
-    for(int i = 0; i < order; i++){
+    for(int i = 0; i < order; ++i){
         float row_sum = 0;
         float col_sum = 0;
-        for(int j = 0; j < order; j++){
+        for(int j = 0; j < order; ++j){
             row_sum += fabsf(m->matrix_[i * order + j]);
             col_sum += fabsf(m->matrix_[j * order + i]);
         }
@@ -126,9 +139,10 @@ struct matrix* invert_matrix(struct matrix* A, int iter_number){
     copy_matrix(R_1_deg, R);
     struct matrix* inv_A = get_identity_matrix(A->order_);
     struct matrix* tmp;
-    for(int i = 0; i < iter_number; i++){
+    transpose_matrix(R_1_deg);
+    for(int i = 0; i < iter_number; ++i){
         sum_matrices(inv_A, R); //I + R^2 + ... + R^(i)
-        tmp = mul_matrices(R, R_1_deg); //R^(i)*R = R^(i+1)
+        tmp = mul_matrices_tr_b(R, R_1_deg); //R^(i)*R = R^(i+1)
         free_matrix(R);
         R = tmp;
     }
