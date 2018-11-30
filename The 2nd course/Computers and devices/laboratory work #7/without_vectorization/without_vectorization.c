@@ -99,7 +99,6 @@ struct matrix* mul_matrices_tr_b(struct matrix* a, struct matrix* b){
     return tmp;
 }
 
-
 void mul_matrix_on_scalar(struct matrix* m, float scalar){
     register int order = m->order_ * m->order_;
     for(int i = 0; i < order; ++i)
