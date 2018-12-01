@@ -43,19 +43,14 @@ void init_random_bypass(int *array, int size){
     array[current_elem] = 0;
 }
 
-ull test_access_speed(int *array, int size){
-    int tmp = 0;
-    for(int j = 0; j < size; j++)
-        tmp = array[tmp];
-    printf("Antioptimization: %d\n", tmp);    //print a value of the tmp for no cutting loop
+ull test_access_speed(volatile int *array, int size){
+    for(int j = 0, k = 0; j < size; j++)
+        k = array[k];
     size *= CYCLES_AMOUNT;
-    tmp = 0;
     ull start = rdtsc();
-    for(int j = 0; j < size; j++){
-        tmp = array[tmp];
-    }
+    for(int j = 0, k = 0; j < size; j++)
+        k = array[k];
     ull end = rdtsc();
-    printf("Antioptimization: %d\n", tmp);    //print a value of the tmp for no cutting loop
     return  end - start;
 }
 

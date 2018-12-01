@@ -131,9 +131,13 @@ struct matrix* invert_matrix(struct matrix* A, int iter_number){
     get_matrix_norms(A, &l1_norm, &max_norm);
     mul_matrix_on_scalar(B, 1.0 / (l1_norm * max_norm));    //A^(T) / (l1 * max) = B
     struct matrix* R = get_identity_matrix(A->order_);
-    struct matrix* BA = mul_matrices(B, A);
+    struct matrix* c_A = create_matrix(A->order_);
+    copy_matrix(c_A, A);
+    transpose_matrix(c_A);
+    struct matrix* BA = mul_matrices_tr_b(B, c_A);
     sub_matrices(R, BA);    //R = I - BA
     free_matrix(BA);
+    free(c_A);
     struct matrix* R_1_deg = create_matrix(A->order_);
     copy_matrix(R_1_deg, R);
     struct matrix* inv_A = get_identity_matrix(A->order_);
@@ -145,7 +149,8 @@ struct matrix* invert_matrix(struct matrix* A, int iter_number){
         free_matrix(R);
         R = tmp;
     }
-    tmp = mul_matrices(inv_A, B);   //(I + R^2 + R^3 + ...)*B
+    transpose_matrix(B);
+    tmp = mul_matrices_tr_b(inv_A, B);   //(I + R^2 + R^3 + ...)*B
     free_matrix(inv_A);
     inv_A = tmp;
     free_matrix(B);

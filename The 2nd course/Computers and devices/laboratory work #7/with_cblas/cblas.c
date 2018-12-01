@@ -1,10 +1,10 @@
-#include <stdio.h>  //printf
-#include <string.h> //memset
-#include <time.h>   //time
-#include <cblas.h>  //cblas_scopy, cblas_sscal, cblas_sgemm
+#include <stdio.h>      //printf
+#include <string.h>     //memset
+#include <time.h>       //time
+#include <cblas.h>      //cblas_scopy, cblas_sscal, cblas_sgemm
 #include <sys/times.h>  //times
-#include <unistd.h> //sysconf
-#include <math.h>   //fabsf
+#include <unistd.h>     //sysconf
+#include <math.h>       //fabsf
 #include <xmmintrin.h>  //_mm_malloc
 #define  ALIGN 16
 
@@ -78,40 +78,34 @@ float* invert_matrix(float* A, int order, int iter_number){
         cblas_saxpy(order * order, 1, R, 1, inv_A, 1);
         cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, order, order, order, 1, R, order, R_1_deg, order, 0, tmp,
                     order);
-        free(R);
+        _mm_free(R);
         R = tmp;
     }
     cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, order, order, order, 1, inv_A, order, B, order, 0.0, tmp,
             order);
-    free(inv_A);
+    _mm_free(inv_A);
     inv_A = tmp;
-    free(B);
-    free(R_1_deg);
+    _mm_free(B);
+    _mm_free(R_1_deg);
     return inv_A;
 }
 
 int main(){
-    struct tms start, finish;
-    long long int clocks_per_sec = sysconf(_SC_CLK_TCK);
     FILE* input = fopen("input.txt", "r");
     FILE* output = fopen("output.txt", "w");
     int N = 0, M = 0;
     fscanf(input, "%d%d", &N, &M);
     float* A = gen_matrix(N, 5.0);
     time_t start_real = time(NULL);
-    times(&start);
     float* inv_A = invert_matrix(A, N, M);
-    times(&finish);
     time_t finish_real = time(NULL);
-    double total_process_time = finish.tms_utime - start.tms_utime;
     float* rez = _mm_malloc(N * N * sizeof(float), ALIGN);
     cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, N, N, N, 1, inv_A, N, A, N, 0, rez, N);
     print_matrix(rez, N, output);
-    printf("Total process time: %lf sec.\n", total_process_time / clocks_per_sec);
     printf("Total real time: %ld sec.\n", finish_real - start_real);
-    free(A);
-    free(inv_A);
-    free(rez);
+    _mm_free(A);
+    _mm_free(inv_A);
+    _mm_free(rez);
     fclose(input);
     fclose(output);
     return 0;
