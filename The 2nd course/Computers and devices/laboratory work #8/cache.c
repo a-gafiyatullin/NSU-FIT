@@ -62,7 +62,7 @@ int main(){
     for(; current_size < MAX_SIZE; current_size += step){
         srand(time(NULL));
         test_array = malloc(sizeof(int) * current_size);
-        //test direct acccess
+        //test direct access
         init_direct_bypass(test_array, current_size);
         ticks_amount = test_access_speed(test_array, current_size);
         printf("Direct bypass, array size: %d, amount of ticks: %llu\n", current_size,
