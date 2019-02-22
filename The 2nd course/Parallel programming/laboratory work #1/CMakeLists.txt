@@ -5,4 +5,6 @@ set(CMAKE_C_STANDARD 11)
 
 include_directories(/usr/include/mpi/)
 
-add_executable(laboratory_work__1 main.c matrix.c)
+add_executable(laboratory_work__1 src/main.c src/matrix.c src/linear_equations.h src/linear_equations.c)
+
+target_link_libraries(laboratory_work__1 m)

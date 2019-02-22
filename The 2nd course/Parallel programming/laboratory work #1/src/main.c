@@ -1,4 +1,4 @@
-#include "src/linear_equations.h"
+#include "linear_equations.h"
 #define EPS 1e-3 //accuracy
 #define T 1e-4  //parameter
 #define DIMM 1200
