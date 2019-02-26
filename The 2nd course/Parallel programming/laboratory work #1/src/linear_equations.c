@@ -1,24 +1,27 @@
 #include "linear_equations.h"
 
-struct matrix* solve_system(struct matrix* A, struct matrix* b, int comm_size, int rank, float eps, float t) {
-    int* recvcounts, *displs;
-    get_borders(b, comm_size, &recvcounts, &displs);
-    int first = displs[rank] / (b->cols_ + b->cols_align_); // get first and last processed row of this process
+struct matrix* solve_system(struct matrix* A, struct matrix* b, int rank, float eps, float t,
+        int* recvcounts, int * displs) {
+    int first = displs[rank] / (b->cols_ + b->cols_align_);
     int last = first + recvcounts[rank] / (b->cols_ + b->cols_align_);
     struct matrix* x = create_matrix(b->rows_, b->cols_);
-    struct matrix* Ax = NULL;
+    float global_norm = 0;
     do {
+        struct matrix* Ax = create_matrix(b->rows_, b->cols_);
+        global_norm = 0;
+        mul_matrices(A, x, Ax, first);  //A*x
+        sub_matrices(Ax, b, first, last);   //A*x - b
+        mul_matrix_on_scalar(Ax, t);        //t(A*x - b)
+        sub_matrices(x, Ax, first, last);   //x(n) - t(A*x - b)
         free_matrix(Ax);
-        Ax = mul_matrices(A, x, first, last);
-        sub_matrices(Ax, b);
-        mul_matrix_on_scalar(Ax, t);
-        sub_matrices(x, Ax);
+        Ax = create_matrix(b->rows_, b->cols_);
+        MPI_Allgatherv(MPI_IN_PLACE, 0, MPI_FLOAT, x->matrix_, recvcounts, displs, MPI_FLOAT, MPI_COMM_WORLD);
+        mul_matrices(A, x, Ax, first);  //A*x(n+1)
+        sub_matrices(Ax, b, first, last);   //A*x(n+1) - b
+        float local_norm = squared_euclid_norm(Ax); // ||A*x(n+1) - b||
+        MPI_Allreduce(&local_norm, &global_norm, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
         free_matrix(Ax);
-        MPI_Allgatherv(MPI_IN_PLACE, 0, MPI_FLOAT, x->matrix_, recvcounts, displs,
-                MPI_FLOAT, MPI_COMM_WORLD);
-        Ax = mul_matrices(A, x, 0, A->rows_);
-        sub_matrices(Ax, b);
-    } while(euclid_norm(Ax) / euclid_norm(b) > eps);
+    } while(sqrt(global_norm) / sqrt(squared_euclid_norm(b)) > eps);
 
     return x;
 }
@@ -35,10 +38,10 @@ void get_borders(struct matrix* m, int comm_size, int** recvcounts, int** displs
     }
 }
 
-struct matrix* gen_system(struct matrix* A, struct matrix* b) {
+struct matrix* gen_system(struct matrix* A, struct matrix* b, int first) {
     for(int i = 0; i < A->rows_; i++) {
         for(int j = 0; j < A->cols_; j++) {
-            *get_element(A, i, j) = (i == j) ? 2.0 : 1.0;
+            *get_element(A, i, j) = (i + first == j) ? 2.0 : 1.0;
         }
     }
 
@@ -48,7 +51,6 @@ struct matrix* gen_system(struct matrix* A, struct matrix* b) {
         *get_element(u, i, 0) = sin((2 * PI * i) / u->rows_);
     }
 
-    struct matrix* tmp = mul_matrices(A, u, 0, A->rows_);
-    copy_matrix(b, tmp);
+    mul_matrices(A, u, b, first);
     return u;
 }
