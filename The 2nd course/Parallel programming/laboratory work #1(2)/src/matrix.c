@@ -90,6 +90,7 @@ void sub_matrices(struct matrix* a, struct matrix* b) {
 void mul_matrices(struct matrix* a, struct matrix* b, struct matrix* c, int first_col) {
     register int rows = a->rows_;
     register int cols = b->cols_;
+    register int mul_amount = b->rows_;
     struct  matrix* tr_b = transpose_matrix(b); //transpose right matrix for better performance of multiplication
     register int ans_real_order = (c->cols_ + c->cols_align_);
     register int a_real_order = (a->cols_ + a->cols_align_);
@@ -99,7 +100,7 @@ void mul_matrices(struct matrix* a, struct matrix* b, struct matrix* c, int firs
         register int a_order = i * a_real_order;
         for (int j = 0; j < cols; ++j) {
             register int b_order = j * b_real_order;
-            for(int k = first_col; k < a->cols_; k++) {
+            for(int k = 0; k < mul_amount; ++k) {
                 c->matrix_[ans_order + j] += a->matrix_[a_order + k] * tr_b->matrix_[b_order + k - first_col];
             }
         }
@@ -110,6 +111,7 @@ void mul_matrices(struct matrix* a, struct matrix* b, struct matrix* c, int firs
 void mul_matrices_tr_b(struct matrix* a, struct matrix* b, struct matrix* c, int first_col) {
     register int rows = a->rows_;
     register int cols = b->rows_;
+    register int mul_amount = b->cols_;
     register int ans_real_order = (c->cols_ + c->cols_align_);
     register int a_real_order = (a->cols_ + a->cols_align_);
     register int b_real_order = (b->cols_ + b->cols_align_);
@@ -118,8 +120,8 @@ void mul_matrices_tr_b(struct matrix* a, struct matrix* b, struct matrix* c, int
         register int a_order = i * a_real_order;
         for (int j = 0; j < cols; ++j) {
             register int b_order = j * b_real_order;
-            for(int k = first_col; k < a->cols_; k++) {
-                c->matrix_[ans_order + j] += a->matrix_[a_order + k] * b->matrix_[b_order + k - first_col];
+            for(int k = 0; k < mul_amount; ++k) {
+                c->matrix_[ans_order + j] += a->matrix_[a_order + k + first_col] * b->matrix_[b_order + k];
             }
         }
     }
