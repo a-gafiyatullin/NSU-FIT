@@ -1,6 +1,15 @@
 #include "matrix.h"
 
 struct matrix* create_matrix(int rows, int cols) {
+    struct matrix* m = non_init_create_matrix(rows, cols);
+    register int order = (m->rows_ + m->rows_align_) * (m->cols_ + m->cols_align_);
+    for(int i = 0; i < order; i++) {
+        m->matrix_[i] = 0;
+    }
+    return m;
+}
+
+struct matrix* non_init_create_matrix(int rows, int cols) {
     struct matrix* m = malloc(sizeof(struct matrix));
     m->rows_ = rows;
     m->cols_ = cols;
@@ -9,9 +18,6 @@ struct matrix* create_matrix(int rows, int cols) {
     //allocate memory with alignment
     m->matrix_ = _mm_malloc((m->rows_ + m->rows_align_) * (m->cols_ + m->cols_align_) * sizeof(float), ALIGN);
     register int order = (m->rows_ + m->rows_align_) * (m->cols_ + m->cols_align_);
-    for(int i = 0; i < order; i++) {
-        m->matrix_[i] = 0;
-    }
     return m;
 }
 
@@ -33,24 +39,22 @@ void print_matrix(struct matrix* m, FILE* out) {
         }
         fprintf(out, "\n");
     }
-    fprintf(out, "\n");
 }
 
-struct matrix* gen_matrix(int rows, int cols) {
+struct matrix* gen_matrix(int rows, int cols, float range) {
     srand(time(NULL));
     struct matrix* tmp = create_matrix(rows, cols);
     for(int i = 0; i < tmp->rows_; i++) {
         for(int j = 0; j < tmp->cols_; j++) {
-            *get_element(tmp, i, j) = (float)(rand() % 1000);
+            *get_element(tmp, i, j) = ((float)rand() / (float)(RAND_MAX)) * range;
         }
     }
     return tmp;
 }
 
 void free_matrix(struct matrix* m) {
-    if(m == NULL) {
+    if(m == NULL)
         return;
-    }
     _mm_free(m->matrix_);
     free(m);
 }
@@ -61,17 +65,6 @@ void copy_matrix(struct matrix* dst, struct matrix* src) {
     dst->cols_ = src->cols_;
     dst->rows_align_ = src->rows_align_;
     dst->cols_align_ = src->cols_align_;
-}
-
-struct matrix* get_submatrix(struct matrix* m, int first, int last) {
-    struct matrix* tmp = create_matrix(last - first, m->cols_);
-    register int cols = m->cols_;
-    for(int i = first; i < last; i++) {
-        for(int j = 0; j < cols; j++) {
-            *get_element(tmp, i - first, j) = *get_element(m, i, j);
-        }
-    }
-    return tmp;
 }
 
 struct matrix* transpose_matrix(struct matrix* m) {
@@ -87,66 +80,49 @@ struct matrix* transpose_matrix(struct matrix* m) {
 }
 
 void sub_matrices(struct matrix* a, struct matrix* b) {
-    register int order = (a->rows_ + a->rows_align_) * (a->cols_ + a->cols_align_) / 4;
+    register int order = (a->rows_+ a->rows_align_) * (a->cols_ + a->cols_align_) / 4;
     __m128* xx = (__m128*)(a->matrix_);
     __m128* yy = (__m128*)(b->matrix_);
-    for(int i = 0; i < order; ++i) {
+    for(int i = 0; i < order; ++i)
         xx[i] = _mm_sub_ps(xx[i], yy[i]);
-    }
 }
 
-struct matrix* mul_matrices(struct matrix* a, struct matrix* b) {
+void mul_matrices(struct matrix* a, struct matrix* b, struct matrix* c, int first_col) {
     register int rows = a->rows_;
     register int cols = b->cols_;
-    register int real_order = (a->cols_ + a->cols_align_) / 4;
     struct  matrix* tr_b = transpose_matrix(b); //transpose right matrix for better performance of multiplication
-    struct matrix* tmp = create_matrix(rows, cols);
-    register int ans_real_order = (tmp->cols_ + tmp->cols_align_);
-    __m128 p, sum;
-    __m128* row = (__m128*)(a->matrix_);
-    __m128* col = (__m128*)(tr_b->matrix_);
+    register int ans_real_order = (c->cols_ + c->cols_align_);
+    register int a_real_order = (a->cols_ + a->cols_align_);
+    register int b_real_order = (tr_b->cols_ + tr_b->cols_align_);
     for(int i = 0; i < rows; ++i) {
+        register int ans_order = i * ans_real_order;
+        register int a_order = i * a_real_order;
         for (int j = 0; j < cols; ++j) {
-            sum = _mm_setzero_ps();
-            for (int k = 0; k < real_order; ++k) {
-                p = _mm_mul_ps(row[i * real_order + k], col[j * real_order + k]);
-                sum = _mm_add_ps(sum, p);
+            register int b_order = j * b_real_order;
+            for(int k = first_col; k < a->cols_; k++) {
+                c->matrix_[ans_order + j] += a->matrix_[a_order + k] * tr_b->matrix_[b_order + k - first_col];
             }
-            p = _mm_movehl_ps(p, sum);
-            sum = _mm_add_ps(sum, p);
-            p = _mm_shuffle_ps(sum, sum, 1);
-            sum = _mm_add_ss(sum, p);
-            _mm_store_ss(&tmp->matrix_[i * ans_real_order + j], sum);
         }
     }
     free_matrix(tr_b);
-    return tmp;
 }
 
-struct matrix* mul_matrices_tr_b(struct matrix* a, struct matrix* b) {
+void mul_matrices_tr_b(struct matrix* a, struct matrix* b, struct matrix* c, int first_col) {
     register int rows = a->rows_;
     register int cols = b->rows_;
-    register int real_order = (a->cols_ + a->cols_align_) / 4;
-    struct matrix* tmp = create_matrix(rows, cols);
-    register int ans_real_order = (tmp->cols_ + tmp->cols_align_);
-    __m128 p, sum;
-    __m128* row = (__m128*)(a->matrix_);
-    __m128* col = (__m128*)(b->matrix_);
+    register int ans_real_order = (c->cols_ + c->cols_align_);
+    register int a_real_order = (a->cols_ + a->cols_align_);
+    register int b_real_order = (b->cols_ + b->cols_align_);
     for(int i = 0; i < rows; ++i) {
+        register int ans_order = i * ans_real_order;
+        register int a_order = i * a_real_order;
         for (int j = 0; j < cols; ++j) {
-            sum = _mm_setzero_ps();
-            for (int k = 0; k < real_order; ++k) {
-                p = _mm_mul_ps(row[i * real_order + k], col[j * real_order + k]);
-                sum = _mm_add_ps(sum, p);
+            register int b_order = j * b_real_order;
+            for(int k = first_col; k < a->cols_; k++) {
+                c->matrix_[ans_order + j] += a->matrix_[a_order + k] * b->matrix_[b_order + k - first_col];
             }
-            p = _mm_movehl_ps(p, sum);
-            sum = _mm_add_ps(sum, p);
-            p = _mm_shuffle_ps(sum, sum, 1);
-            sum = _mm_add_ss(sum, p);
-            _mm_store_ss(&tmp->matrix_[i * ans_real_order + j], sum);
         }
     }
-    return tmp;
 }
 
 void mul_matrix_on_scalar(struct matrix* m, float scalar) {

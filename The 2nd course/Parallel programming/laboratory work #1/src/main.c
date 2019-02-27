@@ -1,7 +1,7 @@
 #include "linear_equations.h"
 #define EPS 1e-3 //accuracy
 #define T 1e-4  //parameter
-#define DIMM 1200
+#define DIMM 2200
 
 int main(int argc, char* argv[]) {
     int comm_size, rank;
@@ -24,11 +24,13 @@ int main(int argc, char* argv[]) {
         printf("Right answer:\n");
         print_matrix(u, stdout);
     }
+
     start = MPI_Wtime();
     struct matrix* x = solve_system(A, b, rank, EPS, T, recvcounts, displs);
-    finish= MPI_Wtime();
+    finish = MPI_Wtime();
+
     if(rank == 0) {
-        printf("Real answer: \n");
+        printf("Real answer:\n");
         print_matrix(x, stdout);
         fprintf(stdout, "Time: %lf sec.\n", finish - start);
     }
