@@ -5,6 +5,7 @@ struct matrix* solve_system(struct matrix* A, struct matrix* b, int rank, float 
     int first = displs[rank] / (b->cols_ + b->cols_align_);
     int last = first + recvcounts[rank] / (b->cols_ + b->cols_align_);
     struct matrix* x = create_matrix(b->rows_, b->cols_);
+    float b_norm = sqrt(squared_euclid_norm(b));
     float global_norm = 0;
     do {
         struct matrix* Ax = create_matrix(b->rows_, b->cols_);
@@ -21,7 +22,7 @@ struct matrix* solve_system(struct matrix* A, struct matrix* b, int rank, float 
         float local_norm = squared_euclid_norm(Ax); // ||A*x(n+1) - b||
         MPI_Allreduce(&local_norm, &global_norm, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
         free_matrix(Ax);
-    } while(sqrt(global_norm) / sqrt(squared_euclid_norm(b)) > eps);
+    } while(sqrt(global_norm) / b_norm > eps);
 
     return x;
 }
