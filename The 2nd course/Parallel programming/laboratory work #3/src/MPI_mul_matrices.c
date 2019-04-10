@@ -4,7 +4,28 @@
 
 #include "MPI_mul_matrices.h"
 
-void create_topology(int **dims, MPI_Comm  *comm_2D, MPI_Comm *comm_X, MPI_Comm *comm_Y) {
+int gcd(int a, int b) {
+    if(a == 0 || b == 0)
+        return a + b;
+    if(a > b)
+        return gcd(a % b, b);
+    else
+        return gcd(a, b % a);
+}
+
+void MPI_create_task(struct matrix **A, struct matrix **B, int cols_per_proc) {
+    int size;
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    int dims[DIMS] = {0};
+    MPI_Dims_create(size, DIMS, dims);
+    int lcm = (dims[X] * dims[Y]) / gcd(dims[X], dims[Y]);
+    printf("X = %d, Y = %d\n", dims[X], dims[Y]);
+    printf("Create matrices with dimensions: %d %d %d\n", lcm * cols_per_proc, lcm * cols_per_proc, lcm * cols_per_proc);
+    *A = gen_matrix(lcm * cols_per_proc, lcm * cols_per_proc);
+    *B = gen_matrix(lcm * cols_per_proc, lcm * cols_per_proc);
+}
+
+void create_topology(int **dims, MPI_Comm *comm_2D, MPI_Comm *comm_X, MPI_Comm *comm_Y) {
     int size;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     /* create a new 2D topology */
@@ -70,7 +91,6 @@ struct matrix *MPI_mul_matrices(struct matrix *A, struct matrix *B) {
     MPI_Comm_rank(comm_2D, &rank);
     MPI_Cart_coords(comm_2D, rank, DIMS, coords);
     if(rank == global_root_rank) {
-        printf("X = %d, Y = %d\n", dims[X], dims[Y]);
         A_rows = A->rows_;
         A_cols = A->cols_;
         B_cols = B->cols_;

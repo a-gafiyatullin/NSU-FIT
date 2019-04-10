@@ -110,8 +110,7 @@ void mul_matrices(struct matrix* a, struct matrix* b, struct matrix* c) {
             sum = _mm_add_ss(sum, p);
             float tmp = 0;
             _mm_store_ss(&tmp, sum);
-            #pragma omp atomic
-                c->matrix_[i * ans_real_order + j] += tmp;
+            c->matrix_[i * ans_real_order + j] += tmp;
         }
     }
     free_matrix(tr_b);

@@ -3,6 +3,7 @@
 //
 
 #ifndef MPI_MUL_MATRICES_H
+#define MPI_MUL_MATRICES_H
 
 #include <mpi.h>
 #include <stdlib.h>
@@ -17,6 +18,7 @@
 //distributed multiplication of the matrices
 struct matrix *MPI_mul_matrices(struct matrix *A, struct matrix *B);
 
-#define MPI_MUL_MATRICES_H
+//create suitable matrix
+void MPI_create_task(struct matrix **A, struct matrix **B, int cols_per_proc);
 
 #endif //MPI_MUL_MATRICES_H

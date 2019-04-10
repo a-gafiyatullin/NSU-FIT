@@ -2,7 +2,7 @@
 #define EPS 1e-3 //accuracy
 #define T 1e-4  //parameter
 #define NUM_THREADS_ARG 1
-#define DIMM 1700
+#define DIMM 2500
 
 int main(int argc, char* argv[]) {
     double start, finish;

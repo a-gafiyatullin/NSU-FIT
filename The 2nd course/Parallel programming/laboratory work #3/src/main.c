@@ -11,20 +11,16 @@ int main(int argc, char *argv[]) {
     /* get A and B matrices dimensions in root process */
     struct matrix *A, *B;
     if(rank == 0) {
-        int A_rows, A_cols, B_cols;
-        fscanf(stdin, "%d%d%d", &A_rows, &A_cols, &B_cols);
-        //A = create_matrix(A_rows, A_cols);
-        //B = create_matrix(A_cols, B_cols);
-        //get_matrix(A, stdin);   /* get part of the A and B matrices in the each process */
-        //get_matrix(B, stdin);
-        A = gen_matrix(A_rows, A_cols);
-        B = gen_matrix(A_cols, B_cols);
+        MPI_create_task(&A, &B, atoi(argv[1]));
         print_matrix(A, stdout);
         print_matrix(B, stdout);
     }
+    double start = MPI_Wtime();
     struct matrix *C = MPI_mul_matrices(A, B);
+    double end = MPI_Wtime();
     if(rank == 0) {
         print_matrix(C, stdout);
+        printf("Total process time: %lf\n", end - start);
     }
 
     MPI_Finalize();
