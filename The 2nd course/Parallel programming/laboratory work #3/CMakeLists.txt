@@ -6,4 +6,4 @@ set(CMAKE_C_COMPILER /usr/bin/mpicc)
 
 include_directories(/usr/include/mpi/)
 
-add_executable(laboratory_work__3 main.c matrix.h matrix.c)
+add_executable(laboratory_work__3 main.c matrix.h matrix.c MPI_mul_matrices.h MPI_mul_matrices.c)

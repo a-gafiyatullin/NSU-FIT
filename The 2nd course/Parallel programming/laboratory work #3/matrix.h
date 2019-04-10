@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h> //malloc
 #include <assert.h> //assert
+#include <time.h>
 
 struct matrix {
     double *matrix_;
@@ -28,6 +29,9 @@ void print_matrix(struct matrix *m, FILE *out);
 //free the memory allocated for the matrix
 void free_matrix(struct matrix *m);
 
+//generate random matrix
+struct matrix *gen_matrix(int rows, int cols);
+
 //-----------------------------Matrix operations--------------------------------
 
 //transpose the matrix
@@ -35,9 +39,6 @@ struct matrix *transpose_matrix(struct matrix* m);
 
 //matrix multiplication
 struct matrix *mul_matrices(struct matrix* a, struct matrix* b);
-
-//matrix multiplication if b is transposed
-struct matrix* mul_matrices_tr_b(struct matrix* a, struct matrix* b);
 
 #define MATRIX_H
 

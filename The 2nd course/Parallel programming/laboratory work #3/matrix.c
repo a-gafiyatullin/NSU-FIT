@@ -18,6 +18,14 @@ void get_matrix(struct matrix *m, FILE *in){
         fscanf(in, "%lf", &m->matrix_[i]);
 }
 
+struct matrix* gen_matrix(int rows, int cols){
+    struct matrix* m = create_matrix(rows, cols);
+    srand(time(NULL));
+    for(int i = 0; i < m->rows_ * m->cols_; ++i)
+        m->matrix_[i] = rand() % 10;
+    return m;
+}
+
 void print_matrix(struct matrix *m, FILE *out) {
     for(int i = 0; i < m->rows_; ++i){
         for(int j = 0; j <  m->cols_; ++j)
