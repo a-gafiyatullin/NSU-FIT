@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "MPI_mul_matrices.h"
-#include "mpi.h"
 
 int main(int argc, char *argv[]) {
     /* initialize environment */
