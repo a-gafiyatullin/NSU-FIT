@@ -1,19 +1,13 @@
 #include <stdio.h>
 #include "jacobi_method.h"
-#define TOTAL_AREAS 50000
+#define TOTAL_AREAS 320
 
-double f(point p, double a) {
-    return p.x * p.x + p.y * p.y + p.z * p.z;
+double f(double x, double y, double z, double a) {
+    return x * x + y * y + z * z;
 }
 
-double p(point p, double a) {
-    return 6 - a * f(p, a);
-}
-
-void print_values(values *val, int size) {
-    for(int i = 0; i < size; i++) {
-        printf("point (%lf, %lf, %lf) = %lf\n", val->p[i].x, val->p[i].y, val->p[i].z, val->value[i]);
-    }
+double p(double x, double y, double z, double a) {
+    return 6 - a * f(x, y, z, a);
 }
 
 int main(int argc, char *argv[]) {
@@ -21,40 +15,42 @@ int main(int argc, char *argv[]) {
     int size, rank;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    area cube;
-    cube.Dx = 2;
-    cube.Dy = 2;
-    cube.Dz = 2;
-    point start_point;
-    start_point.x = -1;
-    start_point.y = -1;
-    start_point.z = -1;
+    double Dx = 2.0;
+    double Dy = 2.0;
+    double Dz = 2.0;
+    double x = -1.0;
+    double y = -1.0;
+    double z = -1.0;
     double a = 100000, e = 1.0e-8;
 
     double start = MPI_Wtime();
-    values *rez = MPI_Jacobi_method(cube, TOTAL_AREAS / size, start_point, a, p, f, e, MPI_COMM_WORLD);
+    double **rez = MPI_Jacobi_method(Dx, Dy, Dz, TOTAL_AREAS / size, x, y, z, a, p, f, e, MPI_COMM_WORLD);
     double end = MPI_Wtime();
 
-    int turn = 0;
-    if(size != 1) {
-        if (rank == 0) {
-            print_values(rez, TOTAL_AREAS / size);
-            MPI_Send(&turn, 1, MPI_INT, 1, 1, MPI_COMM_WORLD);
-        } else if (rank != size - 1) {
-            MPI_Recv(&turn, 1, MPI_INT, rank - 1, rank, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            print_values(rez, TOTAL_AREAS / size);
-            MPI_Send(&turn, 1, MPI_INT, rank + 1, rank + 1, MPI_COMM_WORLD);
-        } else {
-            MPI_Recv(&turn, 1, MPI_INT, rank - 1, rank, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            print_values(rez, TOTAL_AREAS / size);
-            printf("Total time: %lf\n", end - start);
-        }
-    } else {
-        print_values(rez, TOTAL_AREAS / size);
-        printf("Total time: %lf\n", end - start);
+//    double hx = Dx / (TOTAL_AREAS - 1);
+//    double hy = Dy / (TOTAL_AREAS - 1);
+//    double hz = Dz / (TOTAL_AREAS - 1);
+//    int x_dimm_offset = rank * TOTAL_AREAS / size;
+//    for(int k = 0; k < size; k++) {
+//        if(k == rank) {
+//            for (int i = 0; i < TOTAL_AREAS / size; i++) {
+//                for (int j = 0; j < TOTAL_AREAS; j++) {
+//                    for (int l = 0; l < TOTAL_AREAS; l++) {
+//                        printf("f(%lf, %lf, %lf) = %lf\n", x + (x_dimm_offset + i) * hx, y + j * hy, z + l * hz,
+//                                rez[i][j * TOTAL_AREAS + l]);
+//                    }
+//                }
+//            }
+//        }
+//        MPI_Barrier(MPI_COMM_WORLD);
+//    }
+    if(rank == 0) {
+        printf("Total time: %lf sec.\n", end - start);
     }
-    free(rez->value);
-    free(rez->p);
+
+    for(int i = 0; i < TOTAL_AREAS / size; i++) {
+        free(rez[i]);
+    }
     free(rez);
     MPI_Finalize();
     return 0;
