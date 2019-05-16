@@ -9,6 +9,10 @@ queue *q_init_queue() {
     if((q = malloc(sizeof(queue))) == NULL) {
         return NULL;
     }
+    if(pthread_mutex_init(&q->q_mutex, NULL) != 0) {
+        free(q);
+        return NULL;
+    }
     q->q_counter = 0;
     q->q_first_node = NULL;
     q->q_last_node = NULL;
@@ -54,4 +58,22 @@ void *q_pop(queue *q) {
     return data;
 }
 
-inline int q_get_counter(queue *q) { return q->q_counter; }
+int q_get_counter(queue *q, pthread_mutex_t **q_mutex) {
+    pthread_mutex_lock(&q->q_mutex);
+    *q_mutex = &q->q_mutex;
+    return q->q_counter;
+}
+
+void q_free(queue *q, void (*u_free)(void*)) {
+    pthread_mutex_lock(&q->q_mutex);
+    queue_node *current = q->q_first_node;
+    while(current != NULL) {
+        u_free(current->q_data);
+        current = current->q_next_node;
+    }
+    q->q_counter = 0;
+    q->q_first_node = NULL;
+    q->q_last_node = NULL;
+    pthread_mutex_unlock(&q->q_mutex);
+    free(q);
+}

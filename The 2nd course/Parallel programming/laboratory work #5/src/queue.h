@@ -27,6 +27,8 @@ int q_push(queue *q, void *data);
 
 void *q_pop(queue *q);
 
-int q_get_counter(queue *q);
+int q_get_counter(queue *q, pthread_mutex_t **q_mutex);
+
+void q_free(queue *q, void (*u_free)(void*));
 
 #endif //QUEUE_H

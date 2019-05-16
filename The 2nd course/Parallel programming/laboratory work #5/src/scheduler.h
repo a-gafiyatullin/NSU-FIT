@@ -9,21 +9,20 @@
 #include "task.h"
 #include <mpi.h>
 
-#define REQ_TASK 0
-#define REQ_END 1
-#define REQ_IN 1
 #define REQ_OUT 0
-
-#define MINIMAL_IN_QUEUE_TASKS_NUM 2
+#define REQ_IN 1
 
 typedef struct scheduler {
-    queue *q;
+    p_problem *p;
     int comm_size;
     int rank;
+    int send_task_num;
 } scheduler;
 
 void *in_scheduler(void *arg);
 
 void *out_scheduler(void *arg);
+
+void *simple_out_scheduler(void *arg);
 
 #endif //SCHEDULER_H
