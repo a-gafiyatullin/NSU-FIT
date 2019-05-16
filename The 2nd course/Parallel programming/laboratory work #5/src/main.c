@@ -61,8 +61,9 @@ int main(int argc, char *argv[]) {
     pthread_mutex_unlock(p_mutex);
     pthread_join(pthread[OUT_SCHEDULER], NULL);
     pthread_join(pthread[IN_SCHEDULER], NULL);
-    global_rez = p_reduce_result(MPI_COMM_WORLD, p);
     end = MPI_Wtime();
+
+    global_rez = p_reduce_result(MPI_COMM_WORLD, p);
     p_print_result(p->rez);
 
     if(rank == 0) {
