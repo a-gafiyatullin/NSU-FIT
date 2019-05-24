@@ -31,7 +31,12 @@ p_problem *p_init(int task_cycles, int task_num) {
         free(p);
         return NULL;
     }
-    p->p_end_status = 0;
+    if(pthread_cond_init(&p->p_wait_cond, NULL) != 0) {
+        free(p->rez);
+        q_free(p->q, p_free_task);
+        free(p);
+        return NULL;
+    }
     p->task_cycles = task_cycles;
     p->in_q_task_max_num = task_num;
 
@@ -125,15 +130,12 @@ void p_copy_task(p_task *dest, p_task *src) {
     dest->weight = src->weight;
 }
 
-int p_get_end_status(p_problem *p, pthread_mutex_t **p_mutex) {
+pthread_mutex_t *p_wait(p_problem *p) {
     pthread_mutex_lock(&p->p_mutex);
-    *p_mutex = &p->p_mutex;
-
-    return p->p_end_status;
+    pthread_cond_wait(&p->p_wait_cond, &p->p_mutex);
+    return &p->p_mutex;
 }
 
-void p_set_end_status(p_problem *p, pthread_mutex_t **p_mutex) {
-    pthread_mutex_lock(&p->p_mutex);
-    *p_mutex = &p->p_mutex;
-    p->p_end_status = 1;
+void p_signal(p_problem *p) {
+    pthread_cond_signal(&p->p_wait_cond);
 }

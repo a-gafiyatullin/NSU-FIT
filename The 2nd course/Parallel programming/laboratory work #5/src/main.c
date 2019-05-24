@@ -6,8 +6,8 @@
 #define IN_SCHEDULER 0
 #define OUT_SCHEDULER 1
 
-#define TASK_CYCLES 200
-#define IN_Q_TASK_NUM 7000
+#define TASK_CYCLES 1
+#define IN_Q_TASK_NUM 1
 #define SEND_TASK_NUM (IN_Q_TASK_NUM / 100 * 5) //5% of tasks
 
 int main(int argc, char *argv[]) {
@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    pthread_mutex_t *p_mutex;
+    pthread_mutex_t *p_mutex, *q_mutex;
     p_problem *p = p_init(TASK_CYCLES, IN_Q_TASK_NUM);
     if(p == NULL) {
         fprintf(stderr, "p_init: can't initialize tasks!\n");
@@ -47,6 +47,10 @@ int main(int argc, char *argv[]) {
     pthread_create(&pthread[IN_SCHEDULER], NULL, in_scheduler, &schdlr);
     pthread_create(&pthread[OUT_SCHEDULER], NULL, out_scheduler, &schdlr);
     while (1) {
+        if(q_get_counter(schdlr.p->q, &q_mutex) <= schdlr.send_task_num * 2) {
+            p_signal(schdlr.p);
+        }
+        pthread_mutex_unlock(q_mutex);
         if(p_is_any_task_cycles(p, &p_mutex) == 0) {
             break;
         }

@@ -28,14 +28,15 @@ double **MPI_Jacobi_method(double Dx, double Dy, double Dz, int areas_per_proces
     }
     double *prev_neighbour = malloc(count * sizeof(double));
     double *next_neighbour = malloc(count * sizeof(double));
-    double global_max, curr, local_max;
+    double global_max = INT_MAX, curr, local_max = 0, lm = INT_MAX;
 
-    MPI_Request send_request[2], recv_request[2]; /* IPC info */
+    MPI_Request send_request[2], recv_request[2], reduce_rq; /* IPC info */
 
     init_borders(current_val, prev_val, areas_per_process, rank, size, F, a, hx, hy, hz, start_x, start_y, start_z);
 
     int x_dimm_offset = rank * areas_per_process;
 
+    MPI_Iallreduce(&lm, &global_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD, &reduce_rq);
     do {    /* main cycle */
         if(rank != size - 1) { /* init send and recv operations */
             MPI_Isend(current_val[areas_per_process - 1], count, MPI_DOUBLE, rank + 1, 0, comm, &send_request[NEXT_PROC]);
@@ -111,11 +112,13 @@ double **MPI_Jacobi_method(double Dx, double Dy, double Dz, int areas_per_proces
                 }
             }
         }
-        /* check the possibility of the ending */
-        MPI_Allreduce(&local_max, &global_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+        MPI_Wait(&reduce_rq, MPI_STATUS_IGNORE);
         if(global_max < e) {
             break;
         }
+        lm = local_max;
+        /* check the possibility of the ending */
+        MPI_Iallreduce(&lm, &global_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD, &reduce_rq);
     } while(1);
 
     free(prev_neighbour);

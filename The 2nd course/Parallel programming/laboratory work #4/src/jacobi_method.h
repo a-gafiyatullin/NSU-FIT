@@ -4,6 +4,7 @@
 #include <mpi.h>
 #include <stdlib.h>
 #include <math.h>
+#include <limits.h>
 
 #define PREV_PROC 0
 #define NEXT_PROC 1

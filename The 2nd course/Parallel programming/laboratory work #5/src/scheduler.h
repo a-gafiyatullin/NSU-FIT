@@ -12,6 +12,9 @@
 #define REQ_OUT 0
 #define REQ_IN 1
 
+#define REQ_END 0
+#define REQ_TASK 1
+
 typedef struct scheduler {
     p_problem *p;
     int comm_size;

@@ -1,7 +1,3 @@
-//
-// Created by xp10rd on 5/13/19.
-//
-
 #ifndef TASK_H
 #define TASK_H
 
@@ -21,11 +17,11 @@ typedef struct p_result {
 
 typedef struct problem {
     pthread_mutex_t p_mutex;
+    pthread_cond_t p_wait_cond;
     queue *q;
     p_result *rez;
     int task_cycles;
     int in_q_task_max_num;
-    int p_end_status;
     MPI_Datatype task_type;
 } p_problem;
 
@@ -55,8 +51,8 @@ void p_generate_tasks(p_problem *p, int size, int rank, void *coeff);
 
 void p_copy_task(p_task *dest, p_task *src);
 
-int p_get_end_status(p_problem *p, pthread_mutex_t **p_mutex);
+pthread_mutex_t *p_wait(p_problem *p);
 
-void p_set_end_status(p_problem *p, pthread_mutex_t **p_mutex);
+void p_signal(p_problem *p);
 
 #endif //TASK_H
