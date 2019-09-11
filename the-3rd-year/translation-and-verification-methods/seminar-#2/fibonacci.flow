@@ -1,0 +1,25 @@
+import runtime;
+import ds/array;
+import string;
+
+fib(n: int) -> [int] {
+	if(n == 0) []  
+	else if(n == 1) [0] 
+	else if(n == 2) [0, 1] 
+	else {
+		x = fib(n - 1);
+		concat(x, [x[n - 2] + x[n - 3]]);
+	}		
+}
+
+fibt(n: int, fp: ref [int]) -> [int] {
+        if(n <= 2) ^fp 
+	else {
+                fibt(n - 1, { refArrayPush(fp, (^fp)[length(^fp) - 1] + (^fp)[length(^fp) - 2]); fp });
+        }
+}
+
+main() -> void {
+	println(strGlue(map(fib(10), i2s), ","));
+	println(strGlue(map(fibt(10, ref [0, 1]), i2s), ","));
+}

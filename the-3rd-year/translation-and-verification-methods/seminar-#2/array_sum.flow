@@ -1,0 +1,7 @@
+import runtime;
+
+main() {
+        a = [1, 2, 3];
+	println(fold(a, 0, \acc, v -> acc + v));
+}
+

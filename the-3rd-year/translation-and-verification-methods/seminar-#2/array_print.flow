@@ -1,0 +1,11 @@
+import runtime;
+import ds/array;
+import string;
+
+main() {
+	f = i2s;
+	m = map([1,2,3], f);
+	x = strGlue(m, ".");
+	println(x);  
+}
+
