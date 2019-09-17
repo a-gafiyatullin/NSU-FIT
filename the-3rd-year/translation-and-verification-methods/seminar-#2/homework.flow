@@ -1,0 +1,9 @@
+import runtime;
+import ds/array;
+import string;
+
+main() {
+    a : [int] = [6, 5, 2, 9, 1, 6, 3, 7, 4, 12, 3];
+    k = 10;
+    iteri(a, \i, v -> iteri(a, \j, m -> { if(v + m == k) println(i2s(i) + " " + i2s(j));}));
+}
