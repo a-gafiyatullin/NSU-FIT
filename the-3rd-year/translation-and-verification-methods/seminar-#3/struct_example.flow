@@ -1,0 +1,28 @@
+import runtime;
+import string;
+
+NumInd(
+	ind: int,
+	num: int,
+);
+
+inds(ar: [int], m: int) -> [Pair<int, int>] {
+	indexed_ar = fold(ar, Pair([], 0), \acc, n -> {
+							nar = concat(acc.first, [NumInd(acc.second, n)]);
+							Pair(nar, acc.second + 1);
+						}
+	).first;
+	fold(indexed_ar, [], \acc, a -> fold(indexed_ar, acc, \bcc, b -> {
+											if(a.num + b.num != m) bcc
+											else concat(bcc, [Pair(a.ind, b.ind)])
+										}
+									)
+	)
+}
+
+main() -> void {
+	a = [1, 2, 3, 4, 5];
+	m = 5;
+	ar = inds(a, m);
+	iter(ar, \v -> println(i2s(v.first) + " " + i2s(v.second)));
+}

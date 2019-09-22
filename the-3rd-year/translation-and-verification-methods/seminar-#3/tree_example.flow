@@ -1,0 +1,30 @@
+import runtime;
+import ds/tree;
+import string;
+
+inds(ar: [int], m: int) -> [Pair<int, int>] {
+	tree = foldi(ar, makeTree(), \i, acc, n ->
+                                        switch(lookupTree(acc, n)) {
+                                            Some(v) : setTree(acc, n, concat(v, [i]));
+                                            None()  : setTree(acc, n, [i]);
+                                        }
+    )
+    foldi(ar, [], \i, acc, a -> {
+				                    b = m - a;
+				                    switch(lookupTree(tree, b)) {
+					                    Some(v) : concat(acc, fold(v, [], \bcc, n ->
+					                                                                {
+					                                                                    concat(bcc, [Pair(i, n)]);
+					                                                                }));
+					                    None()  : acc;
+				                    }
+			                    }
+	)
+}
+
+main() -> void {
+        a = [1, 2, 3, 4, 5];
+        m = 8;
+        ar = inds(a, m);
+        iter(ar, \v -> println(i2s(v.first) + " " + i2s(v.second)));
+}
