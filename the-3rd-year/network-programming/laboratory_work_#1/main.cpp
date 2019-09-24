@@ -1,6 +1,5 @@
 #include <arpa/inet.h>
 #include <ctime>
-#include <fcntl.h>
 #include <iostream>
 #include <map>
 #include <net/if.h>
@@ -61,10 +60,6 @@ int main(int argc, char *argv[]) {
   int socket_handler = socket(domain, SOCK_DGRAM, 0);
   if (socket_handler < 0) {
     std::perror("socket");
-    return -1;
-  }
-  if (fcntl(socket_handler, F_SETFL, O_NONBLOCK) < 0) {
-    std::perror("fcntl");
     return -1;
   }
 
