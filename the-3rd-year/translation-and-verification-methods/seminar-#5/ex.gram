@@ -1,0 +1,6 @@
+s = plus | mult | int | ws;
+plus = ws "(" ws s:l ws "+" ws s:r ws ")" ws {ArSum(:l, :r)};
+mult = ws "(" ws s:l ws "*" ws s:r ws ")" ws {ArMult(:l, :r)};
+int = digit + $s{ArInt(s2i($s))};
+digit='0'-'9';
+ws=(' ' | '\t' | '\n')*;
