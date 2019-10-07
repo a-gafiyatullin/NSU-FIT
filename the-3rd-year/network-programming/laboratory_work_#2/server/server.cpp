@@ -22,6 +22,17 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
+  if (chdir("uploads") < 0) {
+    if (mkdir("uploads", S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) < 0) {
+      std::perror("mkdir");
+      return -1;
+    }
+    if (chdir("uploads") < 0) {
+      std::perror("chdir");
+      return -1;
+    }
+  }
+
   int server_socket = socket(AF_INET, SOCK_STREAM, 0);
   if (server_socket < 0) {
     std::perror("socket");
