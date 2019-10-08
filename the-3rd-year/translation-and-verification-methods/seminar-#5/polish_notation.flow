@@ -3,13 +3,29 @@ import string;
 import lingo/pegcode/driver;
 
 ArExp ::= ArSum, ArMult, ArInt;
-ArSum(lhs : ArExp, rhs : ArExp);
-ArMult(lhs : ArExp, rhs : ArExp);
-ArInt(val : int);
+ArSum(lhs: ArExp, rhs: ArExp);
+ArMult(lhs: ArExp, rhs: ArExp);
+ArInt(val: int);
 
 s2ar(s: string) -> ArExp {
     gram = "#include ex.gram";
-    parsic(compilePegGrammar(gram), s, defaultPegActions);
+    parsic(compilePegGrammar(gram), s, defaultPegActions)
+}
+
+ar2i(e : ArExp) -> int {
+    switch(e: ArExp) {
+        ArSum(a, b): ar2i(a) + ar2i(b)
+        ArMult(a, b): ar2i(a) * ar2i(b)
+        ArInt(a): a
+    }
+}
+
+ar2s(e : ArExp, str : string) -> string {
+    switch(e: ArExp) {
+        ArSum(a, b): str + ar2s(a, str) + "+" + ar2s(b, str)
+        ArMult(a, b): str + ar2s(a, str) + "*" + ar2s(b, str)
+        ArInt(a): str + i2s(a)
+    }
 }
 
 ArRPN ::= OpRPN, ValRPN;
@@ -20,46 +36,52 @@ MultRPN();
 
 ar2rpn(e: ArExp) -> [ArRPN] {
 	switch(e: ArExp) {
-		ArSum(a, b) : concat(concat([PlusRPN()], ar2rpn(a)), ar2rpn(b));
-		ArMult(a, b) : concat(concat([MultRPN()], ar2rpn(a)), ar2rpn(b));
-		ArInt(a) : [ValRPN(a)];
+		ArSum(a, b): concat(concat([PlusRPN()], ar2rpn(a)), ar2rpn(b))
+		ArMult(a, b): concat(concat([MultRPN()], ar2rpn(a)), ar2rpn(b))
+		ArInt(a): [ValRPN(a)]
 	}
 }
 
 ar2rpnsize(e: ArExp) -> int {
         switch(e: ArExp) {
-                ArSum(a, b) : 1 + ar2rpnsize(a) +  ar2rpnsize(b);
-                ArMult(a, b) : 1 + ar2rpnsize(a) +  ar2rpnsize(b);
-                ArInt(a) : 1;
+                ArSum(a, b): 1 + ar2rpnsize(a) +  ar2rpnsize(b)
+                ArMult(a, b): 1 + ar2rpnsize(a) +  ar2rpnsize(b)
+                ArInt(a): 1
         }
 }
 
-rpn2ar(e : [ArRPN], i : int) -> ArExp {
-	switch(e[i]) {
-		PlusRPN() : {
-		    subtree = rpn2ar(e, i + 1);
-        	len = ar2rpnsize(subtree) + 1;
-		    ArSum(subtree, rpn2ar(e, i + len))
-		};
-		MultRPN() : {
-		    subtree = rpn2ar(e, i + 1);
-    	    len = ar2rpnsize(subtree) + 1;
-		    ArMult(subtree, rpn2ar(e, i + len));
+rpn2ar(e: [ArRPN], i: int) -> Maybe<ArExp> {
+	if(i >= length(e)) {
+		None()
+	} else {
+		switch(e[i]) {
+			PlusRPN(): {
+		    	left = rpn2ar(e, i + 1);
+        		len = maybeBind(left, fn2some(\ v -> ar2rpnsize(v) + 1));
+				right = maybeBind(len, \ v -> rpn2ar(e, i + v));
+				maybeBind(right, \ r -> maybeBind(left, \ l -> Some(ArSum(l, r))))
+			}
+			MultRPN(): {
+		    	left = rpn2ar(e, i + 1);
+        		len = maybeBind(left, fn2some(\ v -> ar2rpnsize(v) + 1));
+				right = maybeBind(len, \ v -> rpn2ar(e, i + v));
+				maybeBind(right, \ r -> maybeBind(left, \ l -> Some(ArMult(l, r))))
+			}
+			ValRPN(a): Some(ArInt(a))
 		}
-		ValRPN(a) : ArInt(a);
 	}
 }
 
-ar2s(e : ArExp, str : string) -> string {
-    switch(e : ArExp) {
-        ArSum(a, b) : str + ar2s(a, str) + "+" + ar2s(b, str);
-        ArMult(a, b) : str + ar2s(a, str) + "*" + ar2s(b, str);
-        ArInt(a) : str + i2s(a);
-    }
+rpn2i(e: [ArRPN]) -> Maybe<int> {
+	ar = rpn2ar(e, 0);
+	switch(ar: Maybe) {
+		None(): None()
+		Some(v): Some(ar2i(v))
+	}
 }
 
 main() {
-    str = "(   1   + (   3   * 3    )    )";
+    str = "(   (5     * 1)   + (   3   * 3    )    )";
     e = s2ar(str);
     r = ar2rpn(e);
     iter(r, \v -> {
@@ -68,6 +90,16 @@ main() {
 				MultRPN() : println("*");
 				ValRPN(a) : println(i2s(a));
 			}
-		  });
-    println(ar2s(rpn2ar(r, 0), ""));
+	});
+
+	switch(rpn2i(r) : Maybe) {
+		None() : println("Wrong expression!");
+		Some(v) : println(i2s(v));
+	}
+
+	z : [ArRPN] = [PlusRPN(), MultRPN(), PlusRPN()];
+	switch(rpn2i(z) : Maybe) {
+		None() : println("Wrong expression!");
+		Some(v) : println(i2s(v));
+	}
 }
