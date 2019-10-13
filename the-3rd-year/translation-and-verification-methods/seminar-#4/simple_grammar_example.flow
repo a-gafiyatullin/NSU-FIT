@@ -1,0 +1,36 @@
+import runtime;
+import string;
+import lingo/pegcode/driver;
+
+ArExp ::= ArSum, ArMult, ArInt;
+ArSum(lhs : ArExp, rhs : ArExp);
+ArMult(lhs : ArExp, rhs : ArExp);
+ArInt(val : int);
+
+ar2i(e : ArExp) -> int {
+    switch(e : ArExp) {
+        ArSum(a, b) : ar2i(a) + ar2i(b);
+        ArMult(a, b) : ar2i(a) * ar2i(b);
+        ArInt(a) : a;
+    }
+}
+
+ar2s(e : ArExp, str : string) -> string {
+    switch(e : ArExp) {
+        ArSum(a, b) : str + ar2s(a, str) + "+" + ar2s(b, str);
+        ArMult(a, b) : str + ar2s(a, str) + "*" + ar2s(b, str);
+        ArInt(a) :str + i2s(a);
+    }
+}
+
+s2ar(s: string) -> ArExp {
+    gram = "#include ex.gram";
+    parsic(compilePegGrammar(gram), s, defaultPegActions);
+}
+
+main() {
+    str = "(   1   + (   3   * 3    )    )";
+    e = s2ar(str);
+    println(ar2i(e));
+    println(ar2s(e, ""));
+}
