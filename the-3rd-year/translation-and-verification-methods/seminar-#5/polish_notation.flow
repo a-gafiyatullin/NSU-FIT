@@ -56,14 +56,14 @@ rpn2ar(e: [ArRPN], i: int) -> Maybe<ArExp> {
 	} else {
 		switch(e[i]) {
 			PlusRPN(): {
-		    	left = rpn2ar(e, i + 1);
-        		len = maybeBind(left, fn2some(\ v -> ar2rpnsize(v) + 1));
+				left = rpn2ar(e, i + 1);
+				len = maybeBind(left, fn2some(\ v -> ar2rpnsize(v) + 1));
 				right = maybeBind(len, \ v -> rpn2ar(e, i + v));
 				maybeBind(right, \ r -> maybeBind(left, \ l -> Some(ArSum(l, r))))
 			}
 			MultRPN(): {
-		    	left = rpn2ar(e, i + 1);
-        		len = maybeBind(left, fn2some(\ v -> ar2rpnsize(v) + 1));
+				left = rpn2ar(e, i + 1);
+				len = maybeBind(left, fn2some(\ v -> ar2rpnsize(v) + 1));
 				right = maybeBind(len, \ v -> rpn2ar(e, i + v));
 				maybeBind(right, \ r -> maybeBind(left, \ l -> Some(ArMult(l, r))))
 			}

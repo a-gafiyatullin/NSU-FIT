@@ -14,7 +14,7 @@ private:
   std::vector<std::pair<pthread_t *, ClientProcessing *>> clientThreads;
 
 public:
-  Server(in_port_t port);
+  explicit Server(in_port_t port);
 
   int bind();
 

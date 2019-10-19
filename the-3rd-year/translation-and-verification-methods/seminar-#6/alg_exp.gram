@@ -1,0 +1,11 @@
+s = plus | mult | int | var | ws | sub | div | unarsub;
+plus = "(" s:l "+" s:r ")" {AlgSum(:l, :r)};
+mult = "(" s:l "*" s:r ")" {AlgMult(:l, :r)};
+sub = "(" s:l  "-" s:r ")" {AlgSub(:l, :r)};
+div = "(" s:l "/" s:r ")" {AlgDiv(:l, :r)};
+unarsub = "(" "-" s ")" {AlgUnarSub($s)};
+var = letter + $s{AlgVar($s)};
+int = digit + $s{AlgInt(s2i($s))};
+digit='0'-'9';
+letter = 'a'-'z';
+ws=(' ' | '\t' | '\n')*;

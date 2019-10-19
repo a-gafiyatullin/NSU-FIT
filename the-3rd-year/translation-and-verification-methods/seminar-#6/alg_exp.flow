@@ -1,0 +1,49 @@
+import runtime;
+import string;
+import lingo/pegcode/driver;
+
+AlgExp ::= AlgVar, AlgSum, AlgMult, AlgInt, AlgSub, AlgDiv, AlgUnarSub;
+AlgVar(var: string);
+AlgSum(lhs: AlgExp, rhs: AlgExp);
+AlgMult(lhs: AlgExp, rhs: AlgExp);
+AlgSub(lhs: AlgExp, rhs: AlgExp);
+AlgDiv(lhs: AlgExp, rhs: AlgExp);
+AlgUnarSub(val : AlgExp);
+AlgInt(val: int);
+
+s2alg(s: string) -> AlgExp {
+    gram = "#include alg_exp.gram";
+    parsic(compilePegGrammar(gram), s, defaultPegActions)
+}
+
+alg2i(e: AlgExp, var_vals: Tree<string, int>) -> Maybe<int> {
+    switch(e: AlgExp) {
+        AlgVar(val): switch(lookupTree(var_vals, val)) {
+            None() : None()
+            Some(v) : Some(v)
+        }
+        AlgInt(val): Some(val)
+        AlgSum(l, r): maybeBind(alg2i(l, var_vals), \ v1 -> maybeBind(alg2i(r, var_vals), \ v2 -> Some(v1 + v2)))
+        AlgMult(l, r): maybeBind(alg2i(l, var_vals), \ v1 -> maybeBind(alg2i(r, var_vals), \ v2 -> Some(v1 * v2)))
+        AlgSub(l, r): maybeBind(alg2i(l, var_vals), \ v1 -> maybeBind(alg2i(r, var_vals), \ v2 -> Some(v1 - v2)))
+        AlgDiv(l, r): maybeBind(alg2i(l, var_vals), \ v1 -> maybeBind(alg2i(r, var_vals), \ v2 -> {
+                                                                                                    if(v2 == 0)
+                                                                                                        None()
+                                                                                                    else
+                                                                                                        Some(v1 / v2)})
+        )
+        AlgUnarSub(val): maybeBind(alg2i(val, var_vals), \ v1 -> Some(-v1))
+    }
+}
+
+main() {
+    str = "(-(3 + 5))";
+    e = s2alg(str);
+    val_tree = makeTree();
+    tree1 = setTree(val_tree, "x", 10);
+    tree2 = setTree(tree1, "y", 20);
+    switch(alg2i(e, tree2)) {
+        None() : println("Wrong expression!")
+        Some(v) : println(i2s(v))
+    }
+}

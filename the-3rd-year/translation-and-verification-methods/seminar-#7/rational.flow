@@ -1,0 +1,220 @@
+import runtime;
+import string;
+import lingo/pegcode/driver;
+import math/math;
+
+AlgExp ::= AlgVar, AlgSum, AlgMult, AlgInt, AlgSub, AlgDiv, AlgUnarSub;
+AlgVar(var: string);
+AlgSum(lhs: AlgExp, rhs: AlgExp);
+AlgMult(lhs: AlgExp, rhs: AlgExp);
+AlgSub(lhs: AlgExp, rhs: AlgExp);
+AlgDiv(lhs: AlgExp, rhs: AlgExp);
+AlgUnarSub(val: AlgExp);
+AlgInt(val: int);
+
+s2alg(s: string) -> AlgExp {
+    gram = "#include alg_exp.gram";
+    parsic(compilePegGrammar(gram), s, defaultPegActions)
+}
+
+RatNum(num: int, den: int);
+
+sumRat(left: RatNum, right: RatNum) -> RatNum {
+    newden = lcm(left.den, right.den);
+    newleft = left.num * newden / left.den;
+    newright = right.num * newden / right.den;
+    newnum = newleft + newright;
+    RatNum(newnum / gcd(newnum, newden), newden / gcd(newnum, newden))
+}
+
+multRat(left: RatNum, right: RatNum) -> RatNum {
+    newnum = left.num * right.num;
+    newden = left.den * right.den;
+    RatNum(newnum / gcd(newnum, newden), newden / gcd(newnum, newden))
+}
+
+divRat(left: RatNum, right: RatNum) -> RatNum {
+    newnum = left.num * right.den;
+    newden = left.den * right.num;
+    RatNum(newnum / gcd(newnum, newden), newden / gcd(newnum, newden))
+}
+
+negRat(x: RatNum) -> RatNum {
+    RatNum(-x.num, x.den);
+}
+
+alg2i(e: AlgExp, var_vals: Tree<string, int>) -> Maybe<RatNum> {
+    switch(e: AlgExp) {
+        AlgVar(val): switch(lookupTree(var_vals, val)) {
+            None(): None()
+            Some(v): Some(RatNum(v, 1))
+        }
+        AlgInt(val): Some(RatNum(val, 1))
+        AlgSum(l, r): maybeBind(alg2i(l, var_vals), \ v1 -> maybeBind(alg2i(r, var_vals), \ v2 -> Some(sumRat(v1 , v2))))
+        AlgMult(l, r): maybeBind(alg2i(l, var_vals), \ v1 -> maybeBind(alg2i(r, var_vals), \ v2 -> Some(multRat(v1, v2))))
+        AlgSub(l, r): maybeBind(alg2i(l, var_vals), \ v1 -> maybeBind(alg2i(r, var_vals), \ v2 -> Some(sumRat(v1, negRat(v2)))))
+        AlgDiv(l, r): maybeBind(alg2i(l, var_vals), \ v1 -> maybeBind(alg2i(r, var_vals), \ v2 -> {
+                                                                                                    if(v2.num == 0)
+                                                                                                        None()
+                                                                                                    else
+                                                                                                        Some(divRat(v1, v2))})
+        )
+        AlgUnarSub(val): maybeBind(alg2i(val, var_vals), \ v1 -> Some(negRat(v1)))
+    }
+}
+
+diff(e: AlgExp, v: string) -> AlgExp {
+    switch(e: AlgExp) {
+        AlgSum(l , r): AlgSum(diff(l, v), diff(r, v))
+        AlgSub(l, r): AlgSub(diff(l, v), diff(r, v))
+        AlgMult(l, r): AlgSum(AlgMult(diff(l, v), r), AlgMult(l, diff(r, v)))
+        AlgDiv(l, r): AlgDiv(AlgSub(AlgMult(diff(l, v), r), AlgMult(l, diff(r, v))), AlgMult(r, r))
+        AlgUnarSub(val): AlgUnarSub(diff(val, v))
+        AlgInt(val): AlgInt(0)
+        AlgVar(val): if(val == v) { AlgInt(1) } else { AlgInt(0) }
+    }
+}
+
+alg2s(e: AlgExp) -> string {
+    switch(e: AlgExp) {
+        AlgSum(l , r): "(" + alg2s(l) + "+" + alg2s(r) + ")"
+        AlgSub(l, r): "(" + alg2s(l) + "-" + alg2s(r) + ")"
+        AlgMult(l, r): "(" + alg2s(l) + "*" + alg2s(r) + ")"
+        AlgDiv(l, r): "(" + alg2s(l) + "/" + alg2s(r) + ")"
+        AlgUnarSub(val): "(" + "-" + alg2s(val) + ")"
+        AlgInt(val): i2s(val)
+        AlgVar(val): val
+    }
+}
+
+// ------------------------------- SIMPLIFYING FUNCTIONS -------------------------------
+
+sum2smpl(nl: AlgExp, nr: AlgExp) -> AlgExp {
+    switch(nl: AlgExp) {
+        AlgInt(v1): switch(nr: AlgExp) {
+            AlgInt(v2): AlgInt(v1 + v2)
+            default: {
+                if(v1 == 0) {
+                    nr
+                } else {
+                    AlgSum(nl, nr)
+                }
+            }
+        }
+        default: switch(nr: AlgExp) {
+            AlgInt(v2): {
+                if(v2 == 0) {
+                    nl
+                } else {
+                    AlgSum(nl, nr)
+                }
+            }
+            default: AlgSum(nl, nr)
+        }
+    }
+}
+
+sub2smpl(nl: AlgExp, nr: AlgExp) -> AlgExp {
+    switch(nl: AlgExp) {
+        AlgInt(v1): switch(nr: AlgExp) {
+            AlgInt(v2): AlgInt(v1 - v2)
+            default: {
+                if(v1 == 0) {
+                    nr
+                } else {
+                    AlgSub(nl, nr)
+                }
+            }
+        }
+        default: switch(nr: AlgExp) {
+            AlgInt(v2): {
+                if(v2 == 0) {
+                    nl
+                } else {
+                    AlgSub(nl, nr)
+                }
+            }
+            default: AlgSub(nl, nr)
+        }
+    }
+}
+
+mult2smpl(nl: AlgExp, nr: AlgExp) -> AlgExp {
+    switch(nl: AlgExp) {
+        AlgInt(v1): switch(nr: AlgExp) {
+            AlgInt(v2): AlgInt(v1 * v2)
+            default: {
+                if(v1 == 0) AlgInt(0)
+                else if(v1 == 1) nr
+                else AlgMult(nl, nr)
+            }
+        }
+        default: switch(nr: AlgExp) {
+            AlgInt(v2): {
+                if(v2 == 0) AlgInt(0)
+                else if(v2 == 1) nl
+                else AlgMult(nl, nr)
+            }
+            default: AlgMult(nl, nr)
+        }
+    }
+}
+
+div2smpl(nl: AlgExp, nr: AlgExp) -> AlgExp {
+    switch(nl: AlgExp) {
+        AlgInt(v1): switch(nr: AlgExp) {
+            AlgInt(v2): AlgInt(v1 / v2)
+            default: {
+                if(v1 == 0) AlgInt(0)
+                else AlgMult(nl, nr)
+            }
+        }
+        default: switch(nr: AlgExp) {
+            AlgInt(v2): {
+                if(v2 == 1) AlgInt(0)
+                else AlgMult(nl, nr)
+            }
+            default: AlgDiv(nl, nr)
+        }
+    }
+}
+
+alg2simple(e: AlgExp) -> AlgExp {
+    switch(e: AlgExp) {
+        AlgSum(l, r): {
+            nl = alg2simple(l);
+            nr = alg2simple(r);
+            sum2smpl(nl, nr)
+        }
+        AlgSub(l, r): {
+            nl = alg2simple(l);
+            nr = alg2simple(r);
+            sub2smpl(nl, nr)
+        }
+        AlgMult(l, r): {
+            nl = alg2simple(l);
+            nr = alg2simple(r);
+            mult2smpl(nl, nr)
+        }
+        AlgDiv(l, r) : {
+            nl = alg2simple(l);
+            nr = alg2simple(r);
+            div2smpl(nl, nr)
+        }
+        default: e
+    }
+}
+
+main() {
+    str = "((x+1)*(x-1))";
+    ne = s2alg(str);
+    e = alg2simple(diff(ne, "x"));
+    val_tree = makeTree();
+    tree1 = setTree(val_tree, "x", 10);
+    tree2 = setTree(tree1, "y", 20);
+    switch(alg2i(e, tree2)) {
+        None() : println("Wrong expression!")
+        Some(v) : println(i2s(v.num) + "/" + i2s(v.den))
+    }
+    println(alg2s(e));
+}
