@@ -1,0 +1,111 @@
+import runtime;
+import string;
+import lingo/pegcode/driver;
+import math/math;
+
+AlgExp ::= AlgVar, AlgSum, AlgMult, AlgInt, AlgSub, AlgDiv, AlgUnarSub;
+AlgVar(var: string);
+AlgSum(lhs: AlgExp, rhs: AlgExp);
+AlgMult(lhs: AlgExp, rhs: AlgExp);
+AlgSub(lhs: AlgExp, rhs: AlgExp);
+AlgDiv(lhs: AlgExp, rhs: AlgExp);
+AlgUnarSub(val: AlgExp);
+AlgInt(val: int);
+
+s2alg(s: string) -> AlgExp {
+    gram = "#include alg_exp.gram";
+    parsic(compilePegGrammar(gram), s, defaultPegActions)
+}
+
+RatNum(num: int, den: int);
+
+sumRat(left: RatNum, right: RatNum) -> RatNum {
+    newden = lcm(left.den, right.den);
+    newleft = left.num * newden / left.den;
+    newright = right.num * newden / right.den;
+    newnum = newleft + newright;
+    RatNum(newnum / gcd(newnum, newden), newden / gcd(newnum, newden))
+}
+
+multRat(left: RatNum, right: RatNum) -> RatNum {
+    newnum = left.num * right.num;
+    newden = left.den * right.den;
+    RatNum(newnum / gcd(newnum, newden), newden / gcd(newnum, newden))
+}
+
+RatFunc(num: PolySum, den: PolySum);
+PolySum(sum: Tree<PolyProd, RatNum>);
+PolyProd(prod: Tree<string, int>);
+
+multPolySum(l: PolySum, r: PolySum) -> PolySum {
+    PolySum(foldTree(l.sum, makeTree(), \ polyprod, coef, acc -> {
+        mergeTreeCustom(acc, foldTree(r.sum, makeTree(), \ polyprod1, coef1, acc1 -> {
+            setTree(acc1, PolyProd(mergeTreeCustom(polyprod.prod, polyprod1.prod, \ var, deg, deg1 -> { 
+                deg + deg1
+            })), multRat(coef, coef1))
+        }), \ tree, coef2, coef3 -> { sumRat(coef, coef3) })
+    }))
+}
+
+sumPolySum(l: PolySum, r: PolySum) -> PolySum {
+    PolySum(mergeTreeCustom(l.sum, r.sum, \ polyprod, coef, coef1 -> { sumRat(coef, coef1) }))
+}
+
+multRatFunc(l: RatFunc, r: RatFunc) -> RatFunc {
+    RatFunc(multPolySum(l.num, r.num), multPolySum(l.den, r.den))
+}
+
+sumRatFunc(l: RatFunc, r: RatFunc) -> RatFunc {
+    den = multPolySum(l.den, r.den);
+    num = sumPolySum(multPolySum(l.num, r.den), multPolySum(l.den, r.num));
+    RatFunc(num, den)
+}
+
+unarSubRatFunc(val: RatFunc) -> RatFunc {
+    RatFunc(PolySum(foldTree(val.num.sum, makeTree(), \ polyprod, coef, acc -> {
+        setTree(acc, polyprod, RatNum(-coef.num, coef.den))
+    })), val.den)
+}
+
+alg2rat(e: AlgExp) -> RatFunc {
+    switch(e: AlgExp) {
+        AlgSum(l, r): sumRatFunc(alg2rat(l), alg2rat(r))
+        AlgMult(l, r): multRatFunc(alg2rat(l), alg2rat(r))
+        AlgSub(l, r): sumRatFunc(alg2rat(l), alg2rat(AlgUnarSub(r)))
+        AlgDiv(l, r): {
+            nr = alg2rat(r);
+            multRatFunc(alg2rat(l), RatFunc(nr.den, nr.num))
+        }
+        AlgUnarSub(val): unarSubRatFunc(alg2rat(val))
+        AlgInt(val): RatFunc(PolySum(makeTree1(PolyProd(makeTree()), RatNum(val, 1))), PolySum(makeTree1(PolyProd(makeTree()), RatNum(1, 1))))
+        AlgVar(val): RatFunc(PolySum(makeTree1(PolyProd(makeTree1(val, 1)), RatNum(1, 1))), PolySum(makeTree1(PolyProd(makeTree()), RatNum(1, 1))))
+    }
+}
+
+ratnum2str(e: RatNum) -> string {
+    if(e.num == 1) ""
+    else if(e.den == 1) i2s(e.num)
+    else "(" + i2s(e.num) + "/" + i2s(e.den) + ")"
+}
+
+poly2str(e: PolySum) -> string {
+    str = foldTree(e.sum, "", \ polyprod, coef, poly -> {
+        poly + "+" + ratnum2str(coef) + foldTree(polyprod.prod, "", \ var, deg, prod -> {
+            if(deg == 0) prod
+            else if(deg == 1) prod + var
+            else prod + var + "^(" + i2s(deg) + ")"
+        })
+    });
+    strSubRange(str, 1, strlen(str)) 
+}
+
+rat2str(e: RatFunc) -> string {
+    "(" + poly2str(e.num) + ")" + "/" + "(" + poly2str(e.den) + ")"
+}
+
+main() {
+    str = "(((x*z)+((a*(b/c))/(4*x)))/((y+1)+(((2*r)+a)/(x*z))))";
+    alg = s2alg(str);
+    rat = alg2rat(alg);
+    println(rat2str(rat))
+}
