@@ -19,24 +19,34 @@ s2alg(s: string) -> AlgExp {
 
 RatNum(num: int, den: int);
 
+ratNumNormalizeSign(r: RatNum) -> RatNum {
+    if(r.num * r.den > 0) {
+        if(r.num > 0) r
+        else RatNum(-r.num, -r.den)
+    } else {
+        if(r.den < 0) RatNum(-r.num, -r.den)
+        else r
+    }
+}
+
 sumRat(left: RatNum, right: RatNum) -> RatNum {
     newden = lcm(left.den, right.den);
     newleft = left.num * newden / left.den;
     newright = right.num * newden / right.den;
     newnum = newleft + newright;
-    RatNum(newnum / gcd(newnum, newden), newden / gcd(newnum, newden))
+    ratNumNormalizeSign(RatNum(newnum / gcd(newnum, newden), newden / gcd(newnum, newden)))
 }
 
 multRat(left: RatNum, right: RatNum) -> RatNum {
     newnum = left.num * right.num;
     newden = left.den * right.den;
-    RatNum(newnum / gcd(newnum, newden), newden / gcd(newnum, newden))
+    ratNumNormalizeSign(RatNum(newnum / gcd(newnum, newden), newden / gcd(newnum, newden)))
 }
 
 divRat(left: RatNum, right: RatNum) -> RatNum {
     newnum = left.num * right.den;
     newden = left.den * right.num;
-    RatNum(newnum / gcd(newnum, newden), newden / gcd(newnum, newden))
+    ratNumNormalizeSign(RatNum(newnum / gcd(newnum, newden), newden / gcd(newnum, newden)))
 }
 
 ratNum2str(e: RatNum) -> string {
@@ -55,16 +65,22 @@ PolyProd(prod: Tree<string, int>);
 
 multPolySum(l: PolySum, r: PolySum) -> PolySum {
     PolySum(foldTree(l.sum, makeTree(), \ curr_prod, coef, acc_prod -> {
-        mergeTreeCustom(acc_prod, foldTree(r.sum, makeTree(), \ curr_prod1, coef1, acc_prod1 -> {
-            setTree(acc_prod1, PolyProd(mergeTreeCustom(curr_prod.prod, curr_prod1.prod, \ var, deg, deg1 -> { 
+        sumPolySum(PolySum(acc_prod), PolySum(foldTree(r.sum, makeTree(), \ curr_prod1, coef1, acc_prod1 -> {
+            setTree(acc_prod1, PolyProd(mergeTreeCustom(curr_prod.prod, curr_prod1.prod, \ var, deg, deg1 -> {
                 deg + deg1
             })), multRat(coef, coef1))
-        }), \ tree, coef2, coef3 -> { sumRat(coef2, coef3) })
+        }))).sum
     }))
 }
 
 sumPolySum(l: PolySum, r: PolySum) -> PolySum {
     PolySum(mergeTreeCustom(l.sum, r.sum, \ curr_prod, coef, coef1 -> { sumRat(coef, coef1) }))
+}
+
+divPolySumRatNum(l: PolySum, r: RatNum) -> PolySum {
+    PolySum(foldTree(l.sum, makeTree(), \ curr_prod, coef, acc_prod -> {
+        setTree(acc_prod, curr_prod, divRat(coef, r))
+    }))
 }
 
 multRatFunc(l: RatFunc, r: RatFunc) -> RatFunc {
@@ -106,11 +122,17 @@ poly2str(e: PolySum) -> string {
             else acc_var + curr_var + "^(" + i2s(deg) + ")"
         })
     });
-    strSubRange(str, 1, strlen(str)) 
+    strSubRange(str, 1, strlen(str))
 }
 
 rat2str(e: RatFunc) -> string {
-    "(" + poly2str(e.num) + ")" + "/" + "(" + poly2str(e.den) + ")"
+    num = poly2str(e.num);
+    den = poly2str(e.den);
+    if(strlen(den) == 0) {
+        "(" + num + ")"
+    } else {
+        "(" + num + ")" + "/" + "(" + den + ")"
+    }
 }
 
 simplifyrat(e: RatFunc) -> RatFunc {
@@ -128,7 +150,7 @@ simplifyrat(e: RatFunc) -> RatFunc {
     });
     gcd_rat_num = foldTree(e.num.sum, init_prod_num.second, \ prod, curr_coef, acc_coef -> {
         gcdRatNum(acc_coef, curr_coef)
-    })
+    });
     init_prod_den = switch(popmax(e.den.sum)) {
         EmptyPopResult(): Pair(PolyProd(makeTree()), RatNum(0, 0))
         PopResult(k, v, rest): Pair(k, v)
@@ -143,7 +165,7 @@ simplifyrat(e: RatFunc) -> RatFunc {
     });
     gcd_rat_den = foldTree(e.den.sum, init_prod_num.second, \ prod, curr_coef, acc_coef -> {
         gcdRatNum(acc_coef, curr_coef)
-    })
+    });
     gcd_rat = Pair(foldTree(gcd_prod_num, makeTree(), \ var, deg, prod -> {
         switch(lookupTree(gcd_prod_den, var)) {
             None(): prod
@@ -167,11 +189,23 @@ simplifyrat(e: RatFunc) -> RatFunc {
             }
         })), divRat(coef, gcd_rat.second))
     });
-    RatFunc(PolySum(new_num), PolySum(new_den))
+    new_den_without_zeros = foldTree(new_den, makeTree(), \ curr_prod, coef, acc_prod -> {
+        if(coef.num == 0) acc_prod else setTree(acc_prod, curr_prod, coef)
+    });
+    new_num_without_zeros = foldTree(new_num, makeTree(), \ curr_prod, coef, acc_prod -> {
+        if(coef.num == 0) acc_prod else setTree(acc_prod, curr_prod, coef)
+    });
+    if(divPolySumRatNum(PolySum(new_num_without_zeros), gcd_rat_num) == divPolySumRatNum(PolySum(new_den_without_zeros), gcd_rat_den)) {
+        RatFunc(PolySum(makeTree1(PolyProd(makeTree()), divRat(gcd_rat_num, gcd_rat_den))), PolySum(makeTree1(PolyProd(makeTree()), RatNum(1, 1))))
+    } else {
+        RatFunc(PolySum(new_num_without_zeros), PolySum(new_den_without_zeros))
+    }
 }
 
 main() {
-    str = "((4*(((x*z)/(((2*x)*q)-10))+((a*(b/c))/(4*x))))/(8*((y+1)+((((2*r)+a)/(x*z))-(5*x)))))";
+    str = "((((4*a)*a)-9)*((1/((2*a)-3))-(1/((2*a)+3))))";
+    //str = "(((((9*x)*x)-4)/((3*x)+2))-(3*x))";
+    //str = "(((x-5)*(x-4))/((x-4)*((2*x)-10)))";
     alg = s2alg(str);
     rat = simplifyrat(alg2rat(alg));
     println(rat2str(rat))
