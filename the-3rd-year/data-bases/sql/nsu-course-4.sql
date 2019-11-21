@@ -60,7 +60,6 @@ FROM (SELECT department_id, AVG(salary) AS avg_salary, CEIL((AVG(salary) * 100) 
 GROUP BY department_id
 ORDER BY department_id, avg_salary, frac
 -------------------------------------------------------------------------№7-------------------------------------------------------------------------
-Вообще не понял формулировку.
 SELECT first_name, COUNT(first_name) AS cnt
 FROM employees
 GROUP BY first_name
@@ -87,14 +86,27 @@ WHERE department_id = (SELECT department_id
                              ORDER BY cnt)
                        WHERE rownum = 1)
 -------------------------------------------------------------------------№11-------------------------------------------------------------------------
-Как понять "Вывести однофамильцев"? При COUNT(*) > 2 это решение выдает пустую таблицу.
 SELECT last_name, COUNT(*)
 FROM employees
 GROUP BY last_name
 HAVING COUNT(*) > 1
 ORDER BY last_name
 -------------------------------------------------------------------------№12-------------------------------------------------------------------------
-Что такое "средняя зарплата работника"?
+SELECT country_id, employee_id
+FROM (SELECT country_id, MAX(salary) AS max_salary
+      FROM emp_details_view
+      WHERE country_id IN (SELECT country_id AS count
+                           FROM departments D
+                           INNER JOIN locations L ON D.location_id = L.location_id
+                           GROUP BY country_id HAVING COUNT(department_id) = (SELECT MAX(count)
+                                                                              FROM (SELECT country_id, COUNT(department_id) AS count
+                                                                                    FROM departments D
+                                                                                    INNER JOIN locations L ON D.location_id = L.location_id
+                                                                                    GROUP BY country_id)))
+      GROUP BY country_id)
+INNER JOIN emp_details_view USING (country_id)
+WHERE salary = max_salary
+ORDER BY country_id
 -------------------------------------------------------------------------№13-------------------------------------------------------------------------
 А если таких работников в одной стране несколько? Решение пытается учесть этот нюанс.
 SELECT manager_id

@@ -97,22 +97,21 @@ SELECT street_address FROM locations WHERE city LIKE '%Tokyo%'
 -------------------------------------------------------------------------№8-------------------------------------------------------------------------
 SELECT DISTINCT department_name, job_title FROM emp_details_view
 -------------------------------------------------------------------------№9-------------------------------------------------------------------------
-SELECT department_id, COUNT(department_id)
-FROM (SELECT department_id
-      FROM ((SELECT manager_id as m_id, COUNT(employee_id) AS emp_count
-             FROM emp_details_view GROUP BY manager_id) manager_emp_count)
-      INNER JOIN emp_details_view ON emp_details_view.employee_id = manager_emp_count.m_id)
-GROUP BY department_id ORDER BY department_id
+SELECT D.department_id, COUNT(employee_id)
+FROM (SELECT employee_id, department_id
+      FROM employees
+      WHERE employee_id IN (SELECT manager_id as m_id
+                     FROM employees
+                     GROUP BY manager_id)) E
+RIGHT JOIN departments D ON D.department_id = E.department_id
+GROUP BY D.department_id
+ORDER BY 1
+
 -------------------------------------------------------------------------№10------------------------------------------------------------------------
-SELECT dep_id, dep_name, COUNT(dep_id)
-      FROM (SELECT dep_id, (SELECT department_name
-                            FROM departments
-                            WHERE department_id = dep_id) AS dep_name
-            FROM (SELECT department_id as dep_id
-                  FROM employees))
-WHERE dep_id IS NOT NULL
-GROUP BY dep_id, dep_name
-ORDER BY dep_id, dep_name, COUNT(dep_id)
+SELECT departments.department_id, departments.department_name, COUNT(employee_id)
+FROM departments LEFT JOIN employees ON departments.department_id = employees.department_id
+GROUP BY departments.department_id, departments.department_name
+ORDER BY 1
 -------------------------------------------------------------------------№11------------------------------------------------------------------------
 SELECT country_id, country_name, COUNT(department_id)
 FROM departments
@@ -126,16 +125,15 @@ FROM emp_details_view
 WHERE country_name LIKE 'United States of America'
 ORDER BY job_title
 -------------------------------------------------------------------------№13------------------------------------------------------------------------
-SELECT job_id, COUNT(job_id)
-FROM emp_details_view
-GROUP BY job_id
-ORDER BY job_id
+SELECT jobs.job_id, COUNT(employees.employee_id)
+FROM jobs
+RIGHT JOIN employees ON jobs.job_id = employees.job_id
+GROUP BY jobs.job_id
+ORDER BY jobs.job_id
 -------------------------------------------------------------------------№14------------------------------------------------------------------------
-SELECT employee_id
-FROM (SELECT employee_id, COUNT(employee_id) AS counter
-      FROM job_history
-      GROUP BY employee_id)
-WHERE counter >= 2 ORDER BY employee_id
+SELECT DISTINCT employee_id
+FROM job_history
+ORDER BY employee_id
 -------------------------------------------------------------------------№15------------------------------------------------------------------------
 SELECT country_id, SUM(salary)
 FROM emp_details_view
