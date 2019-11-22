@@ -66,7 +66,15 @@ GROUP BY first_name
 HAVING COUNT(first_name) > 1
 ORDER BY cnt
 -------------------------------------------------------------------------№8-------------------------------------------------------------------------
-Сложна
+SELECT dep_id, COUNT(*) - COUNT(third_lvl_manager) AS first_lvl, COUNT(third_lvl_manager) - COUNT(second_lvl_manager) AS second_lvl, COUNT(second_lvl_manager) - COUNT(first_lvl_manager) AS third_lvl
+FROM (SELECT dep_id, fourth_lvl_manager, third_lvl_manager, second_lvl_manager, manager_id AS first_lvl_manager
+      FROM (SELECT dep_id, fourth_lvl_manager, third_lvl_manager, manager_id AS second_lvl_manager
+            FROM (SELECT department_id AS dep_id, employee_id AS fourth_lvl_manager, manager_id AS third_lvl_manager
+                  FROM emp_details_view WHERE region_name LIKE 'Americas')
+            LEFT JOIN employees ON third_lvl_manager = employee_id)
+      LEFT JOIN employees ON second_lvl_manager=employee_id)
+GROUP BY dep_id
+ORDER BY dep_id
 -------------------------------------------------------------------------№9-------------------------------------------------------------------------
 SELECT department_name
 FROM emp_details_view
