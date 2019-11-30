@@ -8,13 +8,13 @@
 class GameField {
 private:
   static std::shared_ptr<GameField> instance;
-  GameField(int32_t width, int32_t height);
+  GameField(const int32_t &width, const int32_t &height);
 
 public:
-  static std::shared_ptr<GameField> getInstance(int32_t width, int32_t height);
-  static void destruct();
+  static std::shared_ptr<GameField> getInstance(const int32_t &width, const int32_t &height);
 
   static void showPoint(const Point &point);
+  static void drawLine(const Point &from, const Point &length);
 
   ~GameField();
 };

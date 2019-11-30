@@ -1,22 +1,39 @@
 #pragma once
 
 #include "../utility/Point.h"
+#include "GameField.h"
 #include <memory>
 #include <vector>
-#include "GameField.h"
+
+enum direction { UP = 1, DOWN, LEFT, RIGHT };
 
 class Snake {
 private:
   std::vector<Point> points;
   std::shared_ptr<GameField> field;
-public:
-  explicit Snake(const Point &head_point, std::shared_ptr<GameField> &field);
-  explicit Snake(std::vector<Point> points);
-  Snake(std::vector<Point> points, std::shared_ptr<GameField> &field);
 
-  inline void setSnakePoints(const std::vector<Point> &points) { this->points = points; }
-  [[nodiscard]] inline std::vector<Point> getSnakePoints() const { return points; }
+  direction curr_direction;
+  void decreaseSnakeTail();
+
+public:
+  Snake(const Point &head_point,
+                 std::shared_ptr<GameField> field);
+  Snake(std::vector<Point> points,
+        std::shared_ptr<GameField> field,
+        const direction &head_direction);
+
+  inline void setSnakePoints(const std::vector<Point> &points) {
+    this->points = points;
+  }
+
+  [[nodiscard]] inline std::vector<Point> getSnakePoints() const {
+    return points;
+  }
+
+  bool moveUp();
+  bool moveDown();
+  bool moveRight();
+  bool moveLeft();
 
   void updateGameField() const;
 };
-

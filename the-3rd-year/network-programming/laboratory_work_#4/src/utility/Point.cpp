@@ -5,13 +5,11 @@ Point::Point(const int32_t &x, const int32_t &y, const int32_t &max_x,
     : x(x), y(y), max_x(max_x), max_y(max_y), symbol(symbol) {}
 
 Point Point::operator-(const Point &other) const {
-  return Point((x - other.x) % max_x, (y - other.y) % max_y, max_x, max_y,
-               symbol);
+  return Point(x - other.x, y - other.y, max_x, max_y, symbol);
 }
 
 Point Point::operator+(const Point &other) const {
-  return Point((x + other.x) % max_x, (y + other.y) % max_y, max_x, max_y,
-               symbol);
+  return Point(x + other.x, y + other.y, max_x, max_y, symbol);
 }
 
 Point &Point::operator=(const Point &other) {
@@ -20,22 +18,70 @@ Point &Point::operator=(const Point &other) {
   }
   x = other.x;
   y = other.y;
+
+  return *this;
 }
 
 Point Point::getLeftNeighbour() const {
-  return *this - Point(1, 0, max_x, max_y, symbol);
+  return (*this - Point(1, 0, max_x, max_y, symbol)).normalize();
 }
 
 Point Point::getRightNeighbour() const {
-  return *this + Point(1, 0, max_x, max_y, symbol);
+  return (*this + Point(1, 0, max_x, max_y, symbol)).normalize();
 }
 
 Point Point::getUpperNeighbour() const {
-  return *this + Point(0, 1, max_x, max_y, symbol);
+  return (*this + Point(0, 1, max_x, max_y, symbol)).normalize();
 }
 
 Point Point::getLowerNeighbour() const {
-  return *this - Point(0, 1, max_x, max_y, symbol);
+  return (*this - Point(0, 1, max_x, max_y, symbol)).normalize();
 }
 
-Point::Point() : x(0), y(0), max_x(0), max_y(0) {}
+Point::Point() : x(0), y(0), max_x(0), max_y(0), symbol('o') {}
+
+bool Point::operator==(const Point &other) const {
+  return x == other.x && y == other.y;
+}
+
+Point &Point::operator-=(const Point &other) {
+  x -= other.x;
+  y -= other.y;
+
+  return *this;
+}
+
+Point &Point::operator+=(const Point &other) {
+  x += other.x;
+  y += other.y;
+
+  return *this;
+}
+
+Point::Point(const int32_t &x, const int32_t &y) : Point(x, y, 0, 0, 'o') {}
+
+Point &Point::getDx() {
+  static Point dx(1, 0);
+  return dx;
+}
+
+Point &Point::getDy() {
+  static Point dy(0, 1);
+  return dy;
+}
+
+Point &Point::operator-() {
+  x = -x;
+  y = -y;
+
+  return *this;
+}
+
+Point &Point::normalize() {
+  x %= max_x;
+  y %= max_y;
+
+  return *this;
+}
+
+bool Point::operator!=(const Point &other) const { return !(*this == other); }
