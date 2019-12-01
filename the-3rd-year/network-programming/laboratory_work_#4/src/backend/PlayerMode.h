@@ -1,5 +1,6 @@
 #pragma once
 #include "../frontend/Snake.h"
+#include <algorithm>
 
 class PlayerMode {
 protected:
@@ -24,6 +25,8 @@ protected:
 public:
   bool getMove();
   virtual bool step() = 0;
+  void genFood();
+  void showFood() const;
 
   virtual ~PlayerMode() = default;
 };

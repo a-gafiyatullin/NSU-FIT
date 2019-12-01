@@ -2,6 +2,7 @@
 
 #include "../utility/Point.h"
 #include "GameField.h"
+#include <algorithm>
 #include <memory>
 #include <vector>
 
@@ -34,6 +35,9 @@ public:
   bool moveDown();
   bool moveRight();
   bool moveLeft();
+
+  bool foodInteraction(std::vector<Point> &food);
+  bool selfInteraction() const;
 
   void updateGameField() const;
 };

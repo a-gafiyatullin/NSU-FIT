@@ -50,6 +50,6 @@ void GameField::drawLine(const Point &from, const Point &length) {
   // show all point in the line
   for (; curr_len != (length + dl); curr_len += dl) {
     auto curr_point = from + curr_len;
-    showPoint(curr_point);
+    showPoint(curr_point.normalize());
   }
 }

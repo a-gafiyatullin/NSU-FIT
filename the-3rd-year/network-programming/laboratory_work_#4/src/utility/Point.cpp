@@ -78,8 +78,8 @@ Point &Point::operator-() {
 }
 
 Point &Point::normalize() {
-  x %= max_x;
-  y %= max_y;
+  x = (x + max_x) % max_x;
+  y = (y + max_y) % max_y;
 
   return *this;
 }

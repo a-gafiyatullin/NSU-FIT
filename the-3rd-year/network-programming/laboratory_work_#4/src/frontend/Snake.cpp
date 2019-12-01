@@ -54,7 +54,7 @@ bool Snake::moveUp() {
   points.front() -= Point::getDy();
   switch (curr_direction) {
   case UP:
-    if (points.size() >= 3) { // snake have head, body and tail
+    if (points.size() >= 2) { // snake have head and body
       points[1] += Point::getDy();
     } else if (points.size() == 1) { // snake have only head
       points.push_back(Point::getDy());
@@ -87,7 +87,7 @@ bool Snake::moveDown() {
     points.insert(points.begin() + 1, -Point::getDy());
     break;
   case DOWN:
-    if (points.size() >= 3) {
+    if (points.size() >= 2) {
       points[1] -= Point::getDy();
     } else if (points.size() == 1) {
       points.push_back(-Point::getDy());
@@ -114,7 +114,7 @@ bool Snake::moveRight() {
   case LEFT:
     return false;
   case RIGHT:
-    if (points.size() >= 3) {
+    if (points.size() >= 2) {
       points[1] -= Point::getDx();
     } else if (points.size() == 1) {
       points.push_back(-Point::getDx());
@@ -139,7 +139,7 @@ bool Snake::moveLeft() {
     points.insert(points.begin() + 1, Point::getDx());
     break;
   case LEFT:
-    if (points.size() >= 3) {
+    if (points.size() >= 2) {
       points[1] += Point::getDx();
     } else if (points.size() == 1) {
       points.push_back(Point::getDx());
@@ -178,3 +178,34 @@ int Snake::getPreviousCommand() const {
     return KEY_LEFT;
   }
 }
+
+bool Snake::foodInteraction(std::vector<Point> &food) {
+  points.front().normalize();
+  auto curr_food = std::find(food.begin(), food.end(), points.front());
+  if (curr_food == food.end()) {
+    return false;
+  }
+  food.erase(curr_food);
+  switch (curr_direction) {
+  case UP:
+    points.front() -= Point::getDy();
+    points[1] += Point::getDy();
+    break;
+  case DOWN:
+    points.front() += Point::getDy();
+    points[1] -= Point::getDy();
+    break;
+  case RIGHT:
+    points.front() += Point::getDx();
+    points[1] -= Point::getDx();
+    break;
+  case LEFT:
+    points.front() -= Point::getDx();
+    points[1] += Point::getDx();
+    break;
+  }
+
+  return true;
+}
+
+bool Snake::selfInteraction() const {}

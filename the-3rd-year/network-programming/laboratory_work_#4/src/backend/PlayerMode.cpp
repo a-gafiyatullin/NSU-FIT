@@ -16,7 +16,7 @@ PlayerMode::PlayerMode() : PlayerMode(40, 30, 1, 1, 1000, 0.1) {}
 bool PlayerMode::getMove() {
   static int prev_command = local_player_snake->getPreviousCommand();
   int curr_command = field->getCommand();
-  if(curr_command == ERR) {
+  if (curr_command == ERR) {
     curr_command = prev_command;
   } else {
     prev_command = curr_command;
@@ -39,4 +39,24 @@ bool PlayerMode::getMove() {
   }
 
   return true;
+}
+
+void PlayerMode::genFood() {
+  srand(time(nullptr));
+  size_t food_amount = food_static + (food_per_player * (1 + snakes.size()));
+  size_t need_food_amount = food_amount - food.size();
+  for (size_t i = 0; i < need_food_amount; i++) {
+    int x = rand() % width;
+    int y = rand() % height;
+    Point new_food(x, y, width, height, '*');
+    if (std::find(food.begin(), food.end(), new_food) == food.end()) {
+      food.push_back(new_food);
+    }
+  }
+}
+
+void PlayerMode::showFood() const {
+  for (auto curr_food : food) {
+    field->showPoint(curr_food);
+  }
 }

@@ -4,7 +4,10 @@ std::shared_ptr<SinglePlayerMode> SinglePlayerMode::instance = nullptr;
 
 bool SinglePlayerMode::step() {
   field->clearField();
+  genFood();
+  local_player_snake->foodInteraction(food);
   local_player_snake->updateGameField();
+  showFood();
   field->refreshField();
   return getMove();
 }
