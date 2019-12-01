@@ -1,41 +1,55 @@
 #include "GameField.h"
 std::shared_ptr<GameField> GameField::instance = nullptr;
 
-GameField::GameField(const int32_t &width, const int32_t &height) {
+GameField::GameField(const int32_t &width, const int32_t &height,
+                     const int &timeout)
+    : field(nullptr) {
+  // initialize ncurses
   initscr();
-  raw();
+  cbreak();
   noecho();
-  wresize(stdscr, width, height);
-  box(stdscr, 0, 0);
   refresh();
+  curs_set(0);
+
+  // create game field
+  field = newwin(height, width, 0, 0);
+  if (field == nullptr) {
+    throw std::bad_alloc();
+  }
+  wtimeout(field, timeout);
+  keypad(field, TRUE);
+  wrefresh(field);
 }
 
 std::shared_ptr<GameField> GameField::getInstance(const int32_t &width,
-                                                  const int32_t &height) {
+                                                  const int32_t &height,
+                                                  const int &timeout) {
   if (instance == nullptr) {
-    instance.reset(new GameField(width, height));
+    instance.reset(new GameField(width, height, timeout));
   }
   return instance;
 }
 
-GameField::~GameField() { endwin(); }
+GameField::~GameField() {
+  delwin(field);
+  endwin();
+}
 
 void GameField::showPoint(const Point &point) {
-  move(point.getX(), point.getY());
-  addch(point.getSymbol());
+  mvwaddch(field, point.getY(), point.getX(), point.getSymbol());
 }
 
 void GameField::drawLine(const Point &from, const Point &length) {
   Point curr_len(0, 0, length.getMaxX(), length.getMaxY(), length.getSymbol());
   Point dl;
   if (length.getX() == 0) {
-    dl = Point::getDy();
+    dl = (length.getY() > 0 ? Point::getDy() : -Point::getDy());
   } else {
-    dl = Point::getDx();
+    dl = (length.getX() > 0 ? Point::getDx() : -Point::getDx());
   }
-  for (; curr_len != length; curr_len += dl) {
+  // show all point in the line
+  for (; curr_len != (length + dl); curr_len += dl) {
     auto curr_point = from + curr_len;
-    showPoint(curr_point.normalize());
+    showPoint(curr_point);
   }
-  refresh();
 }

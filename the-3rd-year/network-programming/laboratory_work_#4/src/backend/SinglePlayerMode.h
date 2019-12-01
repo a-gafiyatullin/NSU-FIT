@@ -18,5 +18,5 @@ public:
               const int32_t &state_delay_ms);
   bool step() override;
 
-  ~SinglePlayerMode() {}
+  ~SinglePlayerMode() override = default;
 };

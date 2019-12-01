@@ -33,8 +33,9 @@ public:
   [[nodiscard]] inline unsigned char getSymbol() const { return symbol; }
   [[nodiscard]] inline int32_t getMaxX() const { return max_x; }
   [[nodiscard]] inline int32_t getMaxY() const { return max_y; }
-  static Point &getDx();
-  static Point &getDy();
+  static Point getDx();
+  static Point getDy();
+  inline bool isZeroPoint() { return (x == 0 && y == 0); };
 
   inline void setX(const int32_t x) { this->x = x; }
   inline void setY(const int32_t y) { this->y = y; }

@@ -8,13 +8,18 @@
 class GameField {
 private:
   static std::shared_ptr<GameField> instance;
-  GameField(const int32_t &width, const int32_t &height);
+  GameField(const int32_t &width, const int32_t &height, const int &timeout);
+  WINDOW *field;
 
 public:
-  static std::shared_ptr<GameField> getInstance(const int32_t &width, const int32_t &height);
+  static std::shared_ptr<GameField>
+  getInstance(const int32_t &width, const int32_t &height, const int &timeout);
 
-  static void showPoint(const Point &point);
-  static void drawLine(const Point &from, const Point &length);
+  void showPoint(const Point &point);
+  void drawLine(const Point &from, const Point &length);
+  inline void clearField() { werase(field); }
+  inline void refreshField() { wrefresh(field); }
+  inline int getCommand() { return wgetch(field); }
 
   ~GameField();
 };

@@ -16,8 +16,6 @@ protected:
   int32_t state_delay_ms;
   double dead_food_prob;
 
-  enum commands { UPc = 'w', DOWNc = 's', LEFTc = 'a', RIGHTc = 'd', QUITc = 'q' };
-
   PlayerMode(const int32_t &width, const int32_t &height,
              const int32_t &food_static, const int32_t &food_per_player,
              const int32_t &state_delay_ms, const double &dead_food_prob);
@@ -27,5 +25,5 @@ public:
   bool getMove();
   virtual bool step() = 0;
 
-  virtual ~PlayerMode() = default;;
+  virtual ~PlayerMode() = default;
 };

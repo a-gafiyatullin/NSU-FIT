@@ -1,7 +1,5 @@
 #include "Snake.h"
 
-#include <utility>
-
 Snake::Snake(const Point &head_point, std::shared_ptr<GameField> field)
     : field(std::move(field)) {
   points.push_back(head_point);
@@ -48,7 +46,7 @@ void Snake::updateGameField() const {
 }
 
 bool Snake::moveUp() {
-  if(curr_direction == DOWN) {
+  if (curr_direction == DOWN) {
     return false;
   }
   decreaseSnakeTail();
@@ -56,7 +54,11 @@ bool Snake::moveUp() {
   points.front() -= Point::getDy();
   switch (curr_direction) {
   case UP:
-    points[1] += Point::getDy();
+    if (points.size() >= 3) { // snake have head, body and tail
+      points[1] += Point::getDy();
+    } else if (points.size() == 1) { // snake have only head
+      points.push_back(Point::getDy());
+    }
     break;
   case LEFT:
   case RIGHT:
@@ -66,15 +68,12 @@ bool Snake::moveUp() {
     return false;
   }
 
-  if(points.back() == points[points.size() - 2]) {
-    points.pop_back();
-  }
-  curr_direction = UP;
+  curr_direction = direction::UP;
   return true;
 }
 
 bool Snake::moveDown() {
-  if(curr_direction == UP) {
+  if (curr_direction == UP) {
     return false;
   }
   decreaseSnakeTail();
@@ -88,19 +87,20 @@ bool Snake::moveDown() {
     points.insert(points.begin() + 1, -Point::getDy());
     break;
   case DOWN:
-    points[1] -= Point::getDy();
+    if (points.size() >= 3) {
+      points[1] -= Point::getDy();
+    } else if (points.size() == 1) {
+      points.push_back(-Point::getDy());
+    }
     break;
   }
 
-  if(points.back() == points[points.size() - 2]) {
-    points.pop_back();
-  }
-  curr_direction = DOWN;
+  curr_direction = direction::DOWN;
   return true;
 }
 
 bool Snake::moveRight() {
-  if(curr_direction == LEFT) {
+  if (curr_direction == LEFT) {
     return false;
   }
   decreaseSnakeTail();
@@ -114,19 +114,20 @@ bool Snake::moveRight() {
   case LEFT:
     return false;
   case RIGHT:
-    points[1] -= Point::getDx();
+    if (points.size() >= 3) {
+      points[1] -= Point::getDx();
+    } else if (points.size() == 1) {
+      points.push_back(-Point::getDx());
+    }
     break;
   }
 
-  if(points.back() == points[points.size() - 2]) {
-    points.pop_back();
-  }
-  curr_direction = RIGHT;
+  curr_direction = direction::RIGHT;
   return true;
 }
 
 bool Snake::moveLeft() {
-  if(curr_direction == RIGHT) {
+  if (curr_direction == RIGHT) {
     return false;
   }
   decreaseSnakeTail();
@@ -138,23 +139,42 @@ bool Snake::moveLeft() {
     points.insert(points.begin() + 1, Point::getDx());
     break;
   case LEFT:
-    points[1] += Point::getDx();
+    if (points.size() >= 3) {
+      points[1] += Point::getDx();
+    } else if (points.size() == 1) {
+      points.push_back(Point::getDx());
+    }
     break;
   case RIGHT:
     return false;
   }
 
-  if(points.back() == points[points.size() - 2]) {
-    points.pop_back();
-  }
-  curr_direction = LEFT;
+  curr_direction = direction::LEFT;
   return true;
 }
 
 void Snake::decreaseSnakeTail() {
-  if(points.back().getY() == 0) {
-    points.back() += (points.back().getX() < 0 ? Point::getDx() : -Point::getDx());
+  if (points.back().getY() == 0) {
+    points.back() +=
+        (points.back().getX() < 0 ? Point::getDx() : -Point::getDx());
   } else {
-    points.back() += (points.back().getY() < 0 ? Point::getDy() : -Point::getDy());
+    points.back() +=
+        (points.back().getY() < 0 ? Point::getDy() : -Point::getDy());
+  }
+  if (points.back().isZeroPoint()) {
+    points.pop_back();
+  }
+}
+
+int Snake::getPreviousCommand() const {
+  switch (curr_direction) {
+  case UP:
+    return KEY_UP;
+  case DOWN:
+    return KEY_DOWN;
+  case RIGHT:
+    return KEY_RIGHT;
+  case LEFT:
+    return KEY_LEFT;
   }
 }

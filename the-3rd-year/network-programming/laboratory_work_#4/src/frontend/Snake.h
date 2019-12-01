@@ -16,10 +16,8 @@ private:
   void decreaseSnakeTail();
 
 public:
-  Snake(const Point &head_point,
-                 std::shared_ptr<GameField> field);
-  Snake(std::vector<Point> points,
-        std::shared_ptr<GameField> field,
+  Snake(const Point &head_point, std::shared_ptr<GameField> field);
+  Snake(std::vector<Point> points, std::shared_ptr<GameField> field,
         const direction &head_direction);
 
   inline void setSnakePoints(const std::vector<Point> &points) {
@@ -29,6 +27,8 @@ public:
   [[nodiscard]] inline std::vector<Point> getSnakePoints() const {
     return points;
   }
+
+  [[nodiscard]] int getPreviousCommand() const;
 
   bool moveUp();
   bool moveDown();

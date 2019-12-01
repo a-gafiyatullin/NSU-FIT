@@ -31,11 +31,11 @@ Point Point::getRightNeighbour() const {
 }
 
 Point Point::getUpperNeighbour() const {
-  return (*this + Point(0, 1, max_x, max_y, symbol)).normalize();
+  return (*this - Point(0, 1, max_x, max_y, symbol)).normalize();
 }
 
 Point Point::getLowerNeighbour() const {
-  return (*this - Point(0, 1, max_x, max_y, symbol)).normalize();
+  return (*this + Point(0, 1, max_x, max_y, symbol)).normalize();
 }
 
 Point::Point() : x(0), y(0), max_x(0), max_y(0), symbol('o') {}
@@ -60,12 +60,12 @@ Point &Point::operator+=(const Point &other) {
 
 Point::Point(const int32_t &x, const int32_t &y) : Point(x, y, 0, 0, 'o') {}
 
-Point &Point::getDx() {
+Point Point::getDx() {
   static Point dx(1, 0);
   return dx;
 }
 
-Point &Point::getDy() {
+Point Point::getDy() {
   static Point dy(0, 1);
   return dy;
 }
