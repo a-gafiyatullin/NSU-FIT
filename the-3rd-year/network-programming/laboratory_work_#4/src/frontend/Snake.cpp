@@ -208,4 +208,18 @@ bool Snake::foodInteraction(std::vector<Point> &food) {
   return true;
 }
 
-bool Snake::selfInteraction() const {}
+bool Snake::interaction(const Snake &snake) const {
+  auto head = points.front();
+  auto next_point = head + points[1];
+  auto other_curr_point = snake.points.front();
+  for (int i = 1; i < snake.points.size(); i++) {
+    auto other_next_point = other_curr_point + snake.points[i];
+    if (head.isBetween(other_curr_point, other_next_point) &&
+        !next_point.isBetween(other_curr_point, other_next_point)) {
+      return true;
+    }
+    other_curr_point = other_next_point;
+  }
+
+  return false;
+}

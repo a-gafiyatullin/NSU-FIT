@@ -85,3 +85,12 @@ Point &Point::normalize() {
 }
 
 bool Point::operator!=(const Point &other) const { return !(*this == other); }
+
+bool Point::isBetween(const Point &left, const Point &right) const {
+  if (left.x == right.x && left.x == x) {
+    return (y >= std::min(left.y, right.y) && y <= std::max(left.y, right.y));
+  } else if (left.y == right.y && left.y == y) {
+    return (x >= std::min(left.x, right.x) && x <= std::max(left.x, right.x));
+  }
+  return false;
+}

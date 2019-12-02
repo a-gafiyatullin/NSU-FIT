@@ -34,9 +34,12 @@ bool PlayerMode::getMove() {
   case KEY_RIGHT:
     local_player_snake->moveRight();
     break;
-  default:
+  case 'q':
     return false;
+  default:
+    break;
   }
+  prev_command = local_player_snake->getPreviousCommand();
 
   return true;
 }

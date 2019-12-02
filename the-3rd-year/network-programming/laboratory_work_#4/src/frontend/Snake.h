@@ -37,7 +37,7 @@ public:
   bool moveLeft();
 
   bool foodInteraction(std::vector<Point> &food);
-  bool selfInteraction() const;
+  [[nodiscard]] bool interaction(const Snake &snake) const;
 
   void updateGameField() const;
 };

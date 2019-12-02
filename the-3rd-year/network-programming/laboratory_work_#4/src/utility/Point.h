@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 
 class Point {
@@ -36,6 +37,7 @@ public:
   static Point getDx();
   static Point getDy();
   inline bool isZeroPoint() { return (x == 0 && y == 0); };
+  bool isBetween(const Point &left, const Point &right) const;
 
   inline void setX(const int32_t x) { this->x = x; }
   inline void setY(const int32_t y) { this->y = y; }

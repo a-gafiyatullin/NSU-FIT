@@ -9,6 +9,9 @@ bool SinglePlayerMode::step() {
   local_player_snake->updateGameField();
   showFood();
   field->refreshField();
+  if (local_player_snake->interaction(*local_player_snake)) {
+    return false;
+  }
   return getMove();
 }
 
