@@ -1,0 +1,86 @@
+import runtime;
+import string;
+import lingo/pegcode/driver;
+import math/math;
+
+export {
+    // Data types for NEMO Virtual Machine
+
+    Type ::= Int, Array;
+    Int();
+    Array(type: Type);
+
+    Expr ::= BinOp, Const, App, Upd, Var;
+    BinOp(op: string, le: Expr, re: Expr);
+    App(ae: Expr, ie: Expr);
+    Upd(ae: Expr, ie: Expr, ve: Expr);
+    Const(val: int);
+    Var(name: string);
+
+    Oper ::= CondOper, PrintOper, AssignOper;
+    CondOp(op: string, le: Expr, re: Expr);
+    CondOper(label: int, cond: CondOp, ll: [UtilityInt], lr: [UtilityInt]);
+    PrintOper(label: int, e: Expr);
+    AssignOper(label: int, var: Var, val: Expr, labels: [UtilityInt]);
+
+    VarDecl(name: string, type: Type);
+
+    UtilityInt(val: int);
+
+    Prog(decls: [VarDecl], operators: [Oper]);
+
+    // Main methods
+    str2prog(s: string) -> Prog;
+
+    // Debug methods
+    printProgStruct(p: Prog) -> void;
+}
+
+str2prog(s: string) -> Prog {
+    gram = "#include nemo-grammar.gram";
+    parsic(compilePegGrammar(gram), s, defaultPegActions)
+}
+
+type2str(t: Type) -> string {
+    switch(t) {
+        Int(): "int"
+        Array(next): "[" + type2str(next) + "]"
+    }
+}
+
+expr2str(e: Expr) -> string {
+    switch(e) {
+        BinOp(op, le, re): "(" + expr2str(le) + op + expr2str(re) + ")"
+        App(ae, ie): "app(" + expr2str(ae) + "," + expr2str(ie) + ")"
+        Upd(ae, ie, ve): "upd(" + expr2str(ae) + "," + expr2str(ie) + "," + expr2str(ve) + ")"
+        Const(v): i2s(v)
+        Var(name): name
+    }
+}
+
+condOp2str(o: CondOp) -> string {
+    expr2str(o.le) + " " + o.op + " " + expr2str(o.re)
+}
+
+oper2str(o: Oper) -> string {
+    switch(o) {
+        CondOper(lab, cond, ll, lr): {
+            ll_s = fold(map(ll, \v -> i2s(v.val)), "", \v, acc -> acc + "," + v);
+            lr_s = fold(map(lr, \v -> i2s(v.val)), "", \v, acc -> acc + "," + v);
+            i2s(lab) + ": " + "if (" + condOp2str(cond) + ") then goto {" 
+                                    + strSubRange(ll_s, 0, strlen(ll_s) - 1) + "} else goto {" 
+                                    + strSubRange(lr_s, 0, strlen(ll_s) - 1) + "};"
+        }
+        PrintOper(lab, e):  i2s(lab) + ": " + " print(" + expr2str(e) + ");"
+        AssignOper(lab, var, val, labels): {
+            labels_str = fold(map(labels, \v -> i2s(v.val)), "", \v, acc -> acc + "," + v);
+            i2s(lab) + ": " + expr2str(var) + "=" + expr2str(val) + 
+                                            " goto {" + strSubRange(labels_str, 0, strlen(labels_str) - 1) + "};"
+        }
+    }
+}
+
+printProgStruct(p: Prog) -> void {
+    iter(p.decls, \v -> println("var " + v.name + ": " + type2str(v.type)  + ";"));
+    iter(p.operators, \v -> println(oper2str(v)));
+}

@@ -1,0 +1,107 @@
+
+import nemo_vm_parser;
+import ds/ntree;
+import ds/array;
+
+export {
+    Node(label: int, values: Tree<string, Value>);
+    Value ::= ValueInt, ValueArr;
+    ValueInt(v: int);
+    ValueArr(a: [Value]);
+}
+
+opValues(op:string, l: Value, r: Value) -> Maybe<int> {
+    switch(l) {
+        ValueArr(al): None()
+        ValueInt(vl): switch(r) {
+            ValueArr(ar): None()
+            ValueInt(vr): {
+                if(op == "+") Some(vl + vr)
+                else if(op == "-") Some(vl - vr)
+                else if(op == "*") Some(vl * vr)
+                else if(op == "/") Some(vl / vr)
+                else if(op == "%") Some(vl % vr)
+                else None()
+            }
+        }
+    }
+}
+
+computeExpr(e: Expr, t: Tree<string, Value>) -> Maybe<Value> {
+    switch(e) {
+        BinOp(op, l, r): {
+            c_l = computeExpr(l, t);
+            c_r = computeExpr(r, t);
+            switch(c_l) {
+                None(): None()
+                Some(lv): switch(c_r) {
+                    None(): None()
+                    Some(rv): switch(opValues(op, lv, rv)) {
+                        None(): None()
+                        Some(rez): Some(ValueInt(rez))
+                    } 
+                }
+            }
+        }
+        App(arr, i):  switch(computeExpr(arr, t)) {
+            None(): None()
+            Some(v): switch(v) {
+                ValueInt(val): None()
+                ValueArr(a): switch(computeExpr(i, t)) {
+                    None(): None()
+                    Some(vi): switch(vi) {
+                        ValueArr(ai): None()
+                        ValueInt(index): Some(a[index])
+                    }
+                }
+            }
+        }
+        Upd(arr, i, v): switch(computeExpr(arr, t)) {
+            None(): None()
+            Some(val): switch(val) {
+                ValueInt(value): None()
+                ValueArr(a): switch(computeExpr(i, t)) {
+                    None(): None()
+                    Some(vi): switch(vi) {
+                        ValueArr(ai): None()
+                        ValueInt(index): switch(computeExpr(v, t)) {
+                            None(): None()
+                            Some(rez_v): {
+                                Some(ValueArr(replace(a, index, rez_v)));
+                            }
+                        }
+                    }      
+                }
+            }
+        }
+        Const(val): Some(ValueInt(val))
+        Var(name): switch(lookupTree(t, name)) {
+            None(): None()
+            Some(v): Some(v)
+        }
+    }
+}
+
+computeCondition(o: CondOp, t: Tree<string, Value>) -> Maybe<bool> {
+    c_le = computeExpr(o.le, t);
+    c_re = computeExpr(o.re, t);
+    switch(c_le) {
+        None(): None()
+        Some(v_le): switch(c_re) {
+            None(): None()
+            Some(v_re): {
+                if(o.op == "==") Some(v_le == v_re)
+                else if(o.op == "<=") Some(v_le <= v_re)
+                else if(o.op == ">=") Some(v_le <= v_re)
+                else if(o.op == "<") Some(v_le < v_re)
+                else if(o.op == ">") Some(v_le > v_re)
+                else None()
+            }
+        }
+    }
+}
+
+main() {
+    s = getFileContent("test1.nemo");
+	printProgStruct(str2prog(s));
+}

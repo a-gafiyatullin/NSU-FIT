@@ -1,0 +1,35 @@
+program = decl*:d operation*:o { Prog(:d, :o) };
+
+// Types
+decl = ws "var" ws letters$l ws ":" ws type:t ws ";" ws { VarDecl($l, :t) };
+type = Int | Array;
+Int = ws "int" ws { Int() };
+Array = ws "[" type:t "]" ws { Array(:t) };
+
+// Operations
+operation = print | assign | cond;
+print = ws digits$l ws ":" ws "print(" expr:e ")" ws ";" ws { PrintOper(s2i($l), :e) };
+
+assign = ws digits$l ws ":" ws var:v ws "=" ws expr:e ws "goto"
+          ws "{" utilInt*:ls "}" ws ";" ws { AssignOper(s2i($l), :v, :e, :ls) };
+
+cond = ws digits$l ws ":" ws "if" ws "(" condop:c ")" ws "then" ws "goto"
+       ws "{" utilInt*:le "}" ws "else" ws "goto" ws "{" utilInt*:lr "}" ws ";"
+       ws { CondOper(s2i($l), :c, :le, :lr) };
+
+condop = ws expr:le ws logOp$o ws expr:re ws { CondOp($o, :le, :re) };
+
+// Expressions
+expr = const | var | binop | app | upd;
+const = ws digits$d ws { Const(s2i($d)) };
+var = ws letters$l ws { Var($l) };
+binop = ws "(" ws expr:l ws arithmeticOp$s ws expr:r ws ")" ws { BinOp($s, :l, :r) };
+app = ws "app(" ws expr:le ws "," ws expr:re ws ")" ws { App(:le, :re) };
+upd = ws "upd(" ws expr:le ws "," ws expr:me ws "," ws expr:re ws ")" ws { Upd(:le, :me, :re) };
+
+digits = ('0'-'9')+;
+letters = ('a'-'z')+;
+ws = (' ' | '\t' | '\n' | '\r')*;
+logOp = ("==" | "<=" | ">=" | "<" | ">");
+arithmeticOp = ("+" | "*" | "/" | "-" | "%");
+utilInt = ws ('0'-'9')+$d ws ","* ws { UtilityInt(s2i($d)) };

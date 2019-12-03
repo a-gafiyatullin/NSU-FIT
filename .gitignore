@@ -13,3 +13,4 @@
 *-build-*
 # Ignore rubbish from flow9 files
 *javagen*
+*.jar
