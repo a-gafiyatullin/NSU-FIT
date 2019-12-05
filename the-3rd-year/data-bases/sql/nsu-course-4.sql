@@ -29,6 +29,7 @@ INNER JOIN (SELECT department_id AS d_id, MIN(salary) AS min_salary
 WHERE salary = min_salary
 ORDER BY department_id, salary, last_name
 -------------------------------------------------------------------------№4-------------------------------------------------------------------------
+TO-DO: будет переформулировка
 SELECT last_name, first_name
 FROM emp_details_view
 WHERE region_name LIKE 'Americas' AND salary > (SELECT salary
@@ -42,6 +43,7 @@ WHERE region_name LIKE 'Americas' AND salary > (SELECT salary
                                                 WHERE rownum = 1)
 ORDER BY last_name, first_name
 -------------------------------------------------------------------------№5-------------------------------------------------------------------------
+TO-DO: попробовать через CROSS JOIN
 SELECT department_id, SUM(sum_salary) AS sum_salary, SUM(frac) AS frac
 FROM (SELECT department_id, SUM(salary) AS sum_salary, CEIL((SUM(salary) * 100) / (SELECT SUM(salary) FROM employees)) AS frac
       FROM employees
@@ -84,15 +86,16 @@ HAVING MIN(salary) > (SELECT AVG(SALARY)
                       WHERE region_name = 'Americas')
 ORDER BY department_name
 -------------------------------------------------------------------------№10-------------------------------------------------------------------------
-Что если таких отделов много? Считаю, что один.
 SELECT SUM(salary)
 FROM emp_details_view
-WHERE department_id = (SELECT department_id
-                       FROM (SELECT department_id, COUNT(*) AS cnt
-                             FROM emp_details_view
-                             GROUP BY department_id
-                             ORDER BY cnt)
-                       WHERE rownum = 1)
+GROUP BY department_id
+HAVING department_id IN (SELECT department_id
+                         FROM emp_details_view
+                         GROUP BY department_id
+                         HAVING COUNT(*) = (SELECT MIN(cnt)
+                                            FROM (SELECT COUNT(*) AS cnt
+                                                  FROM emp_details_view
+                                                  GROUP BY department_id)))
 -------------------------------------------------------------------------№11-------------------------------------------------------------------------
 SELECT last_name, COUNT(*)
 FROM employees
@@ -100,108 +103,105 @@ GROUP BY last_name
 HAVING COUNT(*) > 1
 ORDER BY last_name
 -------------------------------------------------------------------------№12-------------------------------------------------------------------------
+WITH n_countries AS (SELECT country_id
+                     FROM departments D
+                     INNER JOIN locations L
+                     USING(location_id)
+                     GROUP BY country_id
+                     HAVING COUNT(department_id) = (SELECT MAX(count)
+                                                     FROM (SELECT COUNT(department_id) AS count
+                                                           FROM departments D
+                                                           INNER JOIN locations L
+                                                           USING(location_id)
+                                                           GROUP BY country_id))
+)
+
 SELECT country_id, employee_id
 FROM (SELECT country_id, MAX(salary) AS max_salary
       FROM emp_details_view
-      WHERE country_id IN (SELECT country_id AS count
-                           FROM departments D
-                           INNER JOIN locations L ON D.location_id = L.location_id
-                           GROUP BY country_id HAVING COUNT(department_id) = (SELECT MAX(count)
-                                                                              FROM (SELECT country_id, COUNT(department_id) AS count
-                                                                                    FROM departments D
-                                                                                    INNER JOIN locations L ON D.location_id = L.location_id
-                                                                                    GROUP BY country_id)))
+      WHERE country_id IN (SELECT * FROM n_countries)
       GROUP BY country_id)
-INNER JOIN emp_details_view USING (country_id)
+INNER JOIN emp_details_view
+USING (country_id)
 WHERE salary = max_salary
 ORDER BY country_id
 -------------------------------------------------------------------------№13-------------------------------------------------------------------------
-А если таких работников в одной стране несколько? Решение пытается учесть этот нюанс.
-SELECT manager_id
-FROM emp_details_view
-WHERE country_id IN (SELECT country_id
+WITH n_countries AS (SELECT country_id
                      FROM departments
                      INNER JOIN locations USING(location_id)
                      GROUP BY country_id
                      HAVING COUNT(*) = (SELECT MAX(cnt)
                                         FROM (SELECT COUNT(*) AS cnt
                                               FROM departments
-                                              INNER JOIN locations USING(location_id)
-                                              GROUP BY country_id)))
-GROUP BY country_name, manager_id
-HAVING COUNT(*) = (SELECT MAX(mng_counter)
-                   FROM (SELECT COUNT(*) AS mng_counter
-                         FROM emp_details_view
-                         WHERE country_id IN (SELECT country_id
-                                              FROM departments
-                                              INNER JOIN locations USING(location_id)
-                                              GROUP BY country_id
-                                              HAVING COUNT(*) = (SELECT MAX(cnt)
-                                                                 FROM (SELECT COUNT(*) AS cnt
-                                                                       FROM departments
-                                                                       INNER JOIN locations USING(location_id)
-                                                                       GROUP BY country_id)))
-                         GROUP BY country_name, manager_id))
--------------------------------------------------------------------------№14-------------------------------------------------------------------------
-А если таких работников, у которого в подчинении больше всего человек, в одной стране несколько? Решение пытается учесть этот нюанс.
+                                              INNER JOIN locations
+                                              USING(location_id)
+                                              GROUP BY country_id))
+),
+n_managers AS (SELECT E.manager_id, country_id, COUNT(*) AS cnt
+               FROM employees E
+               INNER JOIN emp_details_view EDV ON E.manager_id = EDV.employee_id
+               GROUP BY E.manager_id, country_id
+)
+
 SELECT manager_id
-FROM emp_details_view
-WHERE country_id IN (SELECT country_id
-                     FROM (SELECT employee_id, TRUNC((SELECT SYSDATE FROM DUAL) - hire_date) AS time, country_id
-                           FROM (employees
-                           INNER JOIN departments USING(department_id))
-                           INNER JOIN locations USING(location_id)
-                           WHERE TRUNC((SELECT SYSDATE FROM DUAL) - hire_date) = (SELECT MIN(TRUNC((SELECT SYSDATE FROM DUAL) - hire_date))
-                                                                                  FROM (employees
-                                                                                  INNER JOIN departments USING(department_id))
-                                                                                  INNER JOIN locations USING(location_id)))
-                     GROUP BY country_id)
-GROUP BY manager_id
-HAVING COUNT(*) = (SELECT MAX(cnt)
-                   FROM (SELECT COUNT(*) AS cnt
-                         FROM emp_details_view
-                         WHERE country_id IN (SELECT country_id
-                                              FROM (SELECT employee_id, TRUNC((SELECT SYSDATE FROM DUAL) - hire_date) AS time, country_id
-                                                    FROM (employees
-                                                    INNER JOIN departments USING(department_id))
-                                                    INNER JOIN locations USING(location_id)
-                                                    WHERE TRUNC((SELECT SYSDATE FROM DUAL) - hire_date) = (SELECT MIN(TRUNC((SELECT SYSDATE FROM DUAL) - hire_date))
-                                                                                                           FROM (employees
-                                                                                                           INNER JOIN departments USING(department_id))
-                                                                                                           INNER JOIN locations USING(location_id)))
-                                              GROUP BY country_id)
-                         GROUP BY manager_id))
+FROM n_managers
+INNER JOIN (SELECT country_id, MAX(cnt) as max_cnt
+            FROM (SELECT *
+                  FROM n_managers
+                  WHERE n_managers.country_id IN (SELECT * FROM n_countries))
+                  GROUP BY country_id)
+USING(country_id)
+WHERE cnt = max_cnt
+ORDER BY manager_id
+-------------------------------------------------------------------------№14-------------------------------------------------------------------------
+WITH n_countries AS (SELECT country_id
+                     FROM emp_details_view
+                     INNER JOIN employees
+                     USING(employee_id)
+                     GROUP BY country_id
+                     HAVING MAX(hire_date) = (SELECT MAX(hire_date)
+                                              FROM employees)
+),
+n_managers AS (SELECT E.manager_id, country_id, COUNT(*) AS cnt
+               FROM employees E
+               INNER JOIN emp_details_view EDV ON E.manager_id = EDV.employee_id
+               GROUP BY E.manager_id, country_id
+)
+
+SELECT manager_id
+FROM n_managers
+INNER JOIN (SELECT country_id, MAX(cnt) as max_cnt
+            FROM (SELECT *
+                  FROM n_managers
+                  WHERE n_managers.country_id IN (SELECT * FROM n_countries))
+                  GROUP BY country_id)
+USING(country_id)
+WHERE cnt = max_cnt
 ORDER BY manager_id
 -------------------------------------------------------------------------№15-------------------------------------------------------------------------
-А если таких работников, у которого в подчинении человек с наибольшей зарплатой, в одной стране несколько? Решение пытается учесть этот нюанс.
+WITH n_countries AS (SELECT country_id
+                     FROM emp_details_view
+                     INNER JOIN employees
+                     USING(employee_id)
+                     GROUP BY country_id
+                     HAVING MIN(hire_date) = (SELECT MIN(hire_date)
+                                              FROM employees)
+),
+n_salary AS (SELECT E.manager_id, country_id, MAX(E.salary) AS max_salary
+             FROM employees E
+             INNER JOIN emp_details_view EDV ON E.manager_id = EDV.employee_id
+             GROUP BY E.manager_id, country_id
+)
+
 SELECT manager_id
-FROM emp_details_view
-WHERE country_id IN (SELECT country_id
-                     FROM (SELECT employee_id, TRUNC((SELECT SYSDATE FROM DUAL) - hire_date) AS time, country_id
-                           FROM (employees
-                           INNER JOIN departments USING(department_id))
-                           INNER JOIN locations USING(location_id)
-                           WHERE TRUNC((SELECT SYSDATE FROM DUAL) - hire_date) = (SELECT MAX(TRUNC((SELECT SYSDATE FROM DUAL) - hire_date))
-                                                                                  FROM (employees
-                                                                                  INNER JOIN departments USING(department_id))
-                                                                                  INNER JOIN locations USING(location_id)))
-                     GROUP BY country_id)
+FROM n_salary
+INNER JOIN (SELECT country_id, MAX(max_salary) AS country_max_salary
+            FROM n_salary
+            GROUP BY country_id)
+USING(country_id)
+WHERE country_id IN (SELECT * FROM n_countries) AND max_salary = country_max_salary
 GROUP BY manager_id
-HAVING MAX(salary) = (SELECT MAX(salary)
-                         FROM emp_details_view
-                         WHERE country_id IN (SELECT country_id
-                                              FROM (SELECT employee_id, TRUNC((SELECT SYSDATE FROM DUAL) - hire_date) AS time, country_id
-                                                    FROM (employees
-                                                    INNER JOIN departments USING(department_id))
-                                                    INNER JOIN locations USING(location_id)
-                                                    WHERE TRUNC((SELECT SYSDATE FROM DUAL) - hire_date) = (SELECT MAX(TRUNC((SELECT SYSDATE FROM DUAL) - hire_date))
-                                                                                                           FROM (employees
-                                                                                                           INNER JOIN departments USING(department_id))
-                                                                                                           INNER JOIN locations USING(location_id)))
-                                              GROUP BY country_id) AND manager_id IS NOT NULL)
-ORDER BY manager_id
 -------------------------------------------------------------------------№16-------------------------------------------------------------------------
-А что если таких годов несколько? Решение пытается учесть этот нюанс.
 SELECT EXTRACT(year FROM hire_date), COUNT(*)
 FROM employees
 GROUP BY EXTRACT(year FROM hire_date)
