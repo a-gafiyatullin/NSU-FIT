@@ -1,0 +1,108 @@
+import lingo/pegcode/driver;
+
+export {
+    // Data types for NEMO Language
+    NemoType ::= NemoIntType, NemoArrayType;
+    NemoIntType();
+    NemoArrayType(type: NemoType);
+
+    NemoExpr ::= NemoBinOpExpr, NemoConstExpr,
+        NemoAppExpr, NemoUpdExpr, NemoVarExpr;
+    NemoBinOpExpr(op: string, le: NemoExpr, re: NemoExpr);
+    NemoAppExpr(ae: NemoExpr, ie: NemoExpr);
+    NemoUpdExpr(ae: NemoExpr, ie: NemoExpr, ve: NemoExpr);
+    NemoConstExpr(val: int);
+    NemoVarExpr(name: string);
+
+    NemoOper ::= NemoCondOper, NemoSeqOper,
+        NemoPrintOper, NemoAssignOper, NemoChoiceOper, NemoLoopOper;
+    NemoCondOper(op: string, le: NemoExpr, re: NemoExpr);
+    NemoSeqOper(o: [NemoOper]);
+    NemoChoiceOper(o: [NemoOper]);
+    NemoLoopOper(o: NemoOper);
+    NemoPrintOper(e: NemoExpr);
+    NemoAssignOper(var: NemoVarExpr, val: NemoExpr);
+
+    NemoVarDecl(name: string, type: NemoType);
+
+    NemoProg(decls: [NemoVarDecl], operators: NemoOper);
+
+    // Main methods
+    str2NemoProg(s: string) -> NemoProg;
+
+    // Debug methods
+    printNemoProgStruct(p: NemoProg) -> void;
+}
+
+seqSemanticAct(xs: [flow]) -> NemoSeqOper {
+    NemoSeqOper(concat([xs[0]], xs[1]))
+}
+
+choiceSemanticAct(xs: [flow]) -> NemoChoiceOper {
+    NemoChoiceOper(concat([xs[0]], xs[1]))
+}
+
+negoper(o: string) -> string {
+    if(o == "==") "!="
+    else if(o == "<=") ">"
+    else if(o == ">=") "<"
+    else if(o == "<") ">="
+    else if(o == ">") "<="
+    else if(o == "!=") "=="
+    else o
+}
+
+ifelseSemanticAct(xs: [flow]) -> NemoChoiceOper {
+    NemoChoiceOper([NemoSeqOper([NemoCondOper(xs[0], xs[1], xs[2]), xs[3]]),
+        NemoSeqOper([NemoCondOper(negoper(xs[0]), xs[1], xs[2]), xs[4]])])
+}
+
+whileSemanticAct(xs: [flow]) -> NemoSeqOper {
+    NemoSeqOper([NemoLoopOper(NemoSeqOper([NemoCondOper(xs[0], xs[1], xs[2]), xs[3]])),
+        NemoCondOper(negoper(xs[0]), xs[1], xs[2])])
+}
+
+str2NemoProg(s: string) -> NemoProg {
+    specialPegActions = {
+        t1 = setTree(defaultPegActions.t, "seqSemanticAct", seqSemanticAct);
+        t2 = setTree(t1, "choiceSemanticAct", choiceSemanticAct);
+        t3 = setTree(t2, "ifelseSemanticAct", ifelseSemanticAct);
+        t4 = setTree(t3, "whileSemanticAct", whileSemanticAct);
+        SemanticActions(t4);
+    }
+    gram = "#include nemo_grammar.gram";
+    parsic(compilePegGrammar(gram), s, specialPegActions)
+}
+
+nemoType2str(t: NemoType) -> string {
+    switch(t) {
+        NemoIntType(): "int"
+        NemoArrayType(next): "[" + nemoType2str(next) + "]"
+    }
+}
+
+nemoExpr2str(e: NemoExpr) -> string {
+    switch(e) {
+        NemoBinOpExpr(op, le, re): "(" + nemoExpr2str(le) + op + nemoExpr2str(re) + ")"
+        NemoAppExpr(ae, ie): "app(" + nemoExpr2str(ae) + "," + nemoExpr2str(ie) + ")"
+        NemoUpdExpr(ae, ie, ve): "upd(" + nemoExpr2str(ae) + "," + nemoExpr2str(ie) + "," + nemoExpr2str(ve) + ")"
+        NemoConstExpr(v): i2s(v)
+        NemoVarExpr(name): name
+    }
+}
+
+nemoOper2str(o: NemoOper) -> string {
+    switch(o) {
+        NemoCondOper(op, l, r): "(" + nemoExpr2str(l) + " " + op + " " + nemoExpr2str(r) + ")?"
+        NemoPrintOper(e): "print(" + nemoExpr2str(e) + ")"
+        NemoAssignOper(var, val): "(" + nemoExpr2str(var) + " = " + nemoExpr2str(val) + ")"
+        NemoLoopOper(l): nemoOper2str(l) + "*"
+        NemoSeqOper(s): "{" + fold(s, "", \ acc, v -> acc + "; " + nemoOper2str(v)) + "}"
+        NemoChoiceOper(c): "{" + fold(c, "", \ acc, v -> acc + " U " + nemoOper2str(v)) + "}"
+    }
+}
+
+printNemoProgStruct(p: NemoProg) -> void {
+    iter(p.decls, \v -> println("var " + v.name + ": " + nemoType2str(v.type)  + ";"));
+    println(nemoOper2str(p.operators));
+}

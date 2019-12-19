@@ -5,7 +5,6 @@ import math/math;
 
 export {
     // Data types for NEMO Virtual Machine
-
     Type ::= Int, Array;
     Int();
     Array(type: Type);
@@ -20,7 +19,7 @@ export {
     Oper ::= CondOper, PrintOper, AssignOper;
     CondOp(op: string, le: Expr, re: Expr);
     CondOper(label: int, cond: CondOp, ll: [UtilityInt], lr: [UtilityInt]);
-    PrintOper(label: int, e: Expr);
+    PrintOper(label: int, e: Expr, labels: [UtilityInt]);
     AssignOper(label: int, var: Var, val: Expr, labels: [UtilityInt]);
 
     VarDecl(name: string, type: Type);
@@ -34,10 +33,11 @@ export {
 
     // Debug methods
     printProgStruct(p: Prog) -> void;
+    progStruct2str(p: Prog) -> string;
 }
 
 str2prog(s: string) -> Prog {
-    gram = "#include nemo-grammar.gram";
+    gram = "#include vnemo_grammar.gram";
     parsic(compilePegGrammar(gram), s, defaultPegActions)
 }
 
@@ -67,14 +67,18 @@ oper2str(o: Oper) -> string {
         CondOper(lab, cond, ll, lr): {
             ll_s = fold(map(ll, \v -> i2s(v.val)), "", \v, acc -> acc + "," + v);
             lr_s = fold(map(lr, \v -> i2s(v.val)), "", \v, acc -> acc + "," + v);
-            i2s(lab) + ": " + "if (" + condOp2str(cond) + ") then goto {" 
-                                    + strSubRange(ll_s, 0, strlen(ll_s) - 1) + "} else goto {" 
+            i2s(lab) + ": " + "if (" + condOp2str(cond) + ") then goto {"
+                                    + strSubRange(ll_s, 0, strlen(ll_s) - 1) + "} else goto {"
                                     + strSubRange(lr_s, 0, strlen(ll_s) - 1) + "};"
         }
-        PrintOper(lab, e):  i2s(lab) + ": " + " print(" + expr2str(e) + ");"
+        PrintOper(lab, e, labels): {
+            labels_str = fold(map(labels, \v -> i2s(v.val)), "", \v, acc -> acc + "," + v);
+            i2s(lab) + ": " + "print(" + expr2str(e) + ")" +
+                "goto {" + strSubRange(labels_str, 0, strlen(labels_str) - 1) + "};"
+        }
         AssignOper(lab, var, val, labels): {
             labels_str = fold(map(labels, \v -> i2s(v.val)), "", \v, acc -> acc + "," + v);
-            i2s(lab) + ": " + expr2str(var) + "=" + expr2str(val) + 
+            i2s(lab) + ": " + expr2str(var) + "=" + expr2str(val) +
                                             " goto {" + strSubRange(labels_str, 0, strlen(labels_str) - 1) + "};"
         }
     }
@@ -83,4 +87,10 @@ oper2str(o: Oper) -> string {
 printProgStruct(p: Prog) -> void {
     iter(p.decls, \v -> println("var " + v.name + ": " + type2str(v.type)  + ";"));
     iter(p.operators, \v -> println(oper2str(v)));
+}
+
+progStruct2str(p: Prog) -> string {
+    fold(p.decls, "", \ acc, v -> { acc + "var " + v.name + ": " + type2str(v.type)  + ";\n" })
+    +
+    fold(p.operators, "", \ acc, v -> { acc + oper2str(v) + "\n" })
 }

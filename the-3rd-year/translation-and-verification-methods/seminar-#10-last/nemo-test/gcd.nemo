@@ -1,0 +1,15 @@
+var x: int;
+var y: int;
+var z: int;
+
+{
+    x = 100;
+    y = 110;
+    while(y != 0) do {
+        z = y;
+        y = (x % y);
+        x = z
+    };
+    print(x)
+}
+

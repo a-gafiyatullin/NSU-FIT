@@ -1,0 +1,207 @@
+import nemo_vm_parser;
+import ds/array;
+import ds/dlist;
+
+export {
+    Node(label: int, values: Tree<string, Value>);
+    Value ::= ValueInt, ValueArr;
+    ValueInt(v: int);
+    ValueArr(a: [Value]);
+
+    //Main functions
+    exec(node: Node, prog: Prog) -> DList<Node>;
+
+    //Debug functions
+    initVarsDefault(decls: [VarDecl]) -> Tree<string, Value>;
+}
+
+opValues(op: string, l: Value, r: Value) -> Maybe<int> {
+    switch(l) {
+        ValueArr(al): None()
+        ValueInt(vl): switch(r) {
+            ValueArr(ar): None()
+            ValueInt(vr): {
+                if(op == "+") Some(vl + vr)
+                else if(op == "-") Some(vl - vr)
+                else if(op == "*") Some(vl * vr)
+                else if(op == "/") if(vr != 0) Some(vl / vr) else None()
+                else if(op == "%") Some(vl % vr)
+                else None()
+            }
+        }
+    }
+}
+
+computeExpr(e: Expr, t: Tree<string, Value>) -> Maybe<Value> {
+    switch(e) {
+        BinOp(op, l, r): {
+            c_l = computeExpr(l, t);
+            c_r = computeExpr(r, t);
+            switch(c_l) {
+                None(): None()
+                Some(lv): switch(c_r) {
+                    None(): None()
+                    Some(rv): switch(opValues(op, lv, rv)) {
+                        None(): None()
+                        Some(rez): Some(ValueInt(rez))
+                    }
+                }
+            }
+        }
+        App(arr, i): switch(computeExpr(arr, t)) {
+            None(): None()
+            Some(v): switch(v) {
+                ValueInt(val): None()
+                ValueArr(a): switch(computeExpr(i, t)) {
+                    None(): None()
+                    Some(vi): switch(vi) {
+                        ValueArr(ai): None()
+                        ValueInt(index):
+                            if(index < length(a)) { Some(a[index]) }
+                            else { None() }
+                    }
+                }
+            }
+        }
+        Upd(arr, i, v): switch(computeExpr(arr, t)) {
+            None(): None()
+            Some(val): switch(val) {
+                ValueInt(value): None()
+                ValueArr(a): switch(computeExpr(i, t)) {
+                    None(): None()
+                    Some(vi): switch(vi) {
+                        ValueArr(ai): None()
+                        ValueInt(index): switch(computeExpr(v, t)) {
+                            None(): None()
+                            Some(rez_v): {
+                                if(index < length(a)) { Some(ValueArr(replace(a, index, rez_v))) }
+                                else if(index == length(a)) { Some(ValueArr(concat(a, [rez_v]))) }
+                                else { None() }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Const(val): Some(ValueInt(val))
+        Var(name): switch(lookupTree(t, name)) {
+            None(): None()
+            Some(v): Some(v)
+        }
+    }
+}
+
+computeCondition(o: CondOp, t: Tree<string, Value>) -> Maybe<bool> {
+    c_le = computeExpr(o.le, t);
+    c_re = computeExpr(o.re, t);
+    switch(c_le) {
+        None(): None()
+        Some(v_le): switch(c_re) {
+            None(): None()
+            Some(v_re): {
+                if(o.op == "==") Some(v_le == v_re)
+                else if(o.op == "<=") Some(v_le <= v_re)
+                else if(o.op == ">=") Some(v_le >= v_re)
+                else if(o.op == "<") Some(v_le < v_re)
+                else if(o.op == ">") Some(v_le > v_re)
+                else if(o.op == "!=") Some(v_le != v_re)
+                else None()
+            }
+        }
+    }
+}
+
+getOperByLabel(label: int, prog: Prog) -> Maybe<Oper> {
+    find(prog.operators, \ oper -> {
+        switch(oper) {
+            CondOper(l, cond, ll, lr): {
+                if(l == label) true
+                else false
+            }
+            PrintOper(l, e, labels): {
+                if(l == label) true
+                else false
+            }
+            AssignOper(l, var, val, labels): {
+                if(l == label) true
+                else false
+            }
+        }
+    })
+}
+
+arr2str(arr: Value) -> string {
+    switch(arr) {
+        ValueInt(v): i2s(v)
+        ValueArr(a): "[" + fold(a, "", \ s, v -> {s + " " + arr2str(v)}) + "]"
+    }
+}
+
+printTree(e: Expr, t: Tree<string, Value>) -> void {
+    switch(computeExpr(e, t)) {
+        None(): println("Bad expression!");
+        Some(v): switch(v) {
+            ValueInt(val): println(val);
+            ValueArr(arr): println(arr2str(v));
+        }
+    }
+}
+
+updateNode(node: Node, prog: Prog) -> Pair<bool, DList<Node>> {
+    operator = getOperByLabel(node.label, prog);
+    result = switch(operator) {
+        None(): Pair(false, Some([node]))
+        Some(v): switch(v) {
+            CondOper(l, cond, ll, lr): switch(computeCondition(cond, node.values)) {
+                None(): Pair(false, None())
+                Some(rez): if(rez) {
+                    Pair(true, Some(map(ll, \ label -> { Node(label.val, node.values) })))
+                } else {
+                    Pair(true, Some(map(lr, \ label -> { Node(label.val, node.values) })))
+                }
+            }
+            PrintOper(l, e, labels): { printTree(e, node.values);
+                Pair(true, Some(map(labels, \ label -> { Node(label.val, node.values) })))
+            }
+            AssignOper(l, var, e, labels): {
+                switch(computeExpr(e, node.values)) {
+                    None(): Pair(false, None())
+                    Some(val): switch(lookupTree(node.values, var.name)) {
+                        None(): Pair(false, None())
+                        Some(var_val): {
+                            upd_tree = setTree(node.values, var.name, val);
+                            Pair(true, Some(map(labels, \ label -> { Node(label.val, upd_tree) })))
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Pair(result.first, switch(result.second) {
+        None(): makeDList()
+        Some(array): fold(array, makeDList(), \ q, n -> { pushDList(q, n); q})
+    })
+}
+
+initVarsDefault(decls: [VarDecl]) -> Tree<string, Value> {
+    fold(decls, makeTree(), \ tree, v -> switch(v.type) {
+        Int(): setTree(tree, v.name, ValueInt(0))
+        Array(type): setTree(tree, v.name, ValueArr([]))
+    })
+}
+
+exec(node: Node, prog: Prog) -> DList<Node> {
+    queue = makeDList();
+    pushDList(queue, node);
+    for(queue, \ q -> { !emptyDList(q) }, \ q -> {
+        switch(popFirstDList(q)) {
+            None(): makeDList()
+            Some(v): {
+                new_queue =  updateNode(v, prog);
+                if(new_queue.first) {
+                    concatDList(q, new_queue.second); q
+                } else { q }
+            }
+        }
+    });
+}

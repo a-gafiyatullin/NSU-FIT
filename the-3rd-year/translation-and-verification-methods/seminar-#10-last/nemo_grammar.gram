@@ -1,0 +1,41 @@
+program = decl*:d oper:o { NemoProg(:d, :o) };
+
+// Types
+decl = ws "var" ws letters$l ws ":" ws type:t ws ";" ws { NemoVarDecl($l, :t) };
+type  = Int | Array;
+Int = ws "int" ws { NemoIntType() };
+Array = ws "[" type:t "]" ws { NemoArrayType(:t) };
+
+// Operations
+oper = cond | seq | choice | loop | assign | print | while | ifelse;
+cond = ws "(" expr:l logOp$o expr:r ")" ws "?" ws { NemoCondOper($o, :l, :r) };
+
+seq = ws "{" oper:l sem_seq*:o "}" ws { seqSemanticAct(:l, :o) };
+sem_seq = ws ";" oper;
+
+choice = ws "{" oper:l sem_choice*:o "}" ws { choiceSemanticAct(:l, :o) };
+sem_choice = ws "U" oper;
+
+loop = ws "(" oper:o ws ")" ws "*" ws { NemoLoopOper(:o) };
+print = ws "print" ws "(" expr:e ")" ws { NemoPrintOper(:e) };
+assign = var:v "=" expr:e { NemoAssignOper(:v, :e) };
+
+ifelse = ws "if" ws "(" expr:l logOp$o expr:r ")"
+    ws "then" ws oper:po ws "else" oper:no ws { ifelseSemanticAct($o, :l, :r, :po, :no) };
+while = ws "while" ws "(" expr:l logOp$o expr:r ")"
+    ws "do" ws oper:b ws { whileSemanticAct($o, :l, :r, :b) };
+
+// Expressions
+expr = const | var | binop | app | upd;
+const = ws digits$d ws { NemoConstExpr(s2i($d)) };
+var = ws letters$l ws { NemoVarExpr($l) };
+binop = ws "(" expr:l arithmeticOp$s expr:r ")" ws { NemoBinOpExpr($s, :l, :r) };
+app  = ws "(" ws "app" ws "(" expr:l "," expr:r ")" ws ")" ws { NemoAppExpr(:l, :r) };
+upd = ws "(" ws "upd" ws "(" expr:l "," expr:m "," expr:r ")" ws ")" ws { NemoUpdExpr(:l, :m, :r) };
+
+// Common declarations
+digits = ('0'-'9')+;
+letters = ('a'-'z')+;
+ws = (' ' | '\t' | '\n' | '\r')*;
+logOp = ("==" | "<=" | ">=" | "<" | ">" | "!=");
+arithmeticOp = ("+" | "*" | "/" | "-" | "%");

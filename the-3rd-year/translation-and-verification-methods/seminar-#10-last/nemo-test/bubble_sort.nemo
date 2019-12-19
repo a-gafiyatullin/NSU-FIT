@@ -1,0 +1,35 @@
+var x: [int];
+var i: int;
+var j: int;
+var temp: int;
+
+{
+    i = 0;
+    while((100 - i) > 0) do {
+        x = (upd(x, i, (100 - i)));
+        i = (i + 1)
+    };
+    i = 0;
+    while(i < 100) do {
+        print((app(x, i)));
+        i = (i + 1)
+    };
+    i = 0;
+    while(i < 100) do {
+        j = (i + 1);
+        while(j < 100) do {
+            if((app(x, i)) > (app(x, j))) then {
+                temp = (app(x, i));
+                x = (upd(x, i, (app(x, j))));
+                x = (upd(x, j, temp))
+            } else { j = j };
+            j = (j + 1)
+        };
+        i = (i + 1)
+    };
+    i = 0;
+    while(i < 100) do {
+        print((app(x, i)));
+        i = (i + 1)
+    }
+}

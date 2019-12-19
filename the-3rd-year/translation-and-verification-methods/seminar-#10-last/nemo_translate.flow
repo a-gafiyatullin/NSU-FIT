@@ -1,0 +1,123 @@
+import nemo_parser;
+import nemo_vm_exec;
+
+operMaxLabel(oper: Oper) -> int {
+    switch(oper) {
+        CondOper(lab, cond, ll, lr):
+            max(lab, max(if(length(ll) == 0) { 0 }
+                        else { fold(ll, ll[0].val, \ acc, v -> max(acc, v.val)) }
+                        ,if(length(lr) == 0) { 0 }
+                        else { fold(lr, lr[0].val, \ acc, v -> max(acc, v.val)) }))
+        PrintOper(lab, e, labels):
+            max(lab, if(length(labels) == 0) { 0 }
+                    else { fold(labels, labels[0].val, \ acc, v -> max(acc, v.val)) })
+        AssignOper(lab, var, val, labels):
+            max(lab, if(length(labels) == 0) { 0 }
+                    else { fold(labels, labels[0].val, \ acc, v -> max(acc, v.val)) })
+    }
+}
+
+opersMaxLabel(opers: [Oper]) -> int {
+    fold(opers, 0, \ acc, v -> max(acc, operMaxLabel(v)))
+}
+
+operShiftLabels(oper: Oper, n: int) -> Oper {
+    switch(oper) {
+        CondOper(lab, cond, ll, lr): {
+            CondOper(lab + n, cond, if(length(ll) == 0) { ll }
+                                    else { map(ll, \ v -> UtilityInt(v.val + n)) }
+                                    ,if(length(lr) == 0) { lr }
+                                    else { map(lr, \ v -> UtilityInt(v.val + n)) })
+        }
+        PrintOper(lab, e, labels):
+            PrintOper(lab + n, e, if(length(labels) == 0) { labels }
+                                  else { map(labels, \ v -> UtilityInt(v.val + n)) })
+        AssignOper(lab, var, val, labels): {
+            AssignOper(lab + n, var, val,  if(length(labels) == 0) { labels }
+                                           else { map(labels, \ v -> UtilityInt(v.val + n)) })
+        }
+    }
+}
+
+opersShiftLabels(opers: [Oper], n: int) -> [Oper] {
+    map(opers, \ o -> operShiftLabels(o, n))
+}
+
+operChangeLabels(oper: Oper, n: int, l: int) -> Oper {
+    switch(oper) {
+        CondOper(lab, cond, ll, lr): {
+            CondOper(if(lab == l) n else lab, cond,
+                        if(length(ll) == 0) { ll }
+                        else { map(ll, \ v -> UtilityInt(if(v.val == l) n else v.val)) }
+                        ,if(length(lr) == 0) { lr }
+                        else { map(lr, \ v -> UtilityInt(if(v.val == l) n else v.val)) })
+        }
+        PrintOper(lab, e, labels):
+            PrintOper(if(lab == l) n else lab, e,
+                        if(length(labels) == 0) { labels }
+                        else { map(labels, \ v -> UtilityInt(if(v.val == l) n else v.val)) })
+        AssignOper(lab, var, val, labels): {
+            AssignOper(if(lab == l) n else lab, var, val,
+                        if(length(labels) == 0) { labels }
+                        else { map(labels, \ v -> UtilityInt(if(v.val == l) n else v.val)) })
+        }
+    }
+}
+
+opersChangeLabels(opers: [Oper], n: int, l: int) -> [Oper] {
+    map(opers, \ o -> operChangeLabels(o, n, l))
+}
+
+nemoType2VnemoType(type: NemoType) -> Type {
+    switch(type) {
+        NemoIntType(): Int()
+        NemoArrayType(t): Array(nemoType2VnemoType(t))
+    }
+}
+
+nemoExpr2VnemoExpr(e: NemoExpr) -> Expr {
+    switch(e) {
+        NemoBinOpExpr(op, le, re): BinOp(op, nemoExpr2VnemoExpr(le), nemoExpr2VnemoExpr(re))
+        NemoAppExpr(ae, ie): App(nemoExpr2VnemoExpr(ae), nemoExpr2VnemoExpr(ie))
+        NemoUpdExpr(ae, ie, ve): Upd(nemoExpr2VnemoExpr(ae), nemoExpr2VnemoExpr(ie), nemoExpr2VnemoExpr(ve))
+        NemoConstExpr(val): Const(val)
+        NemoVarExpr(name): Var(name)
+    }
+}
+
+nemoOpers2vnemoOpers(oper: NemoOper) -> [Oper] {
+    switch(oper) {
+        NemoAssignOper(var, val): [AssignOper(0, Var(var.name), nemoExpr2VnemoExpr(val), [UtilityInt(1)])]
+        NemoCondOper(op, le, re): [CondOper(0, CondOp(op, nemoExpr2VnemoExpr(le), nemoExpr2VnemoExpr(re)), [UtilityInt(1)], [])]
+        NemoSeqOper(o): fold(tail(o), nemoOpers2vnemoOpers(o[0]), \ acc, v -> {
+            concat(acc, opersShiftLabels(nemoOpers2vnemoOpers(v), opersMaxLabel(acc)))
+        })
+        NemoChoiceOper(o): fold(tail(o), nemoOpers2vnemoOpers(o[0]), \ acc, v -> {
+            new_acc = opersShiftLabels(acc, 1);
+            new_acc_end = opersMaxLabel(new_acc);
+            new_v = opersShiftLabels(nemoOpers2vnemoOpers(v), new_acc_end);
+            new_v_end = opersMaxLabel(new_v);
+            concat3([CondOper(0, CondOp("==", Const(0), Const(0)), [UtilityInt(1), UtilityInt(new_acc_end)], [])],
+                opersChangeLabels(new_acc, new_v_end, new_acc_end), new_v)
+        })
+        NemoLoopOper(o): {
+            new_o = opersShiftLabels(nemoOpers2vnemoOpers(o), 1);
+            new_o_end = opersMaxLabel(new_o);
+            concat([CondOper(0, CondOp("==", Const(0), Const(0)), [UtilityInt(1), UtilityInt(new_o_end)], [])],
+                opersChangeLabels(new_o, 0, new_o_end))
+        }
+        NemoPrintOper(e): [PrintOper(0, nemoExpr2VnemoExpr(e), [UtilityInt(1)])]
+    }
+}
+
+nemoDecls2VnemoDecls(decls: [NemoVarDecl]) -> [VarDecl] {
+    map(decls, \ v -> VarDecl(v.name, nemoType2VnemoType(v.type)))
+}
+
+main() {
+    s = getFileContent("nemo-test/program.nemo");
+    nemo_prog = str2NemoProg(s);
+    vnemo_prog = Prog(nemoDecls2VnemoDecls(nemo_prog.decls), nemoOpers2vnemoOpers(nemo_prog.operators));
+    setFileContent("nemo-test/program.vnemo",progStruct2str(vnemo_prog));
+    exec(Node(0, initVarsDefault(vnemo_prog.decls)), vnemo_prog);
+}
