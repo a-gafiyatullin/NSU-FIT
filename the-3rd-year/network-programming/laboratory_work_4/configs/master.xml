@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config>
+    <!-- Settings for Snake -->
+    <master>
+        <width>80</width>
+        <height>25</height>
+        <food_static>3</food_static>
+        <food_per_player>2.5</food_per_player>
+        <state_delay_ms>100</state_delay_ms>
+        <dead_food_prob>0.5</dead_food_prob>
+        <ping_delay_ms>400</ping_delay_ms>
+        <node_timeout_ms>800</node_timeout_ms>
+    </master>
+    <node>
+        <name>Albert</name>
+        <only_view>true</only_view>
+    </node>
+</config>

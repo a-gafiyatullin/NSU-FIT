@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config>
+    <!-- Settings for Snake -->
+    <node>
+        <name>Albert</name>
+        <only_view>false</only_view>
+    </node>
+</config>
