@@ -21,6 +21,6 @@ Simple Socks5 Proxy Server.
 </ul>
 
 ## Execution:
-To start proxy server using specified port PORT type command:<br>
+To start proxy server on specific port PORT type command:
 <code>./proxy -p PORT</code><br>
-To see more debug info build project in debug mode using cmake or just compile with -DEBUG compiling option.
+To see more debug info build project in debug mode using cmake or just compile with -DDEBUG compiling option.
