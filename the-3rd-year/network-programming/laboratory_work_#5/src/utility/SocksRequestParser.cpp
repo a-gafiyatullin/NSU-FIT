@@ -71,10 +71,10 @@ int SocksRequestParser::parseConnectRequest(const size_t &delta_buff_len) {
         address_type_ = DOMAIN_NAME;
         break;
       }
-      port_ =
-          htons(((unsigned char)data_[request_min_size_ - PORT_FIELD_LENGTH]
-                 << ONE_OCTET_SHIFT) |
-                (unsigned char)data_[request_min_size_ - PORT_FIELD_LENGTH + 1]);
+      port_ = htons(
+          ((unsigned char)data_[request_min_size_ - PORT_FIELD_LENGTH]
+           << ONE_OCTET_SHIFT) |
+          (unsigned char)data_[request_min_size_ - PORT_FIELD_LENGTH + 1]);
 
       return request_min_size_;
     }

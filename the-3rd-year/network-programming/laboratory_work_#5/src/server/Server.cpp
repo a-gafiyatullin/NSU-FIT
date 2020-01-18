@@ -93,8 +93,15 @@ int Server::getSocketsTasks(fd_set &w, fd_set &r, fd_set &e) {
       FD_SET(client->first.socket_, &w);
       break;
     case DATA_EXCHANGE_DEST:
+      if (!client->second->isClientBufferFull()) {
+        FD_SET(client->first.socket_, &r);
+      }
+      FD_SET(client->first.socket_, &w);
+      break;
     case DATA_EXCHANGE_CLIENT:
-      FD_SET(client->first.socket_, &r);
+      if (!client->second->isDestBufferFull()) {
+        FD_SET(client->first.socket_, &r);
+      }
       FD_SET(client->first.socket_, &w);
       break;
     case NONE:
@@ -221,7 +228,6 @@ int Server::execClientAction(const int &socket, const bool &writable) {
   case DATA_EXCHANGE_CLIENT: {
     int error = client->second->exchangeClientData(writable);
     if (error < 0) {
-      deleteClient(client->second->getDestSocket());
       deleteClient(socket);
       return 0;
     }
@@ -230,7 +236,6 @@ int Server::execClientAction(const int &socket, const bool &writable) {
   case DATA_EXCHANGE_DEST: {
     int error = client->second->exchangeDestData(writable);
     if (error < 0) {
-      deleteClient(client->second->getSocket());
       deleteClient(socket);
       return 0;
     }

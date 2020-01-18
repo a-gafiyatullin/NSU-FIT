@@ -5,7 +5,8 @@ ClientProcessing::ClientProcessing(const int &socket)
       start_to_connect_(false), connection_error_(-1),
       connection_response_(nullptr), client_buffer_pos_(0),
       client_buffer_length_(0), dest_buffer_pos_(0), dest_buffer_length_(0),
-      socks_header_(std::make_shared<SocksRequestParser>()) {
+      socks_header_(std::make_shared<SocksRequestParser>()),
+      ready_to_delete(false), client_data_size_(0), dest_data_size_(0) {
   if (dest_socket_ < 0) {
     throw std::domain_error("Client::Client : resource_socket < 0!");
   }
@@ -163,8 +164,10 @@ int ClientProcessing::exchangeClientData(const bool &write) {
     char buffer[BUFSIZ];
     ssize_t length = recv(client_socket_, buffer, BUFSIZ, 0);
     if (length <= 0) {
+      ready_to_delete = true;
       return -1;
     }
+    dest_data_size_ += length;
 
     char *array = new char[length];
     memcpy(array, buffer, length);
@@ -176,15 +179,23 @@ int ClientProcessing::exchangeClientData(const bool &write) {
       if (!client_data_.empty()) {
         client_buffer_length_ = client_data_.front().second;
       } else {
-        return 0;
+        if (ready_to_delete) {
+          return -1;
+        } else {
+          return 0;
+        }
       }
     }
     auto data = client_data_.front();
     ssize_t len = send(client_socket_, data.first + client_buffer_pos_,
                        client_buffer_length_ - client_buffer_pos_, 0);
+
     if (len <= 0) {
+      ready_to_delete = true;
       return -1;
     }
+
+    client_data_size_ -= len;
     client_buffer_pos_ += len;
     if (client_buffer_pos_ == client_buffer_length_) {
       delete[] client_data_.front().first;
@@ -193,7 +204,11 @@ int ClientProcessing::exchangeClientData(const bool &write) {
       if (!client_data_.empty()) {
         client_buffer_length_ = client_data_.front().second;
       } else {
-        client_buffer_length_ = 0;
+        if (ready_to_delete) {
+          return -1;
+        } else {
+          client_buffer_length_ = 0;
+        }
       }
     }
 
@@ -207,9 +222,11 @@ int ClientProcessing::exchangeDestData(const bool &write) {
 
     ssize_t length = recv(dest_socket_, buffer, BUFSIZ, 0);
     if (length <= 0) {
+      ready_to_delete = true;
       return -1;
     }
 
+    client_data_size_ += length;
     char *array = new char[length];
     memcpy(array, buffer, length);
     client_data_.push(std::make_pair(array, length));
@@ -220,7 +237,11 @@ int ClientProcessing::exchangeDestData(const bool &write) {
       if (!dest_data_.empty()) {
         dest_buffer_length_ = dest_data_.front().second;
       } else {
-        return 0;
+        if (ready_to_delete) {
+          return -1;
+        } else {
+          return 0;
+        }
       }
     }
     auto data = dest_data_.front();
@@ -228,8 +249,11 @@ int ClientProcessing::exchangeDestData(const bool &write) {
     ssize_t len = send(dest_socket_, data.first + dest_buffer_pos_,
                        dest_buffer_length_ - dest_buffer_pos_, 0);
     if (len <= 0) {
+      ready_to_delete = true;
       return -1;
     }
+
+    dest_data_size_ -= len;
     dest_buffer_pos_ += len;
     if (dest_buffer_pos_ == dest_buffer_length_) {
       delete[] dest_data_.front().first;
@@ -238,7 +262,11 @@ int ClientProcessing::exchangeDestData(const bool &write) {
       if (!dest_data_.empty()) {
         dest_buffer_length_ = dest_data_.front().second;
       } else {
-        dest_buffer_length_ = 0;
+        if (ready_to_delete) {
+          return -1;
+        } else {
+          dest_buffer_length_ = 0;
+        }
       }
     }
 

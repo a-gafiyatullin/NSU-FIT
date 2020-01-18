@@ -23,11 +23,15 @@ private:
   bool start_to_connect_;
   int connection_error_;
   char *connection_response_;
+  bool ready_to_delete;
 
   // resource info
+  const int BUFFER_MULTIPLY = 5;
   std::shared_ptr<SocksRequestParser> socks_header_;
   std::queue<std::pair<char *, ssize_t>> client_data_;
+  ssize_t client_data_size_;
   std::queue<std::pair<char *, ssize_t>> dest_data_;
+  ssize_t dest_data_size_;
   // pos in the data piece from previous iteration
   ssize_t client_buffer_pos_;
   ssize_t client_buffer_length_;
@@ -76,6 +80,14 @@ public:
   int connectDestHost();
 
   void setDestAddress(const in_addr &address, const in_port_t &port);
+
+  [[nodiscard]] inline bool isClientBufferFull() const {
+    return client_data_size_ >= BUFFER_MULTIPLY * BUFSIZ;
+  }
+
+  [[nodiscard]] inline bool isDestBufferFull() const {
+    return dest_data_size_ >= BUFFER_MULTIPLY * BUFSIZ;
+  }
 
   ~ClientProcessing();
 };
