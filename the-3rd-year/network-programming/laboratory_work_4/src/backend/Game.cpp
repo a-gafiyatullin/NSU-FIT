@@ -286,6 +286,7 @@ void Server::sendGameMessages(const std::vector<GameMessage> &msgs) {
 
   delete[] buffer;
 
+  std::vector<int> clients_to_delete;
   // try to resend old messages
   for (auto repeated_msg : msg_queues_) {
     auto delay = (getTime() - repeated_msg.second.second);
@@ -344,11 +345,14 @@ void Server::sendGameMessages(const std::vector<GameMessage> &msgs) {
         snake->set_state(GameState_Snake_SnakeState_ZOMBIE);
       } else {
         // delete dead VIEWERS
-        msg_queues_.erase(client->id());
+        clients_to_delete.push_back(client->id());
         clients_addresses_.erase(client->id());
         current_state_.mutable_players()->mutable_players()->erase(client);
       }
     }
+  }
+  for (auto id : clients_to_delete) {
+    msg_queues_.erase(id);
   }
   if (no_deputy_flag_) {
     chooseNewDeputy();
