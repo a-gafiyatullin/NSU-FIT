@@ -1,16 +1,28 @@
 # Ignore executable files
 *.out
+
 # Ignore object files
 *.o
+
 # Ignore files generatied by the coverage test
 *.gcda
 *.gcno
 *.info
 *input*
 *output*
+
 # Ignore IDE files
 *.idea*
+*.iml
 *-build-*
+
 # Ignore rubbish from flow9 files
 *javagen*
 *.jar
+
+# Ignore backup files
+.~*
+
+# Ignore build system files
+target/
+
