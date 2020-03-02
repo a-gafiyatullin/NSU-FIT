@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="ru.nsu.fit.MainForm">
+  <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="5" left="5" bottom="5" right="5"/>
+    <constraints>
+      <xy x="20" y="20" width="598" height="227"/>
+    </constraints>
+    <properties/>
+    <border type="none" title="Main Form" title-justification="2" title-position="2">
+      <font size="14" style="1"/>
+      <title-color color="-4473925"/>
+    </border>
+    <children>
+      <grid id="a0cc6" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none" title="Queries and reports" title-justification="1" title-position="2">
+          <font size="14" style="1"/>
+        </border>
+        <children>
+          <component id="c5b10" class="javax.swing.JButton" binding="theDiskWithTheMostSongsButton">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="The disk with the most songs"/>
+            </properties>
+          </component>
+          <component id="17bed" class="javax.swing.JButton" binding="diskWithSongButton" default-binding="true">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Disk with song"/>
+            </properties>
+          </component>
+          <component id="e0610" class="javax.swing.JButton" binding="composerSDisksButton" default-binding="true">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Composer's disks"/>
+            </properties>
+          </component>
+          <component id="c244f" class="javax.swing.JButton" binding="songsOnTheDiskButton" default-binding="true">
+            <constraints>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Songs on the disk"/>
+            </properties>
+          </component>
+          <component id="391ee" class="javax.swing.JButton" binding="theBandWithTheMostMembersButton">
+            <constraints>
+              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="The band with the most members"/>
+            </properties>
+          </component>
+          <component id="b0097" class="javax.swing.JButton" binding="bandMembersButton">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Band members"/>
+            </properties>
+          </component>
+          <component id="1b2e" class="javax.swing.JButton" binding="authorSBandsButton" default-binding="true">
+            <constraints>
+              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Author's bands"/>
+            </properties>
+          </component>
+          <component id="9dfae" class="javax.swing.JButton" binding="authorSSongsButton" default-binding="true">
+            <constraints>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Author's songs"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <vspacer id="d8178">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+    </children>
+  </grid>
+</form>
