@@ -1,0 +1,392 @@
+<HTML>
+<HEAD>
+  <TITLE>strategy-games</TITLE>
+  <meta NAME = "GENERATOR"          CONTENT = "IHMC CmapTools vr. 4.12 ">
+  <meta NAME = "KEYWORDS"           CONTENT = "Albert Gafiyatullin, Concept Map, cmap, CmapTools, IHMC, strategy-games,  компания,  Tower Defense,  Условно-бесплатная,  RTS,  MOBA,  уровень мастерства игрока,  TBS,  стратегическое мышление,  Auto battler,  Бесплатная,  характеристики ПК,  TRPG,  Wargames,  RTT,  Платная,  Стратегическая игра,  Модель распространения,  сообщество,  Жанры,  4X">
+  <meta NAME = "DESCRIPTION"        CONTENT = "This Concept Map, created with IHMC CmapTools, has information related to: strategy-games, Стратегическая игра разрабатывается компания, Жанры включает в себя Auto battler, Жанры включает в себя TBS, Жанры включает в себя RTS, Стратегическая игра имеет требования характеристики ПК, Жанры включает в себя MOBA, Стратегическая игра разрабатывается сообщество, Модель распространения включает в себя Бесплатная, Модель распространения включает в себя Платная, Жанры включает в себя Wargames, Стратегическая игра имеет требования уровень мастерства игрока, Жанры включает в себя TRPG, Жанры включает в себя RTT, Жанры включает в себя Tower Defense, Стратегическая игра подразделяется по Жанры, Стратегическая игра развивает стратегическое мышление, Жанры включает в себя 4X, Стратегическая игра подразделяется по Модель распространения, Модель распространения включает в себя Условно-бесплатная">
+  <meta NAME = "AUTHOR"             CONTENT = "IHMC CmapTools">
+  <meta HTTP-EQUIV = "Content-Type" CONTENT = "text/html; charset = UTF-8">
+  <script LANGUAGE="JavaScript1.2">
+  <!--
+    //  PopUp --
+    //  Institute for Human and Machine Cognition, http://www.ihmc.us/
+    //  CmapTools, Version 4.11, http://cmap.ihmc.us/
+    //  Modify by: CmapTools Developers, cmapsupport@ihmc.us
+    //  Date: 12/14/2006
+
+    var IE = 0;
+    var IE4PC = 0;
+    var NS = 0;
+    var GECKO = 0;
+
+    var openpopups = new Array();
+
+    if (document.all) {                 // Internet Explorer Detected
+	   IE = true;	
+    }
+    else if (document.layers) {         // Netscape Navigator Detected
+	   NS = true;	
+    }
+    else if (document.getElementById) { // Netscape 6 Detected
+       GECKO = true;
+    }
+    else {
+	   alert("Unrecognized Browser Detected::\nSorry, your browser is not compatible.");
+    }
+
+    if (IE)
+    {
+	   OS = navigator.platform;
+	   VER = new String(navigator.appVersion);
+	   VER = VER.substr (0, VER.indexOf(" "));
+	   if ((VER < 4.8) && (OS == "Win32")) 
+	   {
+	       IE4PC = 1;
+	   }
+    }
+
+    function handleResize() {
+	    location.reload();
+	    return false;
+    }
+
+
+    if ((NS) && (navigator.platform == "MacPPC")) {
+	   window.captureEvents (Event.RESIZE);
+	   window.onresize = handleResize;
+    }
+
+    function openResource(event, resourcePath, resourceName, resourceType)
+    {
+	   var newwindow;
+
+       // Resource MIMETypes are enumerated as follows: 
+       // cMap     = Undefined
+       // Image    = 0
+       // Video    = 1
+       // Text     = 2
+       // Audio    = 3
+
+       popDown();
+
+	   switch (resourceType) 
+	   {
+	    case 0:     //Image
+                    newwindow = window.open (resourcePath,resourceName);
+                    newwindow.onBlur = newwindow.focus()
+                    var text ='<center><img src=\"';
+                    text += resourcePath;
+                    text +='\"> </center>';
+             break;
+		
+	    case 1:  text   // Video
+		     newwindow = window.open (resourcePath,resourceName);
+                     newwindow.onBlur = newwindow.focus()
+                     var text ='<embed src=\"';
+                     text += resourcePath;
+                     text +='\" autostart=true> </embed> ';
+             break;
+
+	    case 2:      // Text or Unknown 
+		     newwindow = window.open(resourcePath,resourceName);
+                     newwindow.onBlur = newwindow.focus()
+              break;
+
+	    case 3:       // Audio
+                    newwindow = window.open (resourcePath,resourceName);
+                    newwindow.onBlur = newwindow.focus()
+                    var text ='<embed src=\"';
+                    text += resourcePath;
+                    text +='\" autoplay=true> </embed> ';
+             break;
+
+	    case 4:
+                    newwindow = window.open(resourcePath,resourceName);
+                    newwindow.onBlur = newwindow.focus()
+	     break;
+	    }
+        return;
+    }
+
+
+
+    function popUpEvt(event, popupName)
+    {
+	popDown();
+
+	if (GECKO)
+	{
+	    document.getElementById(popupName).style.left = event.layerX;
+	    document.getElementById(popupName).style.top = event.layerY;
+	    document.getElementById(popupName).style.background = "#B3B3B3";
+	    document.getElementById(popupName).style.visibility = "visible";
+	    openpopups.push(popupName);
+	}
+	else if (NS) 
+	{
+	    document.layers[popupName].moveTo (event.pageX, event.pageY);
+	    document.layers[popupName].bgColor = "#B3B3B3";
+	    document.layers[popupName].visibility = "show";
+	    openpopups.push(popupName);
+	}
+	else // if (IE)
+	{
+	    window.event.cancelBubble = true;
+	    if (!IE4PC) {
+		document.all[popupName].style.backgroundColor = "#B3B3B3";
+	    }	
+	    document.all[popupName].style.left = window.event.clientX + document.body.scrollLeft;
+	    document.all[popupName].style.top = window.event.clientY + document.body.scrollTop;
+	    document.all[popupName].style.visibility = "visible";
+	    openpopups[openpopups.length] = popupName;
+	}
+	return false;
+    }
+
+    function popDown()
+    {
+	var popupname;
+	
+	for (var i = 0; i < openpopups.length; i++) 
+	{
+	    popupname = new String (openpopups[i]);      
+	    if (GECKO) {
+		document.getElementById(popupname).style.visibility = "hidden";
+	    }
+	    else if (NS) {
+		document.layers[popupname].visibility = "hide";
+	    }
+	    else {
+		document.all[popupname].style.visibility = "hidden";
+	    }
+	}
+	openpopups = new Array();
+	return;
+    }
+
+    function popDownNoGecko() 
+    {
+	var popupname;
+	for (var i = 0; i < openpopups.length; i++) 
+	{
+	    popupname = new String (openpopups[i]);      
+	    if (GECKO) {
+           //  document.getElementById(popupname).style.visibility = "hidden"; 
+	        return;   // erased for test purposes
+	    }  
+	    else if (NS) {
+	        document.layers[popupname].visibility = "hide";
+	    }
+	    else {
+	        document.all[popupname].style.visibility = "hidden";
+	    }
+	}
+	openpopups = new Array();
+        return;
+    }
+  //-->
+  </script>
+</HEAD>
+<BODY bgcolor="#FFFFFF" leftmargin="0" topmargin="0">
+<noscript>
+  <table width=90% cellpadding=10>
+    <tr>
+      <td bgcolor=ff4447>
+        <font color=000000 size=+1 face="helvetica">
+        <h1>WARNING:</h1>
+        <b>JavaScript is turned OFF.  None of the links on this concept map will <br>
+           work until it is reactivated.
+          <p>
+            <a href="http://cmap.ihmc.us/docs/EnablingJavaScript.html">
+                            If you need help turning JavaScript On, click here.
+            </a>
+          </p>
+        </b>
+      </td>
+    </tr>
+  </table>
+This Concept Map, created with IHMC CmapTools, has information related to: strategy-games, Стратегическая игра разрабатывается компания, Жанры включает в себя Auto battler, Жанры включает в себя TBS, Жанры включает в себя RTS, Стратегическая игра имеет требования характеристики ПК, Жанры включает в себя MOBA, Стратегическая игра разрабатывается сообщество, Модель распространения включает в себя Бесплатная, Модель распространения включает в себя Платная, Жанры включает в себя Wargames, Стратегическая игра имеет требования уровень мастерства игрока, Жанры включает в себя TRPG, Жанры включает в себя RTT, Жанры включает в себя Tower Defense, Стратегическая игра подразделяется по Жанры, Стратегическая игра развивает стратегическое мышление, Жанры включает в себя 4X, Стратегическая игра подразделяется по Модель распространения, Модель распространения включает в себя Условно-бесплатная
+
+</noscript>
+
+<map name="strategy-games">
+  <area shape="rect"
+        href="1VJWLCTXMI2KQYPCI1J3ItextIhtml"
+        onClick="popUpEvt(event,'1VJWLCTXMI2KQYPCI1J3ItextIhtml'); return false;"
+        coords="952,350,970,368">
+  <area shape="rect"
+        href="1VJWKJQ5VI4X2JYGIXXIx-cmapIx-storable"
+        onClick="popUpEvt(event,'1VJWKJQ5VI4X2JYGIXXIx-cmapIx-storable'); return false;"
+        coords="573,646,591,664">
+  <area shape="rect"
+        href="1VJWKJVK9IDGF85MIYQIx-cmapIx-storable"
+        onClick="popUpEvt(event,'1VJWKJVK9IDGF85MIYQIx-cmapIx-storable'); return false;"
+        coords="727,682,745,700">
+  <area shape="rect"
+        href="1VJWLF2DVI14B6WHVI1MRItextIhtml"
+        onClick="popUpEvt(event,'1VJWLF2DVI14B6WHVI1MRItextIhtml'); return false;"
+        coords="828,344,846,362">
+  <area shape="rect"
+        href="1VJWMCRV2I19C65VGI2LFItextIhtml"
+        onClick="popUpEvt(event,'1VJWMCRV2I19C65VGI2LFItextIhtml'); return false;"
+        coords="934,609,952,627">
+  <area shape="rect"
+        href="1VJWL9ZLKI1636YBHI1D9ItextIhtml"
+        onClick="popUpEvt(event,'1VJWL9ZLKI1636YBHI1D9ItextIhtml'); return false;"
+        coords="986,431,1004,449">
+  <area shape="rect"
+        href="1VJWLGZ12I1KD6L13I1RNItextIhtml"
+        onClick="popUpEvt(event,'1VJWLGZ12I1KD6L13I1RNItextIhtml'); return false;"
+        coords="545,574,563,592">
+  <area shape="rect"
+        href="1VJWL2MQWI1XR5XWNI12QItextIhtml"
+        onClick="popUpEvt(event,'1VJWL2MQWI1XR5XWNI12QItextIhtml'); return false;"
+        coords="940,535,958,553">
+  <area shape="rect"
+        href="1VJWKXXWRIGVPQB9I10CItextIhtml"
+        onClick="popUpEvt(event,'1VJWKXXWRIGVPQB9I10CItextIhtml'); return false;"
+        coords="820,695,838,713">
+</map>
+
+<center>
+  <table width=* height=* cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td valign=center align=center>
+        <img USEMAP="#strategy-games"
+             SRC="strategy-games.jpg"
+             ALIGN=middle
+             BORDER=0
+             onClick=popDown();>
+      </td>
+    </tr>
+    <tr>
+      <td VALIGN=top ALIGN=right>
+        <table>
+          <tr>
+            <td ALIGN=right VALIGN=middle>
+              <map NAME="CmapToolsTrademark">
+                <area SHAPE="rect"
+                      href="http://cmap.ihmc.us/"
+                      onClick="openResource(event,'http://cmap.ihmc.us/', 0, 2); return false;"
+                      coords="1,1,210,50">
+              </map>
+            </td>
+          </tr>
+          <tr>
+            <td  ALIGN=right VALIGN=middle>
+              <img USEMAP="#CmapToolsTrademark"
+                   SRC="CmapToolsTrademark.gif" 
+                   ALT="IHMC Cmap Tools Trademark" width="210" height="50"
+                   ALIGN=middle
+                   BORDER=0>
+            </td>
+            <td VALIGN=middle>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</center>
+</BODY>
+</HTML>
+<div id="1VJWLCTXMI2KQYPCI1J3ItextIhtml" style="POSITION: absolute; Z-INDEX: 20; VISIBILITY: hidden; left: 0; top: 0;">
+  <table border=1 cellpadding=1 cellspacing=0 bgcolor="#dddddd">
+    <tr>
+      <td nowrap><font face="Geneva, Arial" size=2>
+      <a HREF="https://en.wikipedia.org/wiki/Tower_defense" TITLE="">
+      Tower Defence
+      </a>
+      </td>
+    </tr>
+  </table>
+</div>
+<div id="1VJWKJQ5VI4X2JYGIXXIx-cmapIx-storable" style="POSITION: absolute; Z-INDEX: 20; VISIBILITY: hidden; left: 0; top: 0;">
+  <table border=1 cellpadding=1 cellspacing=0 bgcolor="#dddddd">
+    <tr>
+      <td nowrap><font face="Geneva, Arial" size=2>
+      <a HREF="RTS.html" TITLE="RTS main concepts">
+      RTS
+      </a>
+      </td>
+    </tr>
+  </table>
+</div>
+<div id="1VJWKJVK9IDGF85MIYQIx-cmapIx-storable" style="POSITION: absolute; Z-INDEX: 20; VISIBILITY: hidden; left: 0; top: 0;">
+  <table border=1 cellpadding=1 cellspacing=0 bgcolor="#dddddd">
+    <tr>
+      <td nowrap><font face="Geneva, Arial" size=2>
+      <a HREF="MOBA.html" TITLE="MOBA main concepts">
+      MOBA
+      </a>
+      </td>
+    </tr>
+  </table>
+</div>
+<div id="1VJWLF2DVI14B6WHVI1MRItextIhtml" style="POSITION: absolute; Z-INDEX: 20; VISIBILITY: hidden; left: 0; top: 0;">
+  <table border=1 cellpadding=1 cellspacing=0 bgcolor="#dddddd">
+    <tr>
+      <td nowrap><font face="Geneva, Arial" size=2>
+      <a HREF="https://en.wikipedia.org/wiki/Turn-based_strategy" TITLE="">
+      TBS
+      </a>
+      </td>
+    </tr>
+  </table>
+</div>
+<div id="1VJWMCRV2I19C65VGI2LFItextIhtml" style="POSITION: absolute; Z-INDEX: 20; VISIBILITY: hidden; left: 0; top: 0;">
+  <table border=1 cellpadding=1 cellspacing=0 bgcolor="#dddddd">
+    <tr>
+      <td nowrap><font face="Geneva, Arial" size=2>
+      <a HREF="https://en.wikipedia.org/wiki/Auto_battler" TITLE="">
+      Auto battler
+      </a>
+      </td>
+    </tr>
+  </table>
+</div>
+<div id="1VJWL9ZLKI1636YBHI1D9ItextIhtml" style="POSITION: absolute; Z-INDEX: 20; VISIBILITY: hidden; left: 0; top: 0;">
+  <table border=1 cellpadding=1 cellspacing=0 bgcolor="#dddddd">
+    <tr>
+      <td nowrap><font face="Geneva, Arial" size=2>
+      <a HREF="https://en.wikipedia.org/wiki/Tactical_role-playing_game" TITLE="">
+      TRPG
+      </a>
+      </td>
+    </tr>
+  </table>
+</div>
+<div id="1VJWLGZ12I1KD6L13I1RNItextIhtml" style="POSITION: absolute; Z-INDEX: 20; VISIBILITY: hidden; left: 0; top: 0;">
+  <table border=1 cellpadding=1 cellspacing=0 bgcolor="#dddddd">
+    <tr>
+      <td nowrap><font face="Geneva, Arial" size=2>
+      <a HREF="https://en.wikipedia.org/wiki/Wargame_(video_games)" TITLE="">
+      Wargames
+      </a>
+      </td>
+    </tr>
+  </table>
+</div>
+<div id="1VJWL2MQWI1XR5XWNI12QItextIhtml" style="POSITION: absolute; Z-INDEX: 20; VISIBILITY: hidden; left: 0; top: 0;">
+  <table border=1 cellpadding=1 cellspacing=0 bgcolor="#dddddd">
+    <tr>
+      <td nowrap><font face="Geneva, Arial" size=2>
+      <a HREF="https://en.wikipedia.org/wiki/Real-time_tactics" TITLE="">
+      RTT
+      </a>
+      </td>
+    </tr>
+  </table>
+</div>
+<div id="1VJWKXXWRIGVPQB9I10CItextIhtml" style="POSITION: absolute; Z-INDEX: 20; VISIBILITY: hidden; left: 0; top: 0;">
+  <table border=1 cellpadding=1 cellspacing=0 bgcolor="#dddddd">
+    <tr>
+      <td nowrap><font face="Geneva, Arial" size=2>
+      <a HREF="https://en.wikipedia.org/wiki/4X" TITLE="">
+      4X
+      </a>
+      </td>
+    </tr>
+  </table>
+</div>
+
