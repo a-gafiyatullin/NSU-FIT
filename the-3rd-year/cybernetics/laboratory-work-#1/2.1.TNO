@@ -1,0 +1,19 @@
+********************************************************************************
+***                            Micro-Cap 10.2.0.0                            ***
+***                         a.gafiyatullin@g.nsu.ru                          ***
+***                                   NSU                                    ***
+***                         Transient Analysis of 2                          ***
+***                           3/8/2020 4:57:36 PM                            ***
+********************************************************************************
+Limits
+======
+Time Range           20
+Maximum Time Step    0
+Number of Points     51
+Temperature          Linear 27
+Retrace Runs         1
+Run Options          Normal
+State Variables      Zero
+Operating Point      Off
+Operating Point Only Off
+
