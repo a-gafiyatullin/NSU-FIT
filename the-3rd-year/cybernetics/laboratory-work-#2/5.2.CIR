@@ -234,7 +234,7 @@ NodeVoltageFormat=3
 PathDelayFormat=3
 WarningFormat=3
 GridTextFormulaFormat=3
-Window Placement in Transient Analysis=0,1, -1,-1, -8,-31, 61,-10,1010,707
+Window Placement in Transient Analysis=0,1, -1,-1, -8,-31, 0,-10,949,707
 SpiceType=AMBIGUOUS
 Block Select Color=#51F998
 TitleBlock Field_1=$name
@@ -711,7 +711,6 @@ Type=Text
 Print=False
 Enable=True
 Name=Text
-SB 0=0,6
 
 [Page]
 Index=2
@@ -736,7 +735,7 @@ Font=Height=-23,FStyle=0,Color=#000000,Name=Courier New
 Comment Color=#008000
 Background Color=#FFFFFF
 Text=.Define n 3
-Text=.Define Tz 1.5
+Text=.Define Tz 0.0
 Text=.Define T0 0.76
 Text=
 Text=// --------Tz = 0.0--------
@@ -811,8 +810,8 @@ Text=//	4.9	1.0	6.497
 Text=// 4.95	1.0	6.561
 Text=// Ti = 4.9	K = 1.0
 Text=
-Text=.Define Ti 3.6
-Text=.Define K 1.7
+Text=.Define Ti 1.5
+Text=.Define K 11.0
 Text=.Define Td Ti / 4
 Text=.Define Tc Td / 8
 
@@ -824,7 +823,7 @@ Comment Color=#008000
 Background Color=#FFFFFF
 
 [Transient]
-Window Placement=0,1, -1,-1, -8,-31, 1065,31,1837,744
+Window Placement=0,1, -1,-1, -8,-31, 173,31,945,744
 Font=Height=-19,FStyle=0,Color=#0000FF,Name=Arial
 WinBackGround Color=#FFFFFF
 Select Color=#FF0000
@@ -1058,10 +1057,10 @@ AliasID=1
 XExp=T
 YExp=v(3)
 XRng=1000
-YRng=3,-0.75
+YRng=1.5e50,-1e50
 Options=LINEARX,LINEARY
 Range Grid X=200
-Range Grid Y=0.75
+Range Grid Y=5e49
 Enable=Enable
 Line Color=#0000FF
 Text Color=#0000FF
@@ -1084,10 +1083,10 @@ AliasID=2
 XExp=T
 YExp=v(2)
 XRng=1000
-YRng=3,-0.75
+YRng=1.5e50,-1e50
 Options=LINEARX,LINEARY
 Range Grid X=200
-Range Grid Y=0.75
+Range Grid Y=5e49
 Enable=Enable
 Line Color=#FF0000
 Text Color=#FF0000
@@ -1110,10 +1109,10 @@ AliasID=3
 XExp=T
 YExp=v(8)
 XRng=1000
-YRng=6
+YRng=1.25e50
 Options=LINEARX,LINEARY
 Range Grid X=200
-Range Grid Y=1.2
+Range Grid Y=2.5e49
 Enable=Enable
 Line Color=#008000
 Text Color=#008000

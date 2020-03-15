@@ -224,7 +224,7 @@ NodeVoltageFormat=3
 PathDelayFormat=3
 WarningFormat=3
 GridTextFormulaFormat=3
-Window Placement in Transient Analysis=0,1, -1,-1, -8,-30, 0,0,1148,814
+Window Placement in Transient Analysis=0,1, -1,-1, -8,-30, 0,0,949,814
 SpiceType=AMBIGUOUS
 Block Select Color=#51F998
 TitleBlock Field_1=$name
@@ -679,12 +679,12 @@ Text=.Define Ta 3.69 * T0
 Text=.Define tau Temk + Tz
 Text=
 Text=-------Variant 1-------
-Text=// .Define K 1 / (1.905 * (tau / Ta) + 0.826)
-Text=// .Define Ti (0.153 * (tau / Ta) + 0.362) * Ta
+Text=.Define K 1 / (1.905 * (tau / Ta) + 0.826)
+Text=.Define Ti (0.153 * (tau / Ta) + 0.362) * Ta
 Text=
 Text=-------Variant 2-------
-Text=.Define K 1 / (4.345 * (tau / Tint) - 0.151)
-Text=.Define Ti (-0.465 * (tau / Tint) + 0.624) * Tint
+Text=//.Define K 1 / (4.345 * (tau / Tint) - 0.151)
+Text=//.Define Ti (-0.465 * (tau / Tint) + 0.624) * Tint
 
 [Text Area]
 Section=0
@@ -694,7 +694,7 @@ Comment Color=#008000
 Background Color=#FFFFFF
 
 [Transient]
-Window Placement=0,1, -1,-1, -8,-30, 381,-4,1144,810
+Window Placement=0,1, -1,-1, -8,-30, 182,-4,945,810
 Font=Height=-19,FStyle=0,Color=#0000FF,Name=Arial
 WinBackGround Color=#FFFFFF
 Select Color=#FF0000
