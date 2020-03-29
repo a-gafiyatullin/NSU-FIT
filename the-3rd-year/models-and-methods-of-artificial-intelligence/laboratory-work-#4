@@ -1,0 +1,27 @@
+cat(butsy).
+cat(corny).
+cat(mac).
+
+dog(flash).
+dog(rover).
+dog(spot).
+
+brown(butsy).
+black(corny).
+red(mac).
+red(rover).
+white(spot).
+spotted(flash).
+
+animal(X) :- cat(X).
+animal(X) :- dog(X).
+
+owner(tom, X) :- animal(X), black(X).
+owner(tom, X) :- animal(X), brown(X).
+owner(kate, X) :- not(white(X)), dog(X), not(owner(tom, X)).
+owner(alan, mac) :- not(owner(kate, butsy)), not(pedigree(spot)). 
+
+pedigree(X) :- animal(X), owner(tom, X).
+pedigree(X) :- animal(X), owner(kate, X).
+
+print_results :- animal(X), not(owner(_, X)), writeln(X), fail.

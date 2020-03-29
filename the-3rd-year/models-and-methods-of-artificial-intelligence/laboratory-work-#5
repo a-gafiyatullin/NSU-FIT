@@ -1,0 +1,17 @@
+book(tolstoy, "Война и мир").
+book(tolstoy, "Анна Кареннна").
+book(tolstoy,"Детство. Отрочество. Юность").
+book(dostoevsky, "Идиот").
+book(dostoevsky, "Братья Карамазовы").
+book(dostoevsky,"Преступление и наказание").
+book(pushkin, "Евгений Онегин").
+book(pushkin, "Борис Годунов").
+book(lermontov, "Герой нашего времени").
+book(lermontov, "Смерть поэта").
+
+print_list([], 0).
+print_list([Head | Tail], Length) :- write(Head), nl, print_list(Tail, Length + 1).
+
+show_message(0) :- writeln("Для указанного автора нет книг!").
+
+print_results :- read(X), findall(Y, book(X, Y), L), print_list(L, Length), show_message(Length).
