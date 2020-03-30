@@ -18,10 +18,10 @@ animal(X) :- dog(X).
 
 owner(tom, X) :- animal(X), black(X).
 owner(tom, X) :- animal(X), brown(X).
-owner(kate, X) :- not(white(X)), dog(X), not(owner(tom, X)).
-owner(alan, mac) :- not(owner(kate, butsy)), not(pedigree(spot)). 
+owner(kate, X) :- dog(X), \+ white(X), \+ owner(tom, X).
+owner(alan, mac) :- \+ owner(kate, butsy), \+ pedigree(spot). 
 
 pedigree(X) :- animal(X), owner(tom, X).
 pedigree(X) :- animal(X), owner(kate, X).
 
-print_results :- animal(X), not(owner(_, X)), writeln(X), fail.
+print_results :- animal(X), \+ owner(_, X), writeln(X), fail.
