@@ -1,0 +1,6 @@
+Compiler: /opt/intel/bin/icc -O0  main.c
+
+n = 110, sigma = 0.00000001
+Total time: 218 sec.
+Generating plot...
+

@@ -1,0 +1,18 @@
+n = 110, sigma = 0.00000000
+Total time: 19 sec.
+
+ Performance counter stats for './a.out':
+
+     9,065,606,917      branches                                                    
+         2,592,207      branch-misses             #    0.03% of all branches        
+        43,019,723      LLC-loads                                                   
+        19,608,596      LLC-load-misses           #   45.58% of all LL-cache hits   
+    71,513,217,255      L1-dcache-loads                                             
+     3,963,985,860      L1-dcache-load-misses     #    5.54% of all L1-dcache hits  
+   303,946,422,292      instructions              #    3.39  insn per cycle         
+    89,729,447,505      cycles                                                      
+
+      19.133216295 seconds time elapsed
+
+      18.952498000 seconds user
+       0.180004000 seconds sys
