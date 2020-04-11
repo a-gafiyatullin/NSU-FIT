@@ -1,0 +1,97 @@
+Intel(R) Advisor can now assist with vectorization and show optimization
+  report messages with your source code.
+See "https://software.intel.com/en-us/intel-advisor-xe" for details.
+
+Intel(R) C Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 19.1.0.166 Build 20191121
+
+Compiler options: -g -O2 -ip -qopt-report=5 -qopt-report-phase=vec -axcoffeelake -xcoffeelake -MMD -MP -MFsrc/main.d -MTsrc/main.d -c -o src/main.o
+
+Begin optimization report for: main()
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at ../src/main.c(52,2)
+   remark #15542: loop was not vectorized: inner loop was already vectorized
+
+   LOOP BEGIN at ../src/main.c(53,3)
+   <Peeled loop for vectorization>
+   LOOP END
+
+   LOOP BEGIN at ../src/main.c(53,3)
+      remark #15389: vectorization support: reference F_low[i*9000+j] has unaligned access   [ ../src/main.c(63,4) ]
+      remark #15388: vectorization support: reference p[i*9000+j] has aligned access   [ ../src/main.c(57,5) ]
+      remark #15388: vectorization support: reference p[i*9000+j] has aligned access   [ ../src/main.c(59,5) ]
+      remark #15388: vectorization support: reference p[i*9000+j] has aligned access   [ ../src/main.c(61,5) ]
+      remark #15388: vectorization support: reference p[i*9000+j] has aligned access   [ ../src/main.c(57,5) ]
+      remark #15388: vectorization support: reference p[i*9000+j] has aligned access   [ ../src/main.c(59,5) ]
+      remark #15388: vectorization support: reference p[i*9000+j] has aligned access   [ ../src/main.c(61,5) ]
+      remark #15381: vectorization support: unaligned access used inside loop body
+      remark #15305: vectorization support: vector length 8
+      remark #15309: vectorization support: normalized vectorization overhead 0.297
+      remark #15300: LOOP WAS VECTORIZED
+      remark #15442: entire loop may be executed in remainder
+      remark #15448: unmasked aligned unit stride loads: 1 
+      remark #15449: unmasked aligned unit stride stores: 3 
+      remark #15451: unmasked unaligned unit stride stores: 1 
+      remark #15475: --- begin vector cost summary ---
+      remark #15476: scalar cost: 46 
+      remark #15477: vector cost: 8.000 
+      remark #15478: estimated potential speedup: 5.720 
+      remark #15487: type converts: 1 
+      remark #15488: --- end vector cost summary ---
+   LOOP END
+
+   LOOP BEGIN at ../src/main.c(53,3)
+   <Remainder loop for vectorization>
+   LOOP END
+LOOP END
+
+LOOP BEGIN at ../src/main.c(71,2)
+   remark #15542: loop was not vectorized: inner loop was already vectorized
+
+   LOOP BEGIN at ../src/main.c(81,3)
+      remark #15542: loop was not vectorized: inner loop was already vectorized
+
+      LOOP BEGIN at ../src/main.c(82,4)
+      <Peeled loop for vectorization>
+      LOOP END
+
+      LOOP BEGIN at ../src/main.c(82,4)
+         remark #15389: vectorization support: reference F_curr[(i-1)*9000+j-1] has unaligned access   [ ../src/main.c(84,17) ]
+         remark #15389: vectorization support: reference F_curr[(i-1)*9000+j+1] has unaligned access   [ ../src/main.c(84,45) ]
+         remark #15389: vectorization support: reference F_curr[(i-1)*9000+j] has unaligned access   [ ../src/main.c(85,18) ]
+         remark #15389: vectorization support: reference F_curr[(i+1)*9000+j] has unaligned access   [ ../src/main.c(85,42) ]
+         remark #15389: vectorization support: reference F_curr[i*9000+j-1] has unaligned access   [ ../src/main.c(86,17) ]
+         remark #15389: vectorization support: reference F_curr[i*9000+j+1] has unaligned access   [ ../src/main.c(86,41) ]
+         remark #15389: vectorization support: reference F_curr[(i+1)*9000+j-1] has unaligned access   [ ../src/main.c(87,17) ]
+         remark #15389: vectorization support: reference F_curr[(i+1)*9000+j+1] has unaligned access   [ ../src/main.c(87,45) ]
+         remark #15388: vectorization support: reference p[(i-1)*9000+j] has aligned access   [ ../src/main.c(88,16) ]
+         remark #15388: vectorization support: reference p[i*9000+j] has aligned access   [ ../src/main.c(89,14) ]
+         remark #15389: vectorization support: reference p[i*9000+j-1] has unaligned access   [ ../src/main.c(90,7) ]
+         remark #15389: vectorization support: reference p[i*9000+j+1] has unaligned access   [ ../src/main.c(91,7) ]
+         remark #15388: vectorization support: reference p[(i+1)*9000+j] has aligned access   [ ../src/main.c(92,7) ]
+         remark #15389: vectorization support: reference F_curr[i*9000+j] has unaligned access   [ ../src/main.c(93,13) ]
+         remark #15389: vectorization support: reference F_next[i*9000+j] has unaligned access   [ ../src/main.c(94,5) ]
+         remark #15381: vectorization support: unaligned access used inside loop body
+         remark #15305: vectorization support: vector length 8
+         remark #15309: vectorization support: normalized vectorization overhead 1.031
+         remark #15355: vectorization support: delta is float type reduction   [ ../src/main.c(72,3) ]
+         remark #15300: LOOP WAS VECTORIZED
+         remark #15442: entire loop may be executed in remainder
+         remark #15448: unmasked aligned unit stride loads: 3 
+         remark #15450: unmasked unaligned unit stride loads: 11 
+         remark #15451: unmasked unaligned unit stride stores: 1 
+         remark #15475: --- begin vector cost summary ---
+         remark #15476: scalar cost: 71 
+         remark #15477: vector cost: 8.120 
+         remark #15478: estimated potential speedup: 8.620 
+         remark #15488: --- end vector cost summary ---
+      LOOP END
+
+      LOOP BEGIN at ../src/main.c(82,4)
+      <Remainder loop for vectorization>
+      LOOP END
+   LOOP END
+LOOP END
+===========================================================================

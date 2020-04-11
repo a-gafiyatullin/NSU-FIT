@@ -1,0 +1,18 @@
+n = 110, sigma = 0.00000001
+Total time: 6.580000 sec.
+
+ Performance counter stats for './laboratory-work-2':
+
+     1,289,702,051      branches                                                    
+         1,523,949      branch-misses             #    0.12% of all branches        
+       127,729,026      LLC-loads                                                   
+        50,345,988      LLC-load-misses           #   39.42% of all LL-cache hits   
+    15,868,427,490      L1-dcache-loads                                             
+     3,987,037,369      L1-dcache-load-misses     #   25.13% of all L1-dcache hits  
+    35,735,800,963      instructions              #    1.12  insn per cycle         
+    31,860,019,372      cycles                                                      
+
+       6.841395704 seconds time elapsed
+
+       6.618578000 seconds user
+       0.222531000 seconds sys

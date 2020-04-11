@@ -30,7 +30,8 @@ int main() {
   // count cycle clocks
   int i;
   start = __rdtsc();
-  for(i = 0; i < CYCLE_NUM; i++) {}
+  for (i = 0; i < CYCLE_NUM; i++) {
+  }
   end = __rdtsc();
   clocks_per_empty_iter = (double)(end - start) / i;
   printf("Amount of clocks per empty iteration: %lf\n", clocks_per_empty_iter);
@@ -38,30 +39,30 @@ int main() {
   //---------------------------independent operations---------------------------
   // count clocks for cycle with divisions
   start = __rdtsc();
-  for(i = 0; i < CYCLE_NUM; i++) {
+  for (i = 0; i < CYCLE_NUM; i++) {
     result = x / y;
   }
   end = __rdtsc();
   printf("Amount of clocks per iteration with division: %lf, result = %d\n\n",
-      (double)(end - start) / i, result);
+         (double)(end - start) / i, result);
 
   // real division clocks
   printf("Division clocks for independent operations: %lf\n\n",
-      (double)(end - start) / i - clocks_per_empty_iter);
+         (double)(end - start) / i - clocks_per_empty_iter);
   //---------------------------Dependent operations-----------------------------
   x = 1 << 31;
 
   start = __rdtsc();
-  for(i = 0; i < CYCLE_NUM; i++) {
+  for (i = 0; i < CYCLE_NUM; i++) {
     x = x / y;
   }
   end = __rdtsc();
   printf("Amount of clocks per iteration with division: %lf, result = %d\n\n",
-      (double)(end - start) / i, x);
+         (double)(end - start) / i, x);
 
   // real division clocks
   printf("Division clocks for dependent operations: %lf\n\n",
-      (double)(end - start) / i - clocks_per_empty_iter);
+         (double)(end - start) / i - clocks_per_empty_iter);
 
   return 0;
 }

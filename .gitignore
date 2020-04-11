@@ -15,6 +15,8 @@
 *.idea*
 *.iml
 *-build-*
+.project
+.cproject
 
 # Ignore rubbish from flow9 files
 *javagen*
@@ -24,4 +26,5 @@
 
 # Ignore build system files
 target/
-
+/Debug/
+/Release/
