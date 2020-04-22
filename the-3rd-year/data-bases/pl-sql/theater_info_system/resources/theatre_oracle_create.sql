@@ -1,6 +1,6 @@
 CREATE TABLE "Rank" (
 	"id_rank" INT UNIQUE NOT NULL,
-	"name" VARCHAR2(255) UNIQUE NOT NULL,
+	"rank_name" VARCHAR2(255) UNIQUE NOT NULL,
 	constraint RANK_PK PRIMARY KEY ("id_rank"));
 
 CREATE sequence "RANK_ID_RANK_SEQ";
@@ -24,6 +24,7 @@ CREATE TABLE "Employee" (
 	"children_amount" INT NOT NULL DEFAULT "0",
 	"salary" NUMERIC NOT NULL,
 	"id_education" INT,
+	"id_job_type" INT NOT NULL,
 	constraint EMPLOYEE_PK PRIMARY KEY ("id_employee"));
 
 CREATE sequence "EMPLOYEE_ID_EMPLOYEE_SEQ";
@@ -38,7 +39,7 @@ end;
 /
 CREATE TABLE "Gender" (
 	"id_gender" INT UNIQUE NOT NULL,
-	"name" VARCHAR2(255) UNIQUE NOT NULL,
+	"gender_name" VARCHAR2(255) UNIQUE NOT NULL,
 	constraint GENDER_PK PRIMARY KEY ("id_gender"));
 
 CREATE sequence "GENDER_ID_GENDER_SEQ";
@@ -51,17 +52,17 @@ begin
 end;
 
 /
-CREATE TABLE "Actor" (
-	"id_actor" INT NOT NULL,
-	"id_voice" INT NOT NULL,
-	"height" NUMERIC NOT NULL,
-	constraint ACTOR_PK PRIMARY KEY ("id_actor"));
+CREATE TABLE "Employee-Characteristic" (
+	"id_employee" INT NOT NULL,
+	"id_characteristic" INT NOT NULL,
+	"value" NUMERIC,
+	constraint EMPLOYEE-CHARACTERISTIC_PK PRIMARY KEY ("id_employee","id_characteristic"));
 
 
 /
 CREATE TABLE "Competition" (
 	"id_competiton" INT UNIQUE NOT NULL,
-	"name" VARCHAR2(255) UNIQUE NOT NULL,
+	"competiton_name" VARCHAR2(255) UNIQUE NOT NULL,
 	constraint COMPETITION_PK PRIMARY KEY ("id_competiton"));
 
 CREATE sequence "COMPETITION_ID_COMPETITON_SEQ";
@@ -74,56 +75,27 @@ begin
 end;
 
 /
-CREATE TABLE "Director_type" (
-	"id_director_type" INT UNIQUE NOT NULL,
-	"name" VARCHAR2(255) UNIQUE NOT NULL,
-	constraint DIRECTOR_TYPE_PK PRIMARY KEY ("id_director_type"));
-
-CREATE sequence "DIRECTOR_TYPE_ID_DIRECTOR_TYPE_SEQ";
-
-CREATE trigger "BI_DIRECTOR_TYPE_ID_DIRECTOR_TYPE"
-  before insert on "Director_type"
-  for each row
-begin
-  select "DIRECTOR_TYPE_ID_DIRECTOR_TYPE_SEQ".nextval into :NEW."id_director_type" from dual;
-end;
-
-/
-CREATE TABLE "Staff" (
-	"id_staff" INT NOT NULL,
-	"id_staff_type" INT NOT NULL,
-	constraint STAFF_PK PRIMARY KEY ("id_staff"));
-
-
-/
 CREATE TABLE "Actor-Rank" (
 	"id_actor" INT NOT NULL,
 	"id_rank" INT NOT NULL,
-	"obtaining_date" DATE NOT NULL,
+	"obtaining_date" DATE,
 	"id_competition" INT,
 	constraint ACTOR-RANK_PK PRIMARY KEY ("id_actor","id_rank"));
 
 
 /
-CREATE TABLE "Director" (
-	"id_director" INT NOT NULL,
-	"id_director_type" INT NOT NULL,
-	constraint DIRECTOR_PK PRIMARY KEY ("id_director"));
+CREATE TABLE "Characteristic" (
+	"id_characteristic" INT UNIQUE NOT NULL,
+	"characteristic_type" VARCHAR2(255) UNIQUE NOT NULL,
+	constraint CHARACTERISTIC_PK PRIMARY KEY ("id_characteristic"));
 
+CREATE sequence "CHARACTERISTIC_ID_CHARACTERISTIC_SEQ";
 
-/
-CREATE TABLE "Voice" (
-	"id_voice" INT UNIQUE NOT NULL,
-	"voice_type" VARCHAR2(255) UNIQUE NOT NULL,
-	constraint VOICE_PK PRIMARY KEY ("id_voice"));
-
-CREATE sequence "VOICE_ID_VOICE_SEQ";
-
-CREATE trigger "BI_VOICE_ID_VOICE"
-  before insert on "Voice"
+CREATE trigger "BI_CHARACTERISTIC_ID_CHARACTERISTIC"
+  before insert on "Characteristic"
   for each row
 begin
-  select "VOICE_ID_VOICE_SEQ".nextval into :NEW."id_voice" from dual;
+  select "CHARACTERISTIC_ID_CHARACTERISTIC_SEQ".nextval into :NEW."id_characteristic" from dual;
 end;
 
 /
@@ -139,43 +111,6 @@ CREATE trigger "BI_EDUCATION_ID_EDUCATION"
   for each row
 begin
   select "EDUCATION_ID_EDUCATION_SEQ".nextval into :NEW."id_education" from dual;
-end;
-
-/
-CREATE TABLE "Musician" (
-	"id_musician" INT NOT NULL,
-	"id_musician_type" INT NOT NULL,
-	constraint MUSICIAN_PK PRIMARY KEY ("id_musician"));
-
-
-/
-CREATE TABLE "Musician_type" (
-	"id_musician_type" INT UNIQUE NOT NULL,
-	"name" VARCHAR2(255) UNIQUE NOT NULL,
-	constraint MUSICIAN_TYPE_PK PRIMARY KEY ("id_musician_type"));
-
-CREATE sequence "MUSICIAN_TYPE_ID_MUSICIAN_TYPE_SEQ";
-
-CREATE trigger "BI_MUSICIAN_TYPE_ID_MUSICIAN_TYPE"
-  before insert on "Musician_type"
-  for each row
-begin
-  select "MUSICIAN_TYPE_ID_MUSICIAN_TYPE_SEQ".nextval into :NEW."id_musician_type" from dual;
-end;
-
-/
-CREATE TABLE "Staff_type" (
-	"id_staff_type" INT UNIQUE NOT NULL,
-	"name" VARCHAR2(255) UNIQUE NOT NULL,
-	constraint STAFF_TYPE_PK PRIMARY KEY ("id_staff_type"));
-
-CREATE sequence "STAFF_TYPE_ID_STAFF_TYPE_SEQ";
-
-CREATE trigger "BI_STAFF_TYPE_ID_STAFF_TYPE"
-  before insert on "Staff_type"
-  for each row
-begin
-  select "STAFF_TYPE_ID_STAFF_TYPE_SEQ".nextval into :NEW."id_staff_type" from dual;
 end;
 
 /
@@ -223,7 +158,7 @@ end;
 /
 CREATE TABLE "Country" (
 	"id_country" INT UNIQUE NOT NULL,
-	"name" VARCHAR2(255) UNIQUE NOT NULL,
+	"country_name" VARCHAR2(255) UNIQUE NOT NULL,
 	constraint COUNTRY_PK PRIMARY KEY ("id_country"));
 
 CREATE sequence "COUNTRY_ID_COUNTRY_SEQ";
@@ -238,7 +173,7 @@ end;
 /
 CREATE TABLE "Genre" (
 	"id_genre" INT UNIQUE NOT NULL,
-	"name" VARCHAR2(255) UNIQUE NOT NULL,
+	"genre_name" VARCHAR2(255) UNIQUE NOT NULL,
 	constraint GENRE_PK PRIMARY KEY ("id_genre"));
 
 CREATE sequence "GENRE_ID_GENRE_SEQ";
@@ -253,7 +188,7 @@ end;
 /
 CREATE TABLE "Age_category" (
 	"id_age_category" INT UNIQUE NOT NULL,
-	"name" VARCHAR2(255) UNIQUE NOT NULL,
+	"age_category_name" VARCHAR2(255) UNIQUE NOT NULL,
 	constraint AGE_CATEGORY_PK PRIMARY KEY ("id_age_category"));
 
 CREATE sequence "AGE_CATEGORY_ID_AGE_CATEGORY_SEQ";
@@ -307,27 +242,11 @@ end;
 
 /
 CREATE TABLE "Direction" (
-	"id_show" INT NOT NULL,
 	"id_actor" INT NOT NULL,
-	"role" VARCHAR2(255) NOT NULL,
-	"id_actor_type" INT NOT NULL,
-	constraint DIRECTION_PK PRIMARY KEY ("id_show","id_actor"));
+	"id_role" INT NOT NULL,
+	"is_understudy" INT NOT NULL,
+	constraint DIRECTION_PK PRIMARY KEY ("id_actor","id_role"));
 
-
-/
-CREATE TABLE "Actor_type" (
-	"id_actor_type" INT UNIQUE NOT NULL,
-	"name" VARCHAR2(255) UNIQUE NOT NULL,
-	constraint ACTOR_TYPE_PK PRIMARY KEY ("id_actor_type"));
-
-CREATE sequence "ACTOR_TYPE_ID_ACTOR_TYPE_SEQ";
-
-CREATE trigger "BI_ACTOR_TYPE_ID_ACTOR_TYPE"
-  before insert on "Actor_type"
-  for each row
-begin
-  select "ACTOR_TYPE_ID_ACTOR_TYPE_SEQ".nextval into :NEW."id_actor_type" from dual;
-end;
 
 /
 CREATE TABLE "Tour" (
@@ -335,55 +254,108 @@ CREATE TABLE "Tour" (
 	"id_show" INT NOT NULL,
 	"from_date" DATE NOT NULL,
 	"to_date" DATE NOT NULL,
-	"id_tour_type" INT NOT NULL);
+	"is_visiting_tour" INT NOT NULL);
 
 
 /
-CREATE TABLE "Tour_type" (
-	"id_tour_type" INT UNIQUE NOT NULL,
-	"name" VARCHAR2(255) UNIQUE NOT NULL,
-	constraint TOUR_TYPE_PK PRIMARY KEY ("id_tour_type"));
+CREATE TABLE "Job_types" (
+	"id_job_type" INT UNIQUE NOT NULL,
+	"job_name" VARCHAR2(255) UNIQUE NOT NULL,
+	constraint JOB_TYPES_PK PRIMARY KEY ("id_job_type"));
 
-CREATE sequence "TOUR_TYPE_ID_TOUR_TYPE_SEQ";
+CREATE sequence "JOB_TYPES_ID_JOB_TYPE_SEQ";
 
-CREATE trigger "BI_TOUR_TYPE_ID_TOUR_TYPE"
-  before insert on "Tour_type"
+CREATE trigger "BI_JOB_TYPES_ID_JOB_TYPE"
+  before insert on "Job_types"
   for each row
 begin
-  select "TOUR_TYPE_ID_TOUR_TYPE_SEQ".nextval into :NEW."id_tour_type" from dual;
+  select "JOB_TYPES_ID_JOB_TYPE_SEQ".nextval into :NEW."id_job_type" from dual;
+end;
+
+/
+CREATE TABLE "Role-Characteristic" (
+	"id_characteristic" INT NOT NULL,
+	"id_role" INT NOT NULL,
+	"value" DECIMAL,
+	constraint ROLE-CHARACTERISTIC_PK PRIMARY KEY ("id_characteristic","id_role"));
+
+
+/
+CREATE TABLE "Role" (
+	"id_role" INT UNIQUE NOT NULL,
+	"id_show" INT NOT NULL,
+	"role_name" VARCHAR2(255) NOT NULL,
+	"is_main" INT NOT NULL,
+	constraint ROLE_PK PRIMARY KEY ("id_role"));
+
+CREATE sequence "ROLE_ID_ROLE_SEQ";
+
+CREATE trigger "BI_ROLE_ID_ROLE"
+  before insert on "Role"
+  for each row
+begin
+  select "ROLE_ID_ROLE_SEQ".nextval into :NEW."id_role" from dual;
+end;
+
+/
+CREATE TABLE "Subscription" (
+	"id_subscription" INT UNIQUE NOT NULL,
+	"id_genre" INT,
+	"id_author" INT,
+	constraint SUBSCRIPTION_PK PRIMARY KEY ("id_subscription"));
+
+CREATE sequence "SUBSCRIPTION_ID_SUBSCRIPTION_SEQ";
+
+CREATE trigger "BI_SUBSCRIPTION_ID_SUBSCRIPTION"
+  before insert on "Subscription"
+  for each row
+begin
+  select "SUBSCRIPTION_ID_SUBSCRIPTION_SEQ".nextval into :NEW."id_subscription" from dual;
+end;
+
+/
+CREATE TABLE "Ticket-Subscription" (
+	"id_ticket" INT NOT NULL,
+	"id_subscription" INT NOT NULL,
+	constraint TICKET-SUBSCRIPTION_PK PRIMARY KEY ("id_ticket","id_subscription"));
+
+CREATE sequence "TICKET-SUBSCRIPTION_ID_TICKET_SEQ";
+
+CREATE trigger "BI_TICKET-SUBSCRIPTION_ID_TICKET"
+  before insert on "Ticket-Subscription"
+  for each row
+begin
+  select "TICKET-SUBSCRIPTION_ID_TICKET_SEQ".nextval into :NEW."id_ticket" from dual;
+end;
+CREATE sequence "TICKET-SUBSCRIPTION_ID_SUBSCRIPTION_SEQ";
+
+CREATE trigger "BI_TICKET-SUBSCRIPTION_ID_SUBSCRIPTION"
+  before insert on "Ticket-Subscription"
+  for each row
+begin
+  select "TICKET-SUBSCRIPTION_ID_SUBSCRIPTION_SEQ".nextval into :NEW."id_subscription" from dual;
 end;
 
 /
 
 ALTER TABLE "Employee" ADD CONSTRAINT "Employee_fk0" FOREIGN KEY ("id_gender") REFERENCES "Gender"("id_gender");
 ALTER TABLE "Employee" ADD CONSTRAINT "Employee_fk1" FOREIGN KEY ("id_education") REFERENCES "Education"("id_education");
+ALTER TABLE "Employee" ADD CONSTRAINT "Employee_fk2" FOREIGN KEY ("id_job_type") REFERENCES "Job_types"("id_job_type");
 
 
-ALTER TABLE "Actor" ADD CONSTRAINT "Actor_fk0" FOREIGN KEY ("id_actor") REFERENCES "Employee"("id_employee");
-ALTER TABLE "Actor" ADD CONSTRAINT "Actor_fk1" FOREIGN KEY ("id_voice") REFERENCES "Voice"("id_voice");
+ALTER TABLE "Employee-Characteristic" ADD CONSTRAINT "Employee-Characteristic_fk0" FOREIGN KEY ("id_employee") REFERENCES "Employee"("id_employee");
+ALTER TABLE "Employee-Characteristic" ADD CONSTRAINT "Employee-Characteristic_fk1" FOREIGN KEY ("id_characteristic") REFERENCES "Characteristic"("id_characteristic");
 
 
-
-ALTER TABLE "Staff" ADD CONSTRAINT "Staff_fk0" FOREIGN KEY ("id_staff") REFERENCES "Employee"("id_employee");
-ALTER TABLE "Staff" ADD CONSTRAINT "Staff_fk1" FOREIGN KEY ("id_staff_type") REFERENCES "Staff_type"("id_staff_type");
-
-ALTER TABLE "Actor-Rank" ADD CONSTRAINT "Actor-Rank_fk0" FOREIGN KEY ("id_actor") REFERENCES "Actor"("id_actor");
+ALTER TABLE "Actor-Rank" ADD CONSTRAINT "Actor-Rank_fk0" FOREIGN KEY ("id_actor") REFERENCES "Employee"("id_employee");
 ALTER TABLE "Actor-Rank" ADD CONSTRAINT "Actor-Rank_fk1" FOREIGN KEY ("id_rank") REFERENCES "Rank"("id_rank");
 ALTER TABLE "Actor-Rank" ADD CONSTRAINT "Actor-Rank_fk2" FOREIGN KEY ("id_competition") REFERENCES "Competition"("id_competiton");
 
-ALTER TABLE "Director" ADD CONSTRAINT "Director_fk0" FOREIGN KEY ("id_director") REFERENCES "Employee"("id_employee");
-ALTER TABLE "Director" ADD CONSTRAINT "Director_fk1" FOREIGN KEY ("id_director_type") REFERENCES "Director_type"("id_director_type");
 
 
-
-ALTER TABLE "Musician" ADD CONSTRAINT "Musician_fk0" FOREIGN KEY ("id_musician") REFERENCES "Employee"("id_employee");
-ALTER TABLE "Musician" ADD CONSTRAINT "Musician_fk1" FOREIGN KEY ("id_musician_type") REFERENCES "Musician_type"("id_musician_type");
-
-
-
-ALTER TABLE "Show" ADD CONSTRAINT "Show_fk0" FOREIGN KEY ("id_director") REFERENCES "Director"("id_director");
-ALTER TABLE "Show" ADD CONSTRAINT "Show_fk1" FOREIGN KEY ("id_production_designer") REFERENCES "Director"("id_director");
-ALTER TABLE "Show" ADD CONSTRAINT "Show_fk2" FOREIGN KEY ("id_conductor") REFERENCES "Director"("id_director");
+ALTER TABLE "Show" ADD CONSTRAINT "Show_fk0" FOREIGN KEY ("id_director") REFERENCES "Employee"("id_employee");
+ALTER TABLE "Show" ADD CONSTRAINT "Show_fk1" FOREIGN KEY ("id_production_designer") REFERENCES "Employee"("id_employee");
+ALTER TABLE "Show" ADD CONSTRAINT "Show_fk2" FOREIGN KEY ("id_conductor") REFERENCES "Employee"("id_employee");
 ALTER TABLE "Show" ADD CONSTRAINT "Show_fk3" FOREIGN KEY ("id_author") REFERENCES "Author"("id_author");
 ALTER TABLE "Show" ADD CONSTRAINT "Show_fk4" FOREIGN KEY ("id_genre") REFERENCES "Genre"("id_genre");
 ALTER TABLE "Show" ADD CONSTRAINT "Show_fk5" FOREIGN KEY ("id_age_category") REFERENCES "Age_category"("id_age_category");
@@ -399,13 +371,21 @@ ALTER TABLE "Sale" ADD CONSTRAINT "Sale_fk0" FOREIGN KEY ("id_ticket") REFERENCE
 
 ALTER TABLE "Repertoire" ADD CONSTRAINT "Repertoire_fk0" FOREIGN KEY ("id_show") REFERENCES "Show"("id_show");
 
-ALTER TABLE "Direction" ADD CONSTRAINT "Direction_fk0" FOREIGN KEY ("id_show") REFERENCES "Show"("id_show");
-ALTER TABLE "Direction" ADD CONSTRAINT "Direction_fk1" FOREIGN KEY ("id_actor") REFERENCES "Actor"("id_actor");
-ALTER TABLE "Direction" ADD CONSTRAINT "Direction_fk2" FOREIGN KEY ("id_actor_type") REFERENCES "Actor_type"("id_actor_type");
-
+ALTER TABLE "Direction" ADD CONSTRAINT "Direction_fk0" FOREIGN KEY ("id_actor") REFERENCES "Employee"("id_employee");
+ALTER TABLE "Direction" ADD CONSTRAINT "Direction_fk1" FOREIGN KEY ("id_role") REFERENCES "Role"("id_role");
 
 ALTER TABLE "Tour" ADD CONSTRAINT "Tour_fk0" FOREIGN KEY ("id_employee") REFERENCES "Employee"("id_employee");
 ALTER TABLE "Tour" ADD CONSTRAINT "Tour_fk1" FOREIGN KEY ("id_show") REFERENCES "Show"("id_show");
-ALTER TABLE "Tour" ADD CONSTRAINT "Tour_fk2" FOREIGN KEY ("id_tour_type") REFERENCES "Tour_type"("id_tour_type");
 
+
+ALTER TABLE "Role-Characteristic" ADD CONSTRAINT "Role-Characteristic_fk0" FOREIGN KEY ("id_characteristic") REFERENCES "Characteristic"("id_characteristic");
+ALTER TABLE "Role-Characteristic" ADD CONSTRAINT "Role-Characteristic_fk1" FOREIGN KEY ("id_role") REFERENCES "Role"("id_role");
+
+ALTER TABLE "Role" ADD CONSTRAINT "Role_fk0" FOREIGN KEY ("id_show") REFERENCES "Show"("id_show");
+
+ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_fk0" FOREIGN KEY ("id_genre") REFERENCES "Genre"("id_genre");
+ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_fk1" FOREIGN KEY ("id_author") REFERENCES "Author"("id_author");
+
+ALTER TABLE "Ticket-Subscription" ADD CONSTRAINT "Ticket-Subscription_fk0" FOREIGN KEY ("id_ticket") REFERENCES "Ticket"("id_ticket");
+ALTER TABLE "Ticket-Subscription" ADD CONSTRAINT "Ticket-Subscription_fk1" FOREIGN KEY ("id_subscription") REFERENCES "Subscription"("id_subscription");
 
