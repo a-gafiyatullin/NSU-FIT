@@ -127,7 +127,7 @@ Name=Voltage Source
 Definition=VSpice
 Shape=SPICE_V
 Mask=4864
-Used=3
+Used=5
 memo=Voltage Source
 Label Offset=19,13,15,13
 PinCnt=2
@@ -234,7 +234,7 @@ NodeVoltageFormat=3
 PathDelayFormat=3
 WarningFormat=3
 GridTextFormulaFormat=3
-Window Placement in Transient Analysis=0,1, -1,-1, -8,-31, 0,-10,949,707
+Window Placement in Transient Analysis=2,3, -1,-1, -8,-31, -3,59,946,776
 SpiceType=AMBIGUOUS
 Block Select Color=#51F998
 TitleBlock Field_1=$name
@@ -711,6 +711,7 @@ Type=Text
 Print=False
 Enable=True
 Name=Text
+SB 0=0,44
 
 [Page]
 Index=2
@@ -735,7 +736,7 @@ Font=Height=-23,FStyle=0,Color=#000000,Name=Courier New
 Comment Color=#008000
 Background Color=#FFFFFF
 Text=.Define n 3
-Text=.Define Tz 0.0
+Text=.Define Tz 3.0
 Text=.Define T0 0.76
 Text=
 Text=// --------Tz = 0.0--------
@@ -745,26 +746,19 @@ Text=// Kn = 4.62
 Text=// Tin = 1.4
 Text=
 Text=// Ti		K		Sum
-Text=// 1.4	4.62	4.107
-Text=//	1.4	3.0	4.672
-Text=//	1.4	5.0	3.914
-Text=// 1.4	6.0	3.340
-Text=//	1.4	7.0	2.828
-Text=//	1.4	8.0	2.398
-Text=//	1.4	9.0	2.066
-Text=//	1.4	10.0	1.865
-Text=// 1.4	11.0	1.783
-Text=// 1.4	12.0	1.895
-Text=//	1.4	11.5	1.803
-Text=//	1.4	11.25	1.783
-Text=// 1.4	11.15 1.783
-Text=// 1.4	10.9	1.783
-Text=// 2.0	11.0	1.834	
-Text=// 1.8	11.0	1.650
-Text=//	1.6	11.0	1.629
-Text=// 1.5	11.0	1.620
-Text=//	1.3	11.0	2.189
-Text=//	K = 11.0	Ti = 1.5
+Text=// 1.4	4.62	1.262
+Text=//	1.4	3.0	1.363
+Text=// 1.4	4.7	1.257
+Text=// 1.4	4.8	1.257
+Text=// 1.4	4.7	1.257
+Text=// 1.5	4.7	1.115
+Text=// 1.6	4.7	1.021
+Text=// 1.7	4.7	0.945
+Text=// 2.0	4.7	0.826
+Text=// 2.5	4.7	0.786
+Text=// 3.0	4.7	0.855
+Text=// 2.7	4.7	0.801
+Text=// Ti = 2.5	K = 4.7
 Text=
 Text=// --------Tz = 1.5--------
 Text=// Kkr = 1.77
@@ -773,18 +767,20 @@ Text=// Kn = 1.062
 Text=// Tin = 3.5
 Text=
 Text=// Ti		K		Sum
-Text=// 3.5	1.062	5.1
-Text=// 3.5	0.5	7.229
-Text=// 3.5	1.5	4.414
-Text=//	3.5	2.0	4.849
-Text=//	3.5	1.75	4.223
-Text=//	3.5	1.65	4.261
-Text=//	3.5	1.7	4.223
-Text=//	4.0	1.7	5.4
-Text=//	3.0	1.7	5.685
-Text=//	3.6	1.7	4.204
-Text=//	3.7	1.7	4.299
-Text=// Ti = 3.6	K = 1.7
+Text=// 3.5	1.062	3.766
+Text=// 3.5	1.1	3.882
+Text=// 3.5	1.0	3.668
+Text=// 3.5	0.5	6.974
+Text=// 3.5	0.75	4.658
+Text=// 3.5	0.8	4.382
+Text=// 3.5	0.9	3.882
+Text=// 4.0	1.0	4.086
+Text=// 3.0	1.0	3.388
+Text=// 2.5	1.0	3.520
+Text=// 2.7	1.0	3.372
+Text=// 2.8	1.0	3.355
+Text=// 2.9	1.0	3.372
+Text=// Ti = 2.8	K = 1.0
 Text=
 Text=// --------Tz = 3.0--------
 Text=// Kkr = 1.34
@@ -793,25 +789,21 @@ Text=// Kn = 0.804
 Text=// Tin =	5.15
 Text=
 Text=// Ti		K		Sum
-Text=//	5.15	0.804	7.134
-Text=//	5.15	1.0	6.656
-Text=//	5.15	1.5	18.153
-Text=//	5.15	1.25	7.739
-Text=// 5.15	1.1	6.656
-Text=// 5.15	0.9	6.847
-Text=// 5.15	0.95	6.720
-Text=//	6.0	1.0	8.320
-Text=//	5.0	1.0	6.561
-Text=//	4.0	1.0	7.134
-Text=//	4.5	1.0	6.529
-Text=// 4.75	1.0	6.497
-Text=//	4.8	1.0	6.497
-Text=//	4.9	1.0	6.497
-Text=// 4.95	1.0	6.561
-Text=// Ti = 4.9	K = 1.0
+Text=//	5.15	0.804	7.007
+Text=//	5.15	1.0	11.003
+Text=//	5.15	0.7	7.336
+Text=//	5.15	0.75	6.875
+Text=//	5.15	0.75	6.875
+Text=//	6.0	0.75	8.183
+Text=//	4.0	0.75	5.674
+Text=//	3.0	0.75	6.158
+Text=//	3.5	0.75	5.526
+Text=//	3.7	0.75	5.551
+Text=//	3.6	0.75	5.551
+Text=// Ti = 3.5	K = 0.75
 Text=
-Text=.Define Ti 1.5
-Text=.Define K 11.0
+Text=.Define Ti 3.6
+Text=.Define K 0.77
 Text=.Define Td Ti / 4
 Text=.Define Tc Td / 8
 
@@ -823,7 +815,7 @@ Comment Color=#008000
 Background Color=#FFFFFF
 
 [Transient]
-Window Placement=0,1, -1,-1, -8,-31, 173,31,945,744
+Window Placement=2,3, -1,-1, -8,-31, -3,59,946,776
 Font=Height=-19,FStyle=0,Color=#0000FF,Name=Arial
 WinBackGround Color=#FFFFFF
 Select Color=#FF0000
@@ -1040,7 +1032,7 @@ Seed=0
 
 [Limits]
 Analysis=Transient
-TRange=1000
+TRange=50
 TStep=0
 NPts=51
 Temp=27
@@ -1056,11 +1048,11 @@ Plt=1
 AliasID=1
 XExp=T
 YExp=v(3)
-XRng=1000
-YRng=1.5e50,-1e50
+XRng=50
+YRng=3,-0.75
 Options=LINEARX,LINEARY
-Range Grid X=200
-Range Grid Y=5e49
+Range Grid X=10
+Range Grid Y=0.75
 Enable=Enable
 Line Color=#0000FF
 Text Color=#0000FF
@@ -1082,11 +1074,11 @@ Plt=1
 AliasID=2
 XExp=T
 YExp=v(2)
-XRng=1000
-YRng=1.5e50,-1e50
+XRng=50
+YRng=3,-0.75
 Options=LINEARX,LINEARY
-Range Grid X=200
-Range Grid Y=5e49
+Range Grid X=10
+Range Grid Y=0.75
 Enable=Enable
 Line Color=#FF0000
 Text Color=#FF0000
@@ -1108,11 +1100,11 @@ Plt=2
 AliasID=3
 XExp=T
 YExp=v(8)
-XRng=1000
-YRng=1.25e50
+XRng=50
+YRng=7.5
 Options=LINEARX,LINEARY
-Range Grid X=200
-Range Grid Y=2.5e49
+Range Grid X=10
+Range Grid Y=1.5
 Enable=Enable
 Line Color=#008000
 Text Color=#008000
