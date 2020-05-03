@@ -2,6 +2,9 @@ ALTER TABLE "Employee" DROP CONSTRAINT "Employee_fk0";
 ALTER TABLE "Employee" DROP CONSTRAINT "Employee_fk1";
 ALTER TABLE "Employee" DROP CONSTRAINT "Employee_fk2";
 
+ALTER TABLE "Musician-Show" DROP CONSTRAINT "Musician-Show_fk0";
+ALTER TABLE "Musician-Show" DROP CONSTRAINT "Musician-Show_fk1";
+
 ALTER TABLE "Employee-Characteristic" DROP CONSTRAINT "Employee-Characteristic_fk0";
 ALTER TABLE "Employee-Characteristic" DROP CONSTRAINT "Employee-Characteristic_fk1";
 
@@ -42,25 +45,31 @@ ALTER TABLE "Ticket-Subscription" DROP CONSTRAINT "Ticket-Subscription_fk0";
 ALTER TABLE "Ticket-Subscription" DROP CONSTRAINT "Ticket-Subscription_fk1";
 
 DROP trigger "BI_RANK_ID_RANK";
-DROP trigger "BI_EMPLOYEE_ID_EMPLOYEE";
 DROP trigger "BI_GENDER_ID_GENDER";
 DROP trigger "BI_COMPETITION_ID_COMPETITON";
 DROP trigger "BI_CHARACTERISTIC_ID_CHARACTERISTIC";
 DROP trigger "BI_EDUCATION_ID_EDUCATION";
-DROP trigger "BI_SHOW_ID_SHOW";
 DROP trigger "BI_AUTHOR_ID_AUTHOR";
 DROP trigger "BI_COUNTRY_ID_COUNTRY";
 DROP trigger "BI_GENRE_ID_GENRE";
 DROP trigger "BI_AGE_CATEGORY_ID_AGE_CATEGORY";
-DROP trigger "BI_TICKET_ID_TICKET";
-DROP trigger "BI_REPERTOIRE_ID_PERFORMANCE";
 DROP trigger "BI_JOB_TYPES_ID_JOB_TYPE";
 DROP trigger "BI_ROLE_ID_ROLE";
-DROP trigger "BI_SUBSCRIPTION_ID_SUBSCRIPTION";
 DROP trigger "ACTOR-RANK-INSERTION";
+DROP trigger "DIRECTION-INSERTION";
+DROP trigger "TOUR-INSERTION";
+DROP trigger "SHOW-INSERTION";
+DROP trigger "REPERTOIRE-INSERTION";
+DROP trigger "SALE-INSERTION";
+DROP trigger "TICKET-INSERTION";
+DROP trigger "TICKET-SUBSCRIPTION-INSERTION";
+DROP trigger "SUBSCRIPTION-INSERTION";
+DROP trigger "EMPLOYEE-INSERTION";
+DROP trigger "MUSICIAN-SHOW-INSERTION";
 
 DROP TABLE "Rank";
 DROP TABLE "Employee";
+DROP TABLE "Musician-Show";
 DROP TABLE "Gender";
 DROP TABLE "Employee-Characteristic";
 DROP TABLE "Competition";
