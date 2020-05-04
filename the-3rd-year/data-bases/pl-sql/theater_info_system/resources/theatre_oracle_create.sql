@@ -1,6 +1,6 @@
 CREATE TABLE "Rank" (
 	"id_rank" INT PRIMARY KEY,
-	"rank_name" VARCHAR2(255) UNIQUE NOT NULL);
+	"name_rank" VARCHAR2(255) UNIQUE NOT NULL);
 
 CREATE sequence "RANK_ID_RANK_SEQ";
 
@@ -14,17 +14,17 @@ end;
 
 CREATE TABLE "Employee" (
 	"id_employee" INT PRIMARY KEY,
-	"name" VARCHAR2(255) NOT NULL,
-	"surname" VARCHAR2(255),
-	"middle_name" VARCHAR2(255),
+	"name_employee" VARCHAR2(255) NOT NULL,
+	"surname_employee" VARCHAR2(255),
+	"middle_name_employee" VARCHAR2(255),
 	"id_gender" INT NOT NULL,
-	"birthday" DATE NOT NULL,
-	"hire_date" DATE NOT NULL,
-	"children_amount" INT DEFAULT 0 CHECK("children_amount" >= 0),
-	"salary" NUMERIC(*, 2) NOT NULL CHECK("salary" > 0),
+	"birthday_employee" DATE NOT NULL,
+	"hire_date_employee" DATE NOT NULL,
+	"children_amount_employee" INT DEFAULT 0 CHECK("children_amount_employee" >= 0),
+	"salary_employee" NUMERIC(*, 2) NOT NULL CHECK("salary_employee" > 0),
 	"id_education" INT NOT NULL,
 	"id_job_type" INT NOT NULL,
-    "is_active" INT NOT NULL);
+    "is_active_employee" INT NOT NULL);
 
 CREATE sequence "EMPLOYEE_ID_EMPLOYEE_SEQ";
 /
@@ -37,7 +37,7 @@ CREATE TABLE "Musician-Show" (
 
 CREATE TABLE "Gender" (
 	"id_gender" INT PRIMARY KEY,
-	"gender_name" VARCHAR2(255) UNIQUE NOT NULL);
+	"name_gender" VARCHAR2(255) UNIQUE NOT NULL);
 
 CREATE sequence "GENDER_ID_GENDER_SEQ";
 
@@ -52,12 +52,12 @@ end;
 CREATE TABLE "Employee-Characteristic" (
 	"id_employee" INT PRIMARY KEY,
 	"id_characteristic" INT NOT NULL,
-	"value" NUMERIC(*, 2));
+	"value_employee_characteristic" NUMERIC(*, 2));
 /
 
 CREATE TABLE "Competition" (
 	"id_competiton" INT PRIMARY KEY,
-	"competiton_name" VARCHAR2(255) UNIQUE NOT NULL);
+	"name_competiton" VARCHAR2(255) UNIQUE NOT NULL);
 
 CREATE sequence "COMPETITION_ID_COMPETITON_SEQ";
 
@@ -72,14 +72,14 @@ end;
 CREATE TABLE "Actor-Rank" (
 	"id_actor" INT NOT NULL,
 	"id_rank" INT NOT NULL,
-	"obtaining_date" DATE NOT NULL,
+	"obtaining_date_actor_rank" DATE NOT NULL,
 	"id_competition" INT,
 	constraint ACTOR_RANK_PK PRIMARY KEY ("id_actor","id_rank"));
 /
 
 CREATE TABLE "Characteristic" (
 	"id_characteristic" INT PRIMARY KEY,
-	"characteristic_type" VARCHAR2(255) UNIQUE NOT NULL);
+	"type_characteristic" VARCHAR2(255) UNIQUE NOT NULL);
 
 CREATE sequence "CHARACTERISTIC_ID_CHARACTERISTIC_SEQ";
 
@@ -93,7 +93,7 @@ end;
 
 CREATE TABLE "Education" (
 	"id_education" INT PRIMARY KEY,
-	"level_name" VARCHAR2(255) UNIQUE NOT NULL);
+	"name_education" VARCHAR2(255) UNIQUE NOT NULL);
 
 CREATE sequence "EDUCATION_ID_EDUCATION_SEQ";
 
@@ -107,25 +107,25 @@ end;
 
 CREATE TABLE "Show" (
 	"id_show" INT PRIMARY KEY,
-	"name" VARCHAR2(255) UNIQUE NOT NULL,
+	"name_show" VARCHAR2(255) UNIQUE NOT NULL,
 	"id_director" INT NOT NULL,
 	"id_production_designer" INT NOT NULL,
 	"id_conductor" INT NOT NULL,
 	"id_author" INT NOT NULL,
 	"id_genre" INT NOT NULL,
 	"id_age_category" INT NOT NULL,
-	"century" INT NOT NULL,
-	"premier_date" DATE NOT NULL);
+	"century_show" INT NOT NULL,
+	"premier_date_show" DATE NOT NULL);
 
 CREATE sequence "SHOW_ID_SHOW_SEQ";
 /
 
 CREATE TABLE "Author" (
 	"id_author" INT PRIMARY KEY,
-	"name" VARCHAR2(255) NOT NULL,
-	"surname" VARCHAR2(255),
-	"middle_name" VARCHAR2(255),
-	"life_century" INT NOT NULL,
+	"name_author" VARCHAR2(255) NOT NULL,
+	"surname_author" VARCHAR2(255),
+	"middle_name_author" VARCHAR2(255),
+	"life_century_author" INT NOT NULL,
 	"id_country" INT NOT NULL);
 
 CREATE sequence "AUTHOR_ID_AUTHOR_SEQ";
@@ -140,7 +140,7 @@ end;
 
 CREATE TABLE "Country" (
 	"id_country" INT PRIMARY KEY,
-	"country_name" VARCHAR2(255) UNIQUE NOT NULL);
+	"name_country" VARCHAR2(255) UNIQUE NOT NULL);
 
 CREATE sequence "COUNTRY_ID_COUNTRY_SEQ";
 
@@ -154,7 +154,7 @@ end;
 
 CREATE TABLE "Genre" (
 	"id_genre" INT PRIMARY KEY,
-	"genre_name" VARCHAR2(255) UNIQUE NOT NULL);
+	"name_genre" VARCHAR2(255) UNIQUE NOT NULL);
 
 CREATE sequence "GENRE_ID_GENRE_SEQ";
 
@@ -168,7 +168,7 @@ end;
 
 CREATE TABLE "Age_category" (
 	"id_age_category" INT PRIMARY KEY,
-	"age_category_name" VARCHAR2(255) UNIQUE NOT NULL);
+	"name_age_category" VARCHAR2(255) UNIQUE NOT NULL);
 
 CREATE sequence "AGE_CATEGORY_ID_AGE_CATEGORY_SEQ";
 
@@ -183,21 +183,21 @@ end;
 CREATE TABLE "Ticket" (
 	"id_ticket" INT PRIMARY KEY,
 	"id_performance" INT NOT NULL,
-	"seat_number" INT NOT NULL CHECK("seat_number" >= 0),
-	"cost" NUMERIC NOT NULL CHECK("cost" >= 0));
+	"seat_number_ticket" INT NOT NULL CHECK("seat_number_ticket" >= 0),
+	"cost_ticket" NUMERIC NOT NULL CHECK("cost_ticket" >= 0));
 
 CREATE sequence "TICKET_ID_TICKET_SEQ";
 /
 
 CREATE TABLE "Sale" (
 	"id_ticket" INT PRIMARY KEY,
-	"sale_date" DATE NOT NULL);
+	"date_sale" DATE NOT NULL);
 /
 
 CREATE TABLE "Repertoire" (
 	"id_performance" INT PRIMARY KEY,
 	"id_show" INT NOT NULL,
-	"performance_date" DATE NOT NULL);
+	"performance_date_repertoire" DATE NOT NULL);
 
 CREATE sequence "REPERTOIRE_ID_PERFORMANCE_SEQ";
 /
@@ -205,21 +205,21 @@ CREATE sequence "REPERTOIRE_ID_PERFORMANCE_SEQ";
 CREATE TABLE "Direction" (
 	"id_actor" INT NOT NULL,
 	"id_role" INT NOT NULL,
-	"is_understudy" INT NOT NULL,
+	"is_understudy_direction" INT NOT NULL,
 	constraint DIRECTION_PK PRIMARY KEY ("id_actor","id_role"));
 /
 
 CREATE TABLE "Tour" (
 	"id_employee" INT NOT NULL,
 	"id_show" INT NOT NULL,
-	"from_date" DATE NOT NULL,
-	"to_date" DATE NOT NULL,
+	"from_date_tour" DATE NOT NULL,
+	"to_date_tour" DATE NOT NULL,
 	"is_visiting_tour" INT NOT NULL);
 /
 
 CREATE TABLE "Job_types" (
 	"id_job_type" INT PRIMARY KEY,
-	"job_name" VARCHAR2(255) UNIQUE NOT NULL);
+	"name_job_type" VARCHAR2(255) UNIQUE NOT NULL);
 
 CREATE sequence "JOB_TYPES_ID_JOB_TYPE_SEQ";
 
@@ -234,14 +234,14 @@ end;
 CREATE TABLE "Role-Characteristic" (
 	"id_characteristic" INT NOT NULL,
 	"id_role" INT NOT NULL,
-	"value" DECIMAL,
+	"value_role_characteristic" DECIMAL,
 	constraint ROLE_CHARACTERISTIC_PK PRIMARY KEY ("id_characteristic","id_role"));
 
 CREATE TABLE "Role" (
 	"id_role" INT PRIMARY KEY,
 	"id_show" INT NOT NULL,
-	"role_name" VARCHAR2(255) NOT NULL,
-	"is_main" INT NOT NULL);
+	"name_role" VARCHAR2(255) NOT NULL,
+	"is_main_role" INT NOT NULL);
 
 CREATE sequence "ROLE_ID_ROLE_SEQ";
 
@@ -329,15 +329,15 @@ ALTER TABLE "Ticket-Subscription" ADD CONSTRAINT "Ticket-Subscription_fk1" FOREI
     REFERENCES "Subscription"("id_subscription") ON DELETE CASCADE;
 /
 
-CREATE trigger "ACTOR-RANK-INSERTION"
+CREATE OR REPLACE trigger "ACTOR-RANK-INSERTION"
     before insert on "Actor-Rank"
     for each row
 declare
-    actor_job_type VARCHAR(255);
+    actor_job_type VARCHAR2(255);
     birthday DATE;
     is_active INT;
 begin
-    select "job_name", "birthday", "is_active" into actor_job_type, birthday, is_active
+    select "name_job_type", "birthday_employee", "is_active_employee" into actor_job_type, birthday, is_active
     from ("Employee" inner join "Job_types" using("id_job_type"))
     where "id_employee" = :NEW."id_actor";
 
@@ -345,7 +345,7 @@ begin
         raise_application_error(-20000, 'Попытка добавления не актера!');
     end if;
     
-    if :NEW."obtaining_date" < birthday then
+    if :NEW."obtaining_date_actor_rank" < birthday then
         raise_application_error(-20001, 'Получение звания не может произойти раньше рождения!');
     end if;
     
@@ -355,18 +355,18 @@ begin
 end;
 /
 
-CREATE trigger "DIRECTION-INSERTION"
+CREATE OR REPLACE trigger "DIRECTION-INSERTION"
     before insert on "Direction"
     for each row
 declare
-    actor_job_type VARCHAR(255);
+    actor_job_type VARCHAR2(255);
     actors_count INT;
     role_row "Role"%ROWTYPE;
     actor_roles INT;
     is_active INT;
     main_actors_count INT;
 begin
-    select "job_name", "is_active" into actor_job_type, is_active
+    select "name_job_type", "is_active_employee" into actor_job_type, is_active
     from ("Employee" inner join "Job_types" using("id_job_type"))
     where "id_employee" = :NEW."id_actor";
 
@@ -386,15 +386,15 @@ begin
     from "Role"
     where "id_role" = :NEW."id_role";
   
-    if role_row."is_main" = 0 and actors_count = 1 then
+    if role_row."is_main_role" = 0 and actors_count = 1 then
         raise_application_error(-20003, 'Попытка назначения второго актера на не главную роль!');
-    elsif role_row."is_main" = 1 and actors_count = 2 then
+    elsif role_row."is_main_role" = 1 and actors_count = 2 then
         raise_application_error(-20004, 'Попытка назначения третьего актера на главную роль!');
-    elsif role_row."is_main" = 1 and :NEW."is_understudy" = 0 and actors_count = 1 then
+    elsif role_row."is_main_role" = 1 and :NEW."is_understudy_direction" = 0 and actors_count = 1 then
     begin
         select count(*) into main_actors_count
         from "Direction"
-        where "id_role" = :NEW."id_role" and "is_understudy" = 0;
+        where "id_role" = :NEW."id_role" and "is_understudy_direction" = 0;
         if main_actors_count = 1 then
             raise_application_error(-20005, 'Попытка назначения второго основного актера на главную роль!');
         end if;
@@ -411,14 +411,14 @@ begin
 end;
 /
 
-CREATE trigger "TOUR-INSERTION"
+CREATE OR REPLACE trigger "TOUR-INSERTION"
     before insert on "Tour"
     for each row
 declare
-    employee_job_type VARCHAR(255);
+    employee_job_type VARCHAR2(255);
     is_active INT;
 begin
-    select "job_name", "is_active" into employee_job_type, is_active
+    select "name_job_type", "is_active_employee" into employee_job_type, is_active
     from ("Employee" inner join "Job_types" using("id_job_type"))
     where "id_employee" = :NEW."id_employee";
     
@@ -434,13 +434,13 @@ begin
         raise_application_error(-20007, 'Человек с данной профессией не может уезжать на гастроли!');
     end if;
   
-    if :NEW."to_date" < :NEW."from_date" then
+    if :NEW."to_date_tour" < :NEW."from_date_tour" then
         raise_application_error(-20008, 'Дата начала гастролей позже даты конца!');
     end if;
 end;
 /
 
-CREATE trigger "SHOW-INSERTION"
+CREATE OR REPLACE trigger "SHOW-INSERTION"
     before insert on "Show"
     for each row
 declare
@@ -453,21 +453,21 @@ declare
     production_designer_active INT;
     director_active INT;
 begin
-    select "life_century" into author_century
+    select "life_century_author" into author_century
     from "Author"
     where "id_author" = :NEW."id_author";
   
-    if :NEW."century" < author_century then
+    if :NEW."century_show" < author_century then
         raise_application_error(-20009, 'Век спектакля раньше века жизни автора!');
     end if;
   
     select CURRENT_DATE into today_date from dual;
   
-    if :NEW."premier_date" < today_date then
+    if :NEW."premier_date_show" < today_date then
         raise_application_error(-20010, 'Премьера спектакля не может быть раньше сегодняшней даты!');
     end if;
   
-    select "job_name", "is_active" into director_job_type, director_active
+    select "name_job_type", "is_active_employee" into director_job_type, director_active
     from ("Employee" inner join "Job_types" using("id_job_type"))
     where "id_employee" = :NEW."id_director";
     
@@ -479,7 +479,7 @@ begin
         raise_application_error(-20002, 'Попытка назначения уволенного pежиссеpа-постановщика!');
     end if;
   
-    select "job_name", "is_active" into production_designer_job_type, production_designer_active
+    select "name_job_type", "is_active_employee" into production_designer_job_type, production_designer_active
     from ("Employee" inner join "Job_types" using("id_job_type"))
     where "id_employee" = :NEW."id_production_designer";
     
@@ -491,7 +491,7 @@ begin
         raise_application_error(-20002, 'Попытка назначения уволенного художника-постановщика!');
     end if;
   
-    select "job_name", "is_active" into conductor_job_type, conductor_active
+    select "name_job_type", "is_active_employee" into conductor_job_type, conductor_active
     from ("Employee" inner join "Job_types" using("id_job_type"))
     where "id_employee" = :NEW."id_conductor";
   
@@ -507,22 +507,22 @@ begin
 end;
 /
 
-CREATE trigger "REPERTOIRE-INSERTION"
+CREATE OR REPLACE trigger "REPERTOIRE-INSERTION"
     before insert on "Repertoire"
     for each row
 declare
     premier_date DATE;
     actors_count INT;
     cursor show_roles is
-        select "id_role", "is_main"
+        select "id_role", "is_main_role"
         from "Role"
         where "id_show" = :NEW."id_show";
 begin
-    select "premier_date" into premier_date
+    select "premier_date_show" into premier_date
     from "Show"
     where "id_show" = :NEW."id_show";
   
-    if :NEW."performance_date" < premier_date then
+    if :NEW."performance_date_repertoire" < premier_date then
         raise_application_error(-20014, 'Дата показа не может быть раньше даты премьеры!');
     end if;
   
@@ -532,7 +532,7 @@ begin
         from "Direction"
         where "id_role" = role_record."id_role";
     
-        if role_record."is_main" = 0 and actors_count < 1 or role_record."is_main" = 1 and actors_count < 2 then
+        if role_record."is_main_role" = 0 and actors_count < 1 or role_record."is_main_role" = 1 and actors_count < 2 then
             raise_application_error(-20015, 'Актерский состав для данного спектакля сформирован не полностью!');
         end if;
     end loop;
@@ -541,7 +541,7 @@ begin
 end;
 /
 
-CREATE trigger "SALE-INSERTION"
+CREATE OR REPLACE trigger "SALE-INSERTION"
     before insert on "Sale"
     for each row
 begin
@@ -549,7 +549,7 @@ begin
 end;
 /
 
-CREATE trigger "TICKET-INSERTION"
+CREATE OR REPLACE trigger "TICKET-INSERTION"
     before insert on "Ticket"
     for each row
 declare
@@ -557,7 +557,7 @@ declare
 begin
     select count(*) into tickets_count
     from "Ticket" 
-    where "id_performance" = :NEW."id_performance" and "seat_number" = :NEW."seat_number";
+    where "id_performance" = :NEW."id_performance" and "seat_number_ticket" = :NEW."seat_number_ticket";
     if tickets_count = 1 then
         raise_application_error(-20016, 'Билет на это место для этого спектакля уже существует!');
     end if;
@@ -566,7 +566,7 @@ begin
 end;
 /
 
-CREATE trigger "TICKET-SUBSCRIPTION-INSERTION"
+CREATE OR REPLACE trigger "TICKET-SUBSCRIPTION-INSERTION"
     before insert on "Ticket-Subscription"
     for each row
 declare 
@@ -604,7 +604,7 @@ begin
 end;
 /
 
-CREATE trigger "SUBSCRIPTION-INSERTION"
+CREATE OR REPLACE trigger "SUBSCRIPTION-INSERTION"
     before insert on "Subscription"
     for each row
 begin
@@ -616,11 +616,11 @@ begin
 end;
 /
 
-CREATE trigger "EMPLOYEE-INSERTION"
+CREATE OR REPLACE trigger "EMPLOYEE-INSERTION"
     before insert on "Employee"
     for each row
 begin
-    if :NEW."hire_date" < :NEW."birthday" then
+    if :NEW."hire_date_employee" < :NEW."birthday_employee" then
         raise_application_error(-20020, 'Дата рождения сотрудника позже даты найма!');
     end if;
     
@@ -628,14 +628,14 @@ begin
 end;
 /
 
-CREATE trigger "MUSICIAN-SHOW-INSERTION"
+CREATE OR REPLACE trigger "MUSICIAN-SHOW-INSERTION"
     before insert on "Musician-Show"
     for each row
 declare
-    musician_job_type VARCHAR(255);
+    musician_job_type VARCHAR2(255);
     is_active INT;
 begin
-    select "job_name", "is_active" into musician_job_type, is_active
+    select "name_job_type", "is_active_employee" into musician_job_type, is_active
     from ("Employee" inner join "Job_types" using("id_job_type"))
     where "id_employee" = :NEW."id_musician";
 
