@@ -5,8 +5,11 @@ ALTER TABLE "Employee" DROP CONSTRAINT "Employee_fk2";
 ALTER TABLE "Musician-Show" DROP CONSTRAINT "Musician-Show_fk0";
 ALTER TABLE "Musician-Show" DROP CONSTRAINT "Musician-Show_fk1";
 
-ALTER TABLE "Employee-Characteristic" DROP CONSTRAINT "Employee-Characteristic_fk0";
-ALTER TABLE "Employee-Characteristic" DROP CONSTRAINT "Employee-Characteristic_fk1";
+ALTER TABLE "Musician-Instrument" DROP CONSTRAINT "Musician-Instrument_fk0";
+ALTER TABLE "Musician-Instrument" DROP CONSTRAINT "Musician-Instrument_fk1";
+
+ALTER TABLE "Actor-Characteristic" DROP CONSTRAINT "Actor-Characteristic_fk0";
+ALTER TABLE "Actor-Characteristic" DROP CONSTRAINT "Actor-Characteristic_fk1";
 
 ALTER TABLE "Actor-Rank" DROP CONSTRAINT "Actor-Rank_fk0";
 ALTER TABLE "Actor-Rank" DROP CONSTRAINT "Actor-Rank_fk1";
@@ -22,8 +25,6 @@ ALTER TABLE "Show" DROP CONSTRAINT "Show_fk5";
 ALTER TABLE "Author" DROP CONSTRAINT "Author_fk0";
 
 ALTER TABLE "Ticket" DROP CONSTRAINT "Ticket_fk0";
-
-ALTER TABLE "Sale" DROP CONSTRAINT "Sale_fk0";
 
 ALTER TABLE "Repertoire" DROP CONSTRAINT "Repertoire_fk0";
 
@@ -44,34 +45,13 @@ ALTER TABLE "Subscription" DROP CONSTRAINT "Subscription_fk1";
 ALTER TABLE "Ticket-Subscription" DROP CONSTRAINT "Ticket-Subscription_fk0";
 ALTER TABLE "Ticket-Subscription" DROP CONSTRAINT "Ticket-Subscription_fk1";
 
-DROP trigger "BI_RANK_ID_RANK";
-DROP trigger "BI_GENDER_ID_GENDER";
-DROP trigger "BI_COMPETITION_ID_COMPETITON";
-DROP trigger "BI_CHARACTERISTIC_ID_CHARACTERISTIC";
-DROP trigger "BI_EDUCATION_ID_EDUCATION";
-DROP trigger "BI_AUTHOR_ID_AUTHOR";
-DROP trigger "BI_COUNTRY_ID_COUNTRY";
-DROP trigger "BI_GENRE_ID_GENRE";
-DROP trigger "BI_AGE_CATEGORY_ID_AGE_CATEGORY";
-DROP trigger "BI_JOB_TYPES_ID_JOB_TYPE";
-DROP trigger "BI_ROLE_ID_ROLE";
-DROP trigger "ACTOR-RANK-INSERTION";
-DROP trigger "DIRECTION-INSERTION";
-DROP trigger "TOUR-INSERTION";
-DROP trigger "SHOW-INSERTION";
-DROP trigger "REPERTOIRE-INSERTION";
-DROP trigger "SALE-INSERTION";
-DROP trigger "TICKET-INSERTION";
-DROP trigger "TICKET-SUBSCRIPTION-INSERTION";
-DROP trigger "SUBSCRIPTION-INSERTION";
-DROP trigger "EMPLOYEE-INSERTION";
-DROP trigger "MUSICIAN-SHOW-INSERTION";
-
 DROP TABLE "Rank";
+DROP TABLE "Musical_instruments";
+DROP TABLE "Musician-Instrument";
 DROP TABLE "Employee";
 DROP TABLE "Musician-Show";
 DROP TABLE "Gender";
-DROP TABLE "Employee-Characteristic";
+DROP TABLE "Actor-Characteristic";
 DROP TABLE "Competition";
 DROP TABLE "Actor-Rank";
 DROP TABLE "Characteristic";
@@ -82,7 +62,6 @@ DROP TABLE "Country";
 DROP TABLE "Genre";
 DROP TABLE "Age_category";
 DROP TABLE "Ticket";
-DROP TABLE "Sale";
 DROP TABLE "Repertoire";
 DROP TABLE "Direction";
 DROP TABLE "Tour";
@@ -108,5 +87,6 @@ DROP sequence "REPERTOIRE_ID_PERFORMANCE_SEQ";
 DROP sequence "JOB_TYPES_ID_JOB_TYPE_SEQ";
 DROP sequence "ROLE_ID_ROLE_SEQ";
 DROP sequence "SUBSCRIPTION_ID_SUBSCRIPTION_SEQ";
+DROP sequence "MUSICAL_INSTRUMENTS_ID_INSTRUMENT_SEQ";
 
 COMMIT;
