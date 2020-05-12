@@ -41,27 +41,34 @@ CREATE TABLE "Gender" (
 CREATE sequence "GENDER_ID_GENDER_SEQ";
 
 CREATE trigger "BI_GENDER_ID_GENDER"
-    before insert on "Gender"
+    before insert
+    on "Gender"
     for each row
 begin
     select "GENDER_ID_GENDER_SEQ".nextval into :NEW."id_gender" from dual;
 end;
 /
 
-CREATE TABLE "Actor-Characteristic" (
-	"id_actor" INT PRIMARY KEY,
-	"id_characteristic" INT NOT NULL,
-	"value_actor_characteristic" NUMERIC(*, 2));
+CREATE TABLE "Actor-Characteristic"
+(
+    "id_actor"                   INT NOT NULL,
+    "id_characteristic"          INT NOT NULL,
+    "value_actor_characteristic" NUMERIC(*, 2),
+    constraint ACTOR_CHARACTERISTIC_PK PRIMARY KEY ("id_actor", "id_characteristic")
+);
 /
 
-CREATE TABLE "Competition" (
-	"id_competition" INT PRIMARY KEY,
-	"name_competiton" VARCHAR2(255) UNIQUE NOT NULL);
+CREATE TABLE "Competition"
+(
+    "id_competition"   INT PRIMARY KEY,
+    "name_competition" VARCHAR2(255) UNIQUE NOT NULL
+);
 
 CREATE sequence "COMPETITION_ID_COMPETITON_SEQ";
 
 CREATE trigger "BI_COMPETITION_ID_COMPETITON"
-    before insert on "Competition"
+    before insert
+    on "Competition"
     for each row
 begin
     select "COMPETITION_ID_COMPETITON_SEQ".nextval into :NEW."id_competition" from dual;

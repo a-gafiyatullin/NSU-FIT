@@ -1,65 +1,127 @@
-INSERT INTO "Job_types" VALUES(0, NULL, 'актер');                                                       /* должно выполниться */
-INSERT INTO "Job_types" VALUES(0, NULL, 'постановщик');                                                 /* должно выполниться */
-INSERT INTO "Job_types" VALUES(0, 1, 'pежиссеp-постановщик');                                           /* должно выполниться */
-INSERT INTO "Job_types" VALUES(0, 1, 'художник-постановщик');                                           /* должно выполниться */
-INSERT INTO "Job_types" VALUES(0, 1, 'диpижеp-постановщик');                                            /* должно выполниться */
-INSERT INTO "Job_types" VALUES(0, NULL, 'музыкант');                                                    /* должно выполниться */
-INSERT INTO "Job_types" VALUES(0, NULL, 'уборщик');                                                     /* должно выполниться */
-INSERT INTO "Job_types" VALUES(0, NULL, 'NoName');                                                      /* должно выполниться */
-DELETE FROM "Job_types" WHERE "name_job_type" LIKE 'NoName';                                            /* должно выполниться */
+INSERT INTO "Job_types"
+VALUES (0, NULL, 'актер'); /* должно выполниться */
+INSERT INTO "Job_types"
+VALUES (0, NULL, 'постановщик'); /* должно выполниться */
+INSERT INTO "Job_types"
+VALUES (0, 2, 'pежиссеp-постановщик'); /* должно выполниться */
+INSERT INTO "Job_types"
+VALUES (0, 2, 'художник-постановщик'); /* должно выполниться */
+INSERT INTO "Job_types"
+VALUES (0, 2, 'диpижеp-постановщик'); /* должно выполниться */
+INSERT INTO "Job_types"
+VALUES (0, NULL, 'музыкант'); /* должно выполниться */
+INSERT INTO "Job_types"
+VALUES (0, NULL, 'уборщик'); /* должно выполниться */
+INSERT INTO "Job_types"
+VALUES (0, NULL, 'NoName'); /* должно выполниться */
+DELETE
+FROM "Job_types"
+WHERE "name_job_type" LIKE 'NoName'; /* должно выполниться */
 
-INSERT INTO "Education" VALUES(0, 'среднее');                                                           /* должно выполниться */
-INSERT INTO "Education" VALUES(0, 'среднее специальное');                                               /* должно выполниться */
-INSERT INTO "Education" VALUES(0, 'студент');                                                           /* должно выполниться */
-INSERT INTO "Education" VALUES(0, 'высшее');                                                            /* должно выполниться */
-INSERT INTO "Education" VALUES(0, 'NoName');                                                            /* должно выполниться */
-DELETE FROM "Education" WHERE "name_education" LIKE 'NoName';                                           /* должно выполниться */
+INSERT INTO "Education"
+VALUES (0, 'среднее'); /* должно выполниться */
+INSERT INTO "Education"
+VALUES (0, 'среднее специальное'); /* должно выполниться */
+INSERT INTO "Education"
+VALUES (0, 'студент'); /* должно выполниться */
+INSERT INTO "Education"
+VALUES (0, 'высшее'); /* должно выполниться */
+INSERT INTO "Education"
+VALUES (0, 'NoName'); /* должно выполниться */
+DELETE
+FROM "Education"
+WHERE "name_education" LIKE 'NoName'; /* должно выполниться */
 
-INSERT INTO "Gender" VALUES(0, 'мужской');                                                              /* должно выполниться */
-INSERT INTO "Gender" VALUES(0, 'женский');                                                              /* должно выполниться */
-INSERT INTO "Gender" VALUES(0, 'NoName');                                                               /* должно выполниться */
-DELETE FROM "Gender" WHERE "name_gender" LIKE 'NoName';                                                 /* должно выполниться */
+INSERT INTO "Gender"
+VALUES (0, 'мужской'); /* должно выполниться */
+INSERT INTO "Gender"
+VALUES (0, 'женский'); /* должно выполниться */
+INSERT INTO "Gender"
+VALUES (0, 'NoName'); /* должно выполниться */
+DELETE
+FROM "Gender"
+WHERE "name_gender" LIKE 'NoName'; /* должно выполниться */
 
-INSERT INTO "Rank" VALUES(0, 'заслуженный артист');                                                     /* должно выполниться */
-INSERT INTO "Rank" VALUES(0, 'народный артист');                                                        /* должно выполниться */
-INSERT INTO "Rank" VALUES(0, 'лауреат');                                                                /* должно выполниться */
-INSERT INTO "Rank" VALUES(0, 'NoName');                                                                 /* должно выполниться */
-DELETE FROM "Rank" WHERE "name_rank" LIKE 'NoName';                                                     /* должно выполниться */
+INSERT INTO "Rank"
+VALUES (0, 'заслуженный артист'); /* должно выполниться */
+INSERT INTO "Rank"
+VALUES (0, 'народный артист'); /* должно выполниться */
+INSERT INTO "Rank"
+VALUES (0, 'лауреат'); /* должно выполниться */
+INSERT INTO "Rank"
+VALUES (0, 'NoName'); /* должно выполниться */
+DELETE
+FROM "Rank"
+WHERE "name_rank" LIKE 'NoName'; /* должно выполниться */
 
-INSERT INTO "Competition" VALUES(0, 'Голос');                                                           /* должно выполниться */
-INSERT INTO "Competition" VALUES(0, 'Таланты России');                                                  /* должно выполниться */
-INSERT INTO "Competition" VALUES(0, 'NoName');                                                          /* должно выполниться */
-DELETE FROM "Competition" WHERE "name_competiton" LIKE 'NoName';                                        /* должно выполниться */
+INSERT INTO "Competition"
+VALUES (0, 'Голос'); /* должно выполниться */
+INSERT INTO "Competition"
+VALUES (0, 'Таланты России'); /* должно выполниться */
+INSERT INTO "Competition"
+VALUES (0, 'NoName'); /* должно выполниться */
+DELETE
+FROM "Competition"
+WHERE "name_competition" LIKE 'NoName'; /* должно выполниться */
 
-INSERT INTO "Age_category" VALUES(0, 'дети');                                                           /* должно выполниться */
-INSERT INTO "Age_category" VALUES(0, 'взрослые');                                                       /* должно выполниться */
-INSERT INTO "Age_category" VALUES(0, 'NoName');                                                         /* должно выполниться */
-DELETE FROM "Age_category" WHERE "name_age_category" LIKE 'NoName';                                     /* должно выполниться */
+INSERT INTO "Age_category"
+VALUES (0, 'дети'); /* должно выполниться */
+INSERT INTO "Age_category"
+VALUES (0, 'взрослые'); /* должно выполниться */
+INSERT INTO "Age_category"
+VALUES (0, 'NoName'); /* должно выполниться */
+DELETE
+FROM "Age_category"
+WHERE "name_age_category" LIKE 'NoName'; /* должно выполниться */
 
-INSERT INTO "Genre" VALUES(0, 'музыкальная комедия');                                                   /* должно выполниться */
-INSERT INTO "Genre" VALUES(0, 'тpагедия');                                                              /* должно выполниться */
-INSERT INTO "Genre" VALUES(0, 'опеpетта');                                                              /* должно выполниться */
-INSERT INTO "Genre" VALUES(0, 'NoName');                                                                /* должно выполниться */
-DELETE FROM "Genre" WHERE "name_genre" LIKE 'NoName';                                                   /* должно выполниться */
+INSERT INTO "Genre"
+VALUES (0, 'музыкальная комедия'); /* должно выполниться */
+INSERT INTO "Genre"
+VALUES (0, 'тpагедия'); /* должно выполниться */
+INSERT INTO "Genre"
+VALUES (0, 'опеpетта'); /* должно выполниться */
+INSERT INTO "Genre"
+VALUES (0, 'NoName'); /* должно выполниться */
+DELETE
+FROM "Genre"
+WHERE "name_genre" LIKE 'NoName'; /* должно выполниться */
 
-INSERT INTO "Country" VALUES(0, 'Священная Римская империя');                                           /* должно выполниться */
-INSERT INTO "Country" VALUES(0, 'NoName');                                                              /* должно выполниться */
-DELETE FROM "Country" WHERE "name_country" LIKE 'NoName';                                               /* должно выполниться */
+INSERT INTO "Country"
+VALUES (0, 'Священная Римская империя'); /* должно выполниться */
+INSERT INTO "Country"
+VALUES (0, 'NoName'); /* должно выполниться */
+DELETE
+FROM "Country"
+WHERE "name_country" LIKE 'NoName'; /* должно выполниться */
 
-INSERT INTO "Author" VALUES(0, 'Людвиг', 'ван Бетховен', '', 18, 1);                                    /* должно выполниться */
-INSERT INTO "Author" VALUES(0, 'Людвиг ван', 'Бетховен', '', 18, 1);                                    /* должно выполниться */
-INSERT INTO "Author" VALUES(0, 'NoName', '', '', 18, 1);                                                /* должно выполниться */
-DELETE FROM "Author" WHERE "name_author" LIKE 'NoName';                                                 /* должно выполниться */
+INSERT INTO "Author"
+VALUES (0, 'Людвиг', 'ван Бетховен', '', 18, 1); /* должно выполниться */
+INSERT INTO "Author"
+VALUES (0, 'Людвиг ван', 'Бетховен', '', 18, 1); /* должно выполниться */
+INSERT INTO "Author"
+VALUES (0, 'NoName', '', '', 18, 1); /* должно выполниться */
+DELETE
+FROM "Author"
+WHERE "name_author" LIKE 'NoName'; /* должно выполниться */
 
-DELETE FROM "Country" WHERE "name_country" LIKE 'Священная Римская империя';                         /* не должно выполниться */
+DELETE
+FROM "Country"
+WHERE "name_country" LIKE 'Священная Римская империя'; /* не должно выполниться */
 
-INSERT INTO "Musical_instruments" VALUES(0, 'гитара');                                                  /* должно выполниться */    
-INSERT INTO "Musical_instruments" VALUES(0, 'NoName');                                                  /* должно выполниться */
-DELETE FROM "Musical_instruments" WHERE "name_instrument" LIKE 'NoName';                                /* должно выполниться */
-                    
-INSERT INTO "Characteristic" VALUES(0, 'худой');                                                        /* должно выполниться */
-INSERT INTO "Characteristic" VALUES(0, 'высокий');                                                      /* должно выполниться */
-INSERT INTO "Characteristic" VALUES(0, 'NoName');                                                       /* должно выполниться */
+INSERT INTO "Musical_instruments"
+VALUES (0, 'гитара'); /* должно выполниться */
+INSERT INTO "Musical_instruments"
+VALUES (0, 'NoName'); /* должно выполниться */
+DELETE
+FROM "Musical_instruments"
+WHERE "name_instrument" LIKE 'NoName'; /* должно выполниться */
+
+INSERT INTO "Characteristic"
+VALUES (0, 'худой'); /* должно выполниться */
+INSERT INTO "Characteristic"
+VALUES (0, 'высокий'); /* должно выполниться */
+INSERT INTO "Characteristic"
+VALUES (0, 'NoName'); /* должно выполниться */
 DELETE FROM "Characteristic" WHERE "type_characteristic" LIKE 'NoName';                                 /* должно выполниться */
 
 /* тест Employee 1------------------------ -----------------------------------------------------------------------------------*/
@@ -87,65 +149,119 @@ INSERT INTO "Employee" VALUES(0, 'Марсель', '', '', 1, TO_DATE('1999/01/0
 INSERT INTO "Employee" VALUES(0, 'Лариса', '', '', 2, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
     0, 30000, 4, 1);                                                                                    /* должно выполниться */
 INSERT INTO "Employee" VALUES(0, 'Ксения', '', '', 2, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
-    0, 30000, 4, 1);                                                                                    /* должно выполниться */
-INSERT INTO "Employee" VALUES(0, 'Алексей', '', '', 1, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
-    0, 30000, 4, 1);                                                                                    /* должно выполниться */
-INSERT INTO "Employee" VALUES(0, 'NoName', '', '', 1, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
-    0, 30000, 4, 1);                                                                                    /* должно выполниться */
-INSERT INTO "Employee" VALUES(0, 'Владимир', '', '', 2, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
-    0, 30000, 1, 6);                                                                                    /* должно выполниться */
-INSERT INTO "Employee" VALUES(0, 'Максим', '', '', 1, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
-    0, 30000, 4, 6);                                                                                    /* должно выполниться */
-INSERT INTO "Employee" VALUES(0, 'Юрий', '', '', 1, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
-    0, 30000, 1, 7);                                                                                    /* должно выполниться */
-INSERT INTO "Employee" VALUES(0, 'Гузель', '', '', 2, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
-    0, 30000, 1, 3);                                                                                    /* должно выполниться */
+                              0, 30000, 4, 1); /* должно выполниться */
+INSERT INTO "Employee"
+VALUES (0, 'Алексей', '', '', 1, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
+        0, 30000, 4, 1); /* должно выполниться */
+INSERT INTO "Employee"
+VALUES (0, 'NoName', '', '', 1, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
+        0, 30000, 4, 1); /* должно выполниться */
+INSERT INTO "Employee"
+VALUES (0, 'Владимир', '', '', 2, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
+        0, 30000, 1, 6); /* должно выполниться */
+INSERT INTO "Employee"
+VALUES (0, 'Максим', '', '', 1, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
+        0, 30000, 4, 6); /* должно выполниться */
+INSERT INTO "Employee"
+VALUES (0, 'Юрий', '', '', 1, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
+        0, 30000, 1, 7); /* должно выполниться */
+INSERT INTO "Employee"
+VALUES (0, 'Гузель', '', '', 2, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
+        0, 30000, 1, 3);
+/* должно выполниться */
 /* тест простейших таблиц ----------------------------------------------------------------------------------------------------*/
-DELETE FROM "Job_types" WHERE "name_job_type" LIKE 'актер';                                          /* не должно выполниться */
+DELETE
+FROM "Job_types"
+WHERE "name_job_type" LIKE 'актер'; /* не должно выполниться */
 
-DELETE FROM "Education" WHERE "name_education" LIKE 'высшее';                                        /* не должно выполниться */
+DELETE
+FROM "Education"
+WHERE "name_education" LIKE 'высшее'; /* не должно выполниться */
 
-DELETE FROM "Gender" WHERE "name_gender" LIKE 'мужской';                                             /* не должно выполниться */
+DELETE
+FROM "Gender"
+WHERE "name_gender" LIKE 'мужской';
+/* не должно выполниться */
 /* тест Actor-Rank -----------------------------------------------------------------------------------------------------------*/
-INSERT INTO "Actor-Rank" VALUES(1, 1, TO_DATE('1997/01/01', 'yyyy/mm/dd'), 2);                       /* не должно выполниться */
-INSERT INTO "Actor-Rank" VALUES(1, 1, TO_DATE('2020/01/01', 'yyyy/mm/dd'), 2);                          /* должно выполниться */
-UPDATE "Actor-Rank" SET "obtaining_date_actor_rank" = TO_DATE('1997/01/01', 'yyyy/mm/dd')
-    WHERE "id_actor" = 1;                                                                            /* не должно выполниться */                                                                          /* не должно выполниться */
-UPDATE "Actor-Rank" SET "obtaining_date_actor_rank" = TO_DATE('2019/01/01', 'yyyy/mm/dd')
-    WHERE "id_actor" = 1;                                                                               /* должно выполниться */
+INSERT INTO "Actor-Rank"
+VALUES (1, 1, TO_DATE('1997/01/01', 'yyyy/mm/dd'), 2); /* не должно выполниться */
+INSERT INTO "Actor-Rank"
+VALUES (1, 1, TO_DATE('2020/01/01', 'yyyy/mm/dd'), 2); /* должно выполниться */
+UPDATE "Actor-Rank"
+SET "obtaining_date_actor_rank" = TO_DATE('1997/01/01', 'yyyy/mm/dd')
+WHERE "id_actor" = 1;
+/* не должно выполниться */ /* не должно выполниться */
+UPDATE "Actor-Rank"
+SET "obtaining_date_actor_rank" = TO_DATE('2019/01/01', 'yyyy/mm/dd')
+WHERE "id_actor" = 1;
+/* должно выполниться */
 /* тест простейших таблиц ----------------------------------------------------------------------------------------------------*/
-DELETE FROM "Rank" WHERE "name_rank" LIKE 'заслуженный артист';                                      /* не должно выполниться */
+DELETE
+FROM "Rank"
+WHERE "name_rank" LIKE 'заслуженный артист'; /* не должно выполниться */
 
-DELETE FROM "Competition" WHERE "name_competiton" LIKE 'Таланты России';                             /* не должно выполниться */
+DELETE
+FROM "Competition"
+WHERE "name_competition" LIKE 'Таланты России';
+/* не должно выполниться */
 /* тест Show 1 ---------------------------------------------------------------------------------------------------------------*/
-INSERT INTO "Show" VALUES(0, 'Творения Прометея', 2, 3, 4, 1, 1, 2, 17,
-    TO_DATE('2022/01/01', 'yyyy/mm/dd'));                                                            /* не должно выполниться */
-INSERT INTO "Show" VALUES(0, 'Творения Прометея', 2, 3, 4, 1, 1, 2, 19,
-    TO_DATE('2020/01/01', 'yyyy/mm/dd'));                                                            /* не должно выполниться */
-INSERT INTO "Show" VALUES(0, 'Творения Прометея', 2, 3, 4, 1, 1, 2, 19,
-    TO_DATE('2022/01/01', 'yyyy/mm/dd'));                                                               /* должно выполниться */
-UPDATE "Show" SET "century_show" = 17 WHERE "id_show" = 1;                                           /* не должно выполниться */
-UPDATE "Show" SET "premier_date_show" = TO_DATE('2020/01/01', 'yyyy/mm/dd') WHERE "id_show" = 1;     /* не должно выполниться */
-UPDATE "Show" SET "century_show" = 18, "premier_date_show" = TO_DATE('2025/01/01', 'yyyy/mm/dd')
-    WHERE "id_show" = 1;                                                                                /* должно выполниться */
+INSERT INTO "Show"
+VALUES (0, 'Творения Прометея', 2, 3, 4, 1, 1, 2, 17,
+        TO_DATE('2022/01/01', 'yyyy/mm/dd')); /* не должно выполниться */
+INSERT INTO "Show"
+VALUES (0, 'Творения Прометея', 2, 3, 4, 1, 1, 2, 19,
+        TO_DATE('2020/01/01', 'yyyy/mm/dd')); /* не должно выполниться */
+INSERT INTO "Show"
+VALUES (0, 'Творения Прометея', 2, 3, 4, 1, 1, 2, 19,
+        TO_DATE('2022/01/01', 'yyyy/mm/dd')); /* должно выполниться */
+UPDATE "Show"
+SET "century_show" = 17
+WHERE "id_show" = 1; /* не должно выполниться */
+UPDATE "Show"
+SET "premier_date_show" = TO_DATE('2020/01/01', 'yyyy/mm/dd')
+WHERE "id_show" = 1; /* не должно выполниться */
+UPDATE "Show"
+SET "century_show"      = 18,
+    "premier_date_show" = TO_DATE('2025/01/01', 'yyyy/mm/dd')
+WHERE "id_show" = 1;
+/* должно выполниться */
 /* тест простейших таблиц ----------------------------------------------------------------------------------------------------*/
-DELETE FROM "Genre" WHERE "name_genre" LIKE 'музыкальная комедия';                                   /* не должно выполниться */
+DELETE
+FROM "Genre"
+WHERE "name_genre" LIKE 'музыкальная комедия'; /* не должно выполниться */
 
-DELETE FROM "Age_category" WHERE "name_age_category" LIKE 'взрослые';                                /* не должно выполниться */
+DELETE
+FROM "Age_category"
+WHERE "name_age_category" LIKE 'взрослые'; /* не должно выполниться */
 
-DELETE FROM "Author" WHERE "name_author" LIKE 'Людвиг';                                              /* не должно выполниться */
-UPDATE "Author" SET "life_century_author" = 21 WHERE "id_author" = 1;                                /* не должно выполниться */
-UPDATE "Author" SET "life_century_author" = 17 WHERE "id_author" = 1;                                   /* должно выполниться */
+DELETE
+FROM "Author"
+WHERE "name_author" LIKE 'Людвиг'; /* не должно выполниться */
+UPDATE "Author"
+SET "life_century_author" = 21
+WHERE "id_author" = 1; /* не должно выполниться */
+UPDATE "Author"
+SET "life_century_author" = 17
+WHERE "id_author" = 1;
+/* должно выполниться */
 /*----------------------------------------------------------------------------------------------------------------------------*/
-INSERT INTO "Role" VALUES(0, 1, 'Прометей', 1);                                                         /* должно выполниться */
-INSERT INTO "Role" VALUES(0, 1, 'Амфион', 0);                                                           /* должно выполниться */
-INSERT INTO "Role" VALUES(0, 1, 'None', 0);                                                             /* должно выполниться */
-DELETE FROM "Role" WHERE "name_role" LIKE 'None';                                                       /* должно выполниться */
+INSERT INTO "Role"
+VALUES (0, 1, 'Прометей', 1); /* должно выполниться */
+INSERT INTO "Role"
+VALUES (0, 1, 'Амфион', 0); /* должно выполниться */
+INSERT INTO "Role"
+VALUES (0, 1, 'None', 0); /* должно выполниться */
+DELETE
+FROM "Role"
+WHERE "name_role" LIKE 'None'; /* должно выполниться */
 
-INSERT INTO "Role-Characteristic" VALUES(1, 1, 0);                                                      /* должно выполниться */
-INSERT INTO "Role-Characteristic" VALUES(2, 2, 0);                                                      /* должно выполниться */
+INSERT INTO "Role-Characteristic"
+VALUES (1, 1, 0); /* должно выполниться */
+INSERT INTO "Role-Characteristic"
+VALUES (2, 2, 0); /* должно выполниться */
 
-INSERT INTO "Musician-Instrument" VALUES(11, 1);                                                        /* должно выполниться */
+INSERT INTO "Musician-Instrument"
+VALUES (11, 1); /* должно выполниться */
 INSERT INTO "Musician-Show" VALUES(11, 1);                                                              /* должно выполниться */
 INSERT INTO "Musician-Show" VALUES(10, 1);                                                              /* должно выполниться */
 DELETE FROM "Musician-Show" WHERE "id_musician" = 10;                                                   /* должно выполниться */
@@ -229,42 +345,76 @@ INSERT INTO "Role" VALUES(0, 3, 'NoName2', 1);                                  
 INSERT INTO "Direction" VALUES(1, 7, 1);                                                             /* не должно выполниться */
 DELETE FROM "Direction" WHERE "id_actor" = 9 and "id_role" = 6;                                      /* не должно выполниться */
 /* тест Tour -----------------------------------------------------------------------------------------------------------------*/
-INSERT INTO "Tour" VALUES(12, 1, TO_DATE('2021/01/01', 'yyyy/mm/dd'),
-    TO_DATE('2022/01/01', 'yyyy/mm/dd'), 1);                                                         /* не должно выполниться */
-INSERT INTO "Tour" VALUES(1, 2, TO_DATE('2021/01/01', 'yyyy/mm/dd'),
-    TO_DATE('2022/01/01', 'yyyy/mm/dd'), 1);                                                         /* не должно выполниться */
-INSERT INTO "Tour" VALUES(1, 1, TO_DATE('2023/01/01', 'yyyy/mm/dd'),
-    TO_DATE('2021/01/01', 'yyyy/mm/dd'), 1);                                                         /* не должно выполниться */
-INSERT INTO "Tour" VALUES(13, 1, TO_DATE('2021/01/01', 'yyyy/mm/dd'),
-    TO_DATE('2022/01/01', 'yyyy/mm/dd'), 1);                                                         /* не должно выполниться */
-INSERT INTO "Tour" VALUES(1, 1, TO_DATE('2020/01/01', 'yyyy/mm/dd'),
-    TO_DATE('2021/01/01', 'yyyy/mm/dd'), 1);                                                         /* не должно выполниться */
-INSERT INTO "Tour" VALUES(1, 1, TO_DATE('2022/01/01', 'yyyy/mm/dd'),
-    TO_DATE('2023/01/01', 'yyyy/mm/dd'), 1);                                                            /* должно выполниться */
-INSERT INTO "Tour" VALUES(2, 1, TO_DATE('2022/01/01', 'yyyy/mm/dd'),
-    TO_DATE('2023/01/01', 'yyyy/mm/dd'), 1);                                                            /* должно выполниться */
-INSERT INTO "Tour" VALUES(3, 1, TO_DATE('2022/01/01', 'yyyy/mm/dd'),
-    TO_DATE('2023/01/01', 'yyyy/mm/dd'), 1);                                                            /* должно выполниться */
-INSERT INTO "Tour" VALUES(4, 1, TO_DATE('2022/01/01', 'yyyy/mm/dd'),
-    TO_DATE('2023/01/01', 'yyyy/mm/dd'), 1);                                                            /* должно выполниться */
-INSERT INTO "Tour" VALUES(2, 2, TO_DATE('2022/03/01', 'yyyy/mm/dd'),
-    TO_DATE('2024/01/01', 'yyyy/mm/dd'), 1);                                                         /* не должно выполниться */
-INSERT INTO "Tour" VALUES(2, 2, TO_DATE('2023/03/01', 'yyyy/mm/dd'),
-    TO_DATE('2024/01/01', 'yyyy/mm/dd'), 1);                                                            /* должно выполниться */
+INSERT INTO "Tour"
+VALUES (12, 1, TO_DATE('2021/01/01', 'yyyy/mm/dd'),
+        TO_DATE('2022/01/01', 'yyyy/mm/dd'), 1); /* не должно выполниться */
+INSERT INTO "Tour"
+VALUES (1, 2, TO_DATE('2021/01/01', 'yyyy/mm/dd'),
+        TO_DATE('2022/01/01', 'yyyy/mm/dd'), 1); /* не должно выполниться */
+INSERT INTO "Tour"
+VALUES (1, 1, TO_DATE('2023/01/01', 'yyyy/mm/dd'),
+        TO_DATE('2021/01/01', 'yyyy/mm/dd'), 1); /* не должно выполниться */
+INSERT INTO "Tour"
+VALUES (13, 1, TO_DATE('2021/01/01', 'yyyy/mm/dd'),
+        TO_DATE('2022/01/01', 'yyyy/mm/dd'), 1); /* не должно выполниться */
+INSERT INTO "Tour"
+VALUES (1, 1, TO_DATE('2020/01/01', 'yyyy/mm/dd'),
+        TO_DATE('2021/01/01', 'yyyy/mm/dd'), 1); /* не должно выполниться */
+INSERT INTO "Tour"
+VALUES (1, 1, TO_DATE('2022/01/01', 'yyyy/mm/dd'),
+        TO_DATE('2023/01/01', 'yyyy/mm/dd'), 1); /* должно выполниться */
+INSERT INTO "Tour"
+VALUES (2, 1, TO_DATE('2022/01/01', 'yyyy/mm/dd'),
+        TO_DATE('2023/01/01', 'yyyy/mm/dd'), 1); /* должно выполниться */
+INSERT INTO "Tour"
+VALUES (3, 1, TO_DATE('2022/01/01', 'yyyy/mm/dd'),
+        TO_DATE('2023/01/01', 'yyyy/mm/dd'), 1); /* должно выполниться */
+INSERT INTO "Tour"
+VALUES (4, 1, TO_DATE('2022/01/01', 'yyyy/mm/dd'),
+        TO_DATE('2023/01/01', 'yyyy/mm/dd'), 1); /* должно выполниться */
+INSERT INTO "Tour"
+VALUES (2, 2, TO_DATE('2022/03/01', 'yyyy/mm/dd'),
+        TO_DATE('2024/01/01', 'yyyy/mm/dd'), 1); /* не должно выполниться */
+INSERT INTO "Tour"
+VALUES (2, 2, TO_DATE('2023/03/01', 'yyyy/mm/dd'),
+        TO_DATE('2024/01/01', 'yyyy/mm/dd'), 1);
+/* должно выполниться */
 /* тест Subscription ---------------------------------------------------------------------------------------------------------*/
-INSERT INTO "Subscription" VALUES(0, 1, 1);                                                          /* не должно выполниться */
-INSERT INTO "Subscription" VALUES(0, 1, NULL);                                                          /* должно выполниться */
-INSERT INTO "Subscription" VALUES(0, NULL, 1);                                                          /* должно выполниться */
-UPDATE "Subscription" SET "id_genre" = 1 WHERE "id_subscription" = 2;                                /* не должно выполниться */
-UPDATE "Subscription" SET "id_author" = 1 WHERE "id_subscription" = 1;                               /* не должно выполниться */
-UPDATE "Subscription" SET "id_genre" = 2 WHERE "id_subscription" = 1;                                   /* должно выполниться */
-UPDATE "Subscription" SET "id_author" = 2 WHERE "id_subscription" = 2;                                  /* должно выполниться */
-INSERT INTO "Subscription" VALUES(0, NULL, 1);                                                          /* должно выполниться */
+INSERT INTO "Subscription"
+VALUES (0, 1, 1); /* не должно выполниться */
+INSERT INTO "Subscription"
+VALUES (0, 1, NULL); /* должно выполниться */
+INSERT INTO "Subscription"
+VALUES (0, NULL, 1); /* должно выполниться */
+UPDATE "Subscription"
+SET "id_genre" = 1
+WHERE "id_subscription" = 2; /* не должно выполниться */
+UPDATE "Subscription"
+SET "id_author" = 1
+WHERE "id_subscription" = 1; /* не должно выполниться */
+UPDATE "Subscription"
+SET "id_genre" = 2
+WHERE "id_subscription" = 1; /* должно выполниться */
+UPDATE "Subscription"
+SET "id_author" = 2
+WHERE "id_subscription" = 2; /* должно выполниться */
+INSERT INTO "Subscription"
+VALUES (0, NULL, 1);
+/* должно выполниться */
 /* тест Ticket-Subscription --------------------------------------------------------------------------------------------------*/
-INSERT INTO "Ticket-Subscription" VALUES(1, 1);                                                         /* должно выполниться */
-INSERT INTO "Ticket-Subscription" VALUES(1, 2);                                                      /* не должно выполниться */
-INSERT INTO "Ticket-Subscription" VALUES(2, 3);                                                      /* не должно выполниться */
+INSERT INTO "Ticket-Subscription"
+VALUES (1, 1); /* должно выполниться */
+INSERT INTO "Ticket-Subscription"
+VALUES (1, 2); /* не должно выполниться */
+INSERT INTO "Ticket-Subscription"
+VALUES (2, 3);
+/* не должно выполниться */
 /* тест Musician-Show --------------------------------------------------------------------------------------------------------*/
-INSERT INTO "Musician-Show" VALUES(10, 2);                                                           /* не должно выполниться */
-DELETE FROM "Musician-Show" WHERE "id_musician" = 11;                                                /* не должно выполниться */
+INSERT INTO "Musician-Show"
+VALUES (10, 2); /* не должно выполниться */
+DELETE
+FROM "Musician-Show"
+WHERE "id_musician" = 11;
+/* не должно выполниться */
 /*----------------------------------------------------------------------------------------------------------------------------*/
+COMMIT;
