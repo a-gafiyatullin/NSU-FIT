@@ -13,7 +13,6 @@ import java.awt.event.ActionListener;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -353,9 +352,9 @@ public class Authors extends Theater {
     }
 
     private void createUIComponents() {
-        centuryFrom = new JFormattedTextField(NumberFormat.getNumberInstance());
-        centuryTo = new JFormattedTextField(NumberFormat.getNumberInstance());
-        century = new JFormattedTextField(NumberFormat.getNumberInstance());
+        centuryFrom = new JFormattedTextField(numberFormat);
+        centuryTo = new JFormattedTextField(numberFormat);
+        century = new JFormattedTextField(numberFormat);
         dateFrom = new JFormattedTextField(dateFormat);
         dateTo = new JFormattedTextField(dateFormat);
     }

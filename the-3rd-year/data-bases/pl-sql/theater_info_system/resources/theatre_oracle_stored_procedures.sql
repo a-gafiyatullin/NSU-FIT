@@ -161,12 +161,11 @@ begin
                                 and "id_genre" = NVL(id_genre, "id_genre")
                                 and "id_author" = NVL(id_author, "id_author"))
                             group by "id_show");
-
 end;
 /
 
-CREATE OR REPLACE procedure actor_role_show_info(id_show IN INT,
-                                                 list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure actor_role_in_show_info(id_show IN INT,
+                                                    list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -179,8 +178,8 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure musician_show_info(id_show IN INT,
-                                               list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure musicians_in_show_info(id_show IN INT,
+                                                   list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -415,7 +414,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure get_employee_list(list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_employees_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -479,7 +478,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure get_competition_list(list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_competitions_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -518,7 +517,6 @@ begin
           and "obtaining_date_actor_rank" <= NVL(date_to, "obtaining_date_actor_rank")
           and "id_rank" = NVL(id_rank, "id_rank")
           and "id_competition" = NVL(id_competition, "id_competition");
-
 end;
 /
 
@@ -714,8 +712,8 @@ begin
             inner join "Genre" using ("id_genre"))
                  inner join "Age_category" using ("id_age_category")
         where "id_show" in (select "id_show"
-                            from (("Repertoire" inner join "Show" using ("id_show"))
-                                     inner join "Author" using ("id_author"))
+                            from ("Repertoire"
+                                     inner join "Show" using ("id_show"))
                             where ("performance_date_repertoire" <= NVL(to_date_show, "performance_date_repertoire")
                                 and "performance_date_repertoire" >= NVL(from_date_show, "performance_date_repertoire")
                                 and "id_genre" = NVL(id_genre, "id_genre")
@@ -723,5 +721,127 @@ begin
                                 and ("id_director" = id_director or "id_production_designer" = id_director
                                     or "id_conductor" = id_director))
                             group by "id_show");
+end;
+/
+
+CREATE OR REPLACE procedure get_musicians_list(list OUT SYS_REFCURSOR)
+    is
+begin
+    open list for
+        select "id_employee", ("name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee") as name
+        from ("Employee"
+                 inner join "Job_types" using ("id_job_type"))
+        where "name_job_type" like 'музыкант';
+end;
+/
+
+CREATE OR REPLACE procedure get_musical_instruments_list(list OUT SYS_REFCURSOR)
+    is
+begin
+    open list for
+        select "id_instrument", "name_instrument"
+        from "Musical_instruments";
+end;
+/
+
+CREATE OR REPLACE procedure musician_info(id_employee IN "Employee"."id_employee"%TYPE,
+                                          id_gender IN "Employee"."id_gender"%TYPE,
+                                          age_from IN INT,
+                                          age_to IN INT,
+                                          id_instrument IN "Musical_instruments"."id_instrument"%TYPE,
+                                          employee_cur OUT SYS_REFCURSOR)
+    is
+    id_musician_job_type INT;
+begin
+    select "id_job_type"
+    into id_musician_job_type
+    from "Job_types"
+    where "name_job_type" like 'музыкант';
+
+    open employee_cur for
+        select "id_employee",
+               "name_employee"            as "Имя",
+               "surname_employee"         as "Фамилия",
+               "middle_name_employee"     as "Отчество",
+               "name_gender"              as "Гендер",
+               "birthday_employee"        as "Дата рождения",
+               "hire_date_employee"       as "Дата найма",
+               "children_amount_employee" as "Кол-во детей",
+               "salary_employee"          as "Зарплата(руб.)",
+               "name_education"           as "Образование",
+               "name_job_type"            as "Должность",
+               "name_instrument"          as "Инструмент"
+        from (((("Employee" inner join "Education" using ("id_education"))
+            inner join "Gender" using ("id_gender"))
+            inner join "Job_types" using ("id_job_type"))
+            left join "Musician-Instrument" on "id_musician" = "id_employee")
+                 left join "Musical_instruments" using ("id_instrument")
+        where (id_employee is not null and "id_employee" = id_employee)
+           or (id_employee is null and ("id_gender" = NVL(id_gender, "id_gender")
+            and TRUNC(((SELECT SYSDATE FROM DUAL) - "birthday_employee")) >= NVL(age_from * 365.242199,
+                                                                                 TRUNC(((SELECT SYSDATE FROM DUAL) - "birthday_employee")))
+            and TRUNC(((SELECT SYSDATE FROM DUAL) - "birthday_employee")) <= NVL(age_to * 365.242199,
+                                                                                 TRUNC(((SELECT SYSDATE FROM DUAL) - "birthday_employee")))
+            and ("id_instrument" = NVL(id_instrument, "id_instrument") or "id_instrument" is null)
+            and ("id_job_type" = id_musician_job_type or is_sub_job_type(id_musician_job_type, "id_job_type") = 1)));
+end;
+/
+
+CREATE OR REPLACE procedure musician_shows(from_date_show IN "Repertoire"."performance_date_repertoire"%TYPE,
+                                           to_date_show IN "Repertoire"."performance_date_repertoire"%TYPE,
+                                           id_genre IN "Genre"."id_genre"%TYPE,
+                                           id_age_category IN "Age_category"."id_age_category"%TYPE,
+                                           id_musician IN "Employee"."id_employee"%TYPE,
+                                           show_cur OUT SYS_REFCURSOR)
+    is
+begin
+    open show_cur for
+        select "id_show",
+               "name_show"                                                               as "Название",
+               (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
+                from "Employee"
+                where "id_employee" = "id_director")                                     as "Режиссер-постановщик",
+               (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
+                from "Employee"
+                where "id_employee" = "id_conductor")                                    as "Диpижеp-постановщик",
+               (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
+                from "Employee"
+                where "id_employee" = "id_production_designer")                          as "Художник-постановщик",
+               ("name_author" || ' ' || "surname_author" || ' ' || "middle_name_author") as "Автор",
+               "name_genre"                                                              as "Жанр",
+               "century_show"                                                            as "Век спектакля",
+               "premier_date_show"                                                       as "Дата премьеры",
+               "name_age_category"                                                       as "Возратсная категория"
+        from (("Show" inner join "Author" using ("id_author"))
+            inner join "Genre" using ("id_genre"))
+                 inner join "Age_category" using ("id_age_category")
+        where "id_show" in (select "id_show"
+                            from (("Repertoire" inner join "Show" using ("id_show"))
+                                     inner join "Musician-Show" using ("id_show"))
+                            where ("performance_date_repertoire" <= NVL(to_date_show, "performance_date_repertoire")
+                                and "performance_date_repertoire" >= NVL(from_date_show, "performance_date_repertoire")
+                                and "id_genre" = NVL(id_genre, "id_genre")
+                                and "id_age_category" = NVL(id_age_category, "id_age_category")
+                                and ("id_musician" = id_musician))
+                            group by "id_show");
+end;
+/
+
+CREATE OR REPLACE procedure musician_update(id_musician IN "Employee"."id_employee"%TYPE,
+                                            id_instrument IN "Musician-Instrument"."id_instrument"%TYPE)
+    is
+    cnt INT;
+begin
+    select count(*)
+    into cnt
+    from "Musician-Instrument"
+    where "id_musician" = id_musician;
+    if cnt = 0 then
+        INSERT INTO "Musician-Instrument" VALUES (id_musician, id_instrument);
+    else
+        UPDATE "Musician-Instrument" SET "id_instrument" = id_instrument WHERE "id_musician" = id_musician;
+    end if;
+
+    COMMIT;
 end;
 /

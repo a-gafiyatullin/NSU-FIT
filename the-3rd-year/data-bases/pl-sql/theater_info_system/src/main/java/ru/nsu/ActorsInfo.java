@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,7 +57,7 @@ public class ActorsInfo extends Theater {
         getActors = connection.prepareCall("{call get_actors_list(?)}");
         getActors.registerOutParameter("list", OracleTypes.CURSOR);
 
-        getCompetitions = connection.prepareCall("{call get_competition_list(?)}");
+        getCompetitions = connection.prepareCall("{call get_competitions_list(?)}");
         getCompetitions.registerOutParameter("list", OracleTypes.CURSOR);
 
         getDirectors = connection.prepareCall("{call get_directors_list(?)}");
@@ -331,8 +330,8 @@ public class ActorsInfo extends Theater {
     }
 
     private void createUIComponents() {
-        ageFromTextField = new JFormattedTextField(NumberFormat.getNumberInstance());
-        ageToTextField = new JFormattedTextField(NumberFormat.getNumberInstance());
+        ageFromTextField = new JFormattedTextField(numberFormat);
+        ageToTextField = new JFormattedTextField(numberFormat);
         periodToTextField = new JFormattedTextField(dateFormat);
         periodFromTextField = new JFormattedTextField(dateFormat);
     }

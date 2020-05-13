@@ -13,7 +13,6 @@ import java.awt.event.ActionListener;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,15 +83,6 @@ public class Employee extends Theater {
         updateEmployee = connection.prepareCall("{call employee_update(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
 
         deleteEmployee = connection.prepareCall("{call employee_delete(?)}");
-
-        Theater.showComboBoxListFromSQL(genderComboBox, getGenders, genders, "id_gender",
-                "name_gender");
-
-        Theater.showComboBoxListFromSQL(educationComboBox, getEducation, educations, "id_education",
-                "name_education");
-
-        Theater.showComboBoxListFromSQL(jobTypeComboBox, getJobs, jobs, "id_job_type",
-                "name_job_type");
 
         showComboBoxListFromSQL(genderComboBox, getGenders, genders, "id_gender", "name_gender");
         showComboBoxListFromSQL(educationComboBox, getEducation, educations, "id_education", "name_education");
@@ -349,13 +339,13 @@ public class Employee extends Theater {
                         updateEmployee.setString(2, surname);
                         updateEmployee.setString(3, middle_name);
                         updateEmployee.setInt(4, gender);
-                        updateEmployee.setDate(5, new java.sql.Date(Theater.dateFormat.parse(birthday).getTime()));
-                        updateEmployee.setDate(6, new java.sql.Date(Theater.dateFormat.parse(hire_date).getTime()));
+                        updateEmployee.setDate(5, new java.sql.Date(dateFormat.parse(birthday).getTime()));
+                        updateEmployee.setDate(6, new java.sql.Date(dateFormat.parse(hire_date).getTime()));
                         updateEmployee.setInt(7, Integer.parseInt(children_amount));
                         updateEmployee.setDouble(8, Double.parseDouble(salary));
                         updateEmployee.setInt(9, education);
                         updateEmployee.setInt(10, job);
-                        updateEmployee.setInt(11, selectedRow);
+                        updateEmployee.setInt(11, employees.get(selectedRow));
                         updateEmployee.execute();
 
                         updateResultTable();
@@ -417,17 +407,17 @@ public class Employee extends Theater {
     private void createUIComponents() {
         birthdayTextField = new JFormattedTextField(dateFormat);
         hireDateTextField = new JFormattedTextField(dateFormat);
-        childrenTextField = new JFormattedTextField(NumberFormat.getNumberInstance());
-        salaryTextField = new JFormattedTextField(NumberFormat.getNumberInstance());
-        ageToTextField = new JFormattedTextField(NumberFormat.getNumberInstance());
-        ageFromTextField = new JFormattedTextField(NumberFormat.getNumberInstance());
+        childrenTextField = new JFormattedTextField(numberFormat);
+        salaryTextField = new JFormattedTextField(numberFormat);
+        ageToTextField = new JFormattedTextField(numberFormat);
+        ageFromTextField = new JFormattedTextField(numberFormat);
         birthdayFromTextField = new JFormattedTextField(dateFormat);
         birthdayToTextField = new JFormattedTextField(dateFormat);
-        experienceFromTextField = new JFormattedTextField(NumberFormat.getNumberInstance());
-        experienceToTextField = new JFormattedTextField(NumberFormat.getNumberInstance());
-        childrenFromTextField = new JFormattedTextField(NumberFormat.getNumberInstance());
-        childrenToTextField = new JFormattedTextField(NumberFormat.getNumberInstance());
-        salaryFromTextField = new JFormattedTextField(NumberFormat.getNumberInstance());
-        salaryToTextField = new JFormattedTextField(NumberFormat.getNumberInstance());
+        experienceFromTextField = new JFormattedTextField(numberFormat);
+        experienceToTextField = new JFormattedTextField(numberFormat);
+        childrenFromTextField = new JFormattedTextField(numberFormat);
+        childrenToTextField = new JFormattedTextField(numberFormat);
+        salaryFromTextField = new JFormattedTextField(numberFormat);
+        salaryToTextField = new JFormattedTextField(numberFormat);
     }
 }

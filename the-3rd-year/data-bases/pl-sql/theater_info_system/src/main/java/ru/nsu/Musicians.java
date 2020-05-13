@@ -16,26 +16,26 @@ import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Directors extends Theater {
-    private final Map<String, Integer> directors = new HashMap<>();
-    private final CallableStatement getDirectors;
+public class Musicians extends Theater {
+    private final Map<String, Integer> musicians = new HashMap<>();
+    private final CallableStatement getMusicians;
+    private final Map<String, Integer> instruments = new HashMap<>();
+    private final CallableStatement getInstruments;
     private final Map<String, Integer> genders = new HashMap<>();
     private final CallableStatement getGenders;
     private final Map<String, Integer> genres = new HashMap<>();
     private final CallableStatement getGenres;
     private final Map<String, Integer> ageCategories = new HashMap<>();
     private final CallableStatement getAgeCategories;
-    private final Map<String, Integer> directorTypes = new HashMap<>();
-    private final CallableStatement getDirectorTypes;
-    private final Map<Integer, Integer> employees = new HashMap<>();
-    private final CallableStatement getEmployeesInfo;
-    private final CallableStatement updateEmployee;
+    private final Map<Integer, Integer> musiciansInfo = new HashMap<>();
+    private final CallableStatement getMusiciansInfo;
+    private final CallableStatement updateMusician;
     private final CallableStatement getShowInfo;
     private JPanel mainPanel;
     private JTable resultTable;
-    private JComboBox directorsComboBox;
+    private JComboBox musicianComboBox;
     private JComboBox genderComboBox;
-    private JComboBox jobTypeComboBox;
+    private JComboBox instrumentComboBox;
     private JFormattedTextField ageFrom;
     private JFormattedTextField ageTo;
     private JButton queryButton;
@@ -44,11 +44,10 @@ public class Directors extends Theater {
     private JComboBox ageComboBox;
     private JFormattedTextField periodFrom;
     private JFormattedTextField periodTo;
-    private JLabel status;
     private JButton queryButton2;
-    private int id_director_type;
+    private JLabel status;
 
-    Directors(final Connection connection) throws Exception {
+    public Musicians(final Connection connection) throws Exception {
         resultTable.getTableHeader().setReorderingAllowed(false);
         resultTable.setModel(new DefaultTableModel() {
 
@@ -57,6 +56,12 @@ public class Directors extends Theater {
                 return false;
             }
         });
+
+        getMusicians = connection.prepareCall("{call get_musicians_list(?)}");
+        getMusicians.registerOutParameter("list", OracleTypes.CURSOR);
+
+        getInstruments = connection.prepareCall("{call get_musical_instruments_list(?)}");
+        getInstruments.registerOutParameter("list", OracleTypes.CURSOR);
 
         getGenres = connection.prepareCall("{call get_genres_list(?)}");
         getGenres.registerOutParameter("list", OracleTypes.CURSOR);
@@ -67,32 +72,24 @@ public class Directors extends Theater {
         getGenders = connection.prepareCall("{call get_genders_list(?)}");
         getGenders.registerOutParameter("list", OracleTypes.CURSOR);
 
-        getDirectorTypes = connection.prepareCall("{call get_director_types_list(?, ?)}");
-        getDirectorTypes.registerOutParameter("list", OracleTypes.CURSOR);
-        getDirectorTypes.registerOutParameter("id_director_type", OracleTypes.INTEGER);
+        getMusiciansInfo = connection.prepareCall("{call musician_info(?, ?, ?, ?, ?, ?)}");
+        getMusiciansInfo.registerOutParameter(6, OracleTypes.CURSOR);
 
-        getDirectors = connection.prepareCall("{call get_all_types_directors_list(?)}");
-        getDirectors.registerOutParameter("list", OracleTypes.CURSOR);
+        updateMusician = connection.prepareCall("{call musician_update(?, ?)}");
 
-        getEmployeesInfo = connection.prepareCall("{call employee_info(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
-        getEmployeesInfo.registerOutParameter(18, OracleTypes.CURSOR);
-
-        updateEmployee = connection.prepareCall("{call employee_update(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
-
-        getShowInfo = connection.prepareCall("{call director_shows(?, ?, ?, ?, ?, ?)}");
+        getShowInfo = connection.prepareCall("{call musician_shows(?, ?, ?, ?, ?, ?)}");
         getShowInfo.registerOutParameter(6, OracleTypes.CURSOR);
 
-        showComboBoxListFromSQL(directorsComboBox, getDirectors, directors, "id_employee", "name");
+        showComboBoxListFromSQL(musicianComboBox, getMusicians, musicians, "id_employee", "name");
         showComboBoxListFromSQL(genderComboBox, getGenders, genders, "id_gender", "name_gender");
-        showComboBoxListFromSQL(jobTypeComboBox, getDirectorTypes, directorTypes, "id_job_type", "name_job_type");
-        id_director_type = getDirectorTypes.getInt("id_director_type");
+        showComboBoxListFromSQL(instrumentComboBox, getInstruments, instruments, "id_instrument", "name_instrument");
         showComboBoxListFromSQL(genreComboBox, getGenres, genres, "id_genre", "name_genre");
         showComboBoxListFromSQL(ageComboBox, getAgeCategories, ageCategories, "id_age_category", "name_age_category");
 
-        directorsComboBox.addPopupMenuListener(new PopupMenuListener() {
+        musicianComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(directorsComboBox, getDirectors, directors, "id_employee", "name");
+                showComboBoxListFromSQL(musicianComboBox, getMusicians, musicians, "id_employee", "name");
             }
 
             @Override
@@ -119,16 +116,11 @@ public class Directors extends Theater {
             }
         });
 
-        jobTypeComboBox.addPopupMenuListener(new PopupMenuListener() {
+        instrumentComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(jobTypeComboBox, getDirectorTypes, directorTypes, "id_job_type",
-                        "name_job_type");
-                try {
-                    id_director_type = getDirectorTypes.getInt("id_director_type");
-                } catch (Exception exception) {
-                    exception.printStackTrace();
-                }
+                showComboBoxListFromSQL(instrumentComboBox, getInstruments, instruments, "id_instrument",
+                        "name_instrument");
             }
 
             @Override
@@ -177,48 +169,36 @@ public class Directors extends Theater {
                 try {
                     resultTable.setEnabled(true);
                     // process query
-                    if (directorsComboBox.getSelectedItem().equals("-")) {
-                        getEmployeesInfo.setNull(1, OracleTypes.INTEGER);
+                    if (musicianComboBox.getSelectedItem().equals("-")) {
+                        getMusiciansInfo.setNull(1, OracleTypes.INTEGER);
                     } else {
-                        getEmployeesInfo.setInt(1, directors.get((directorsComboBox.getSelectedItem())));
+                        getMusiciansInfo.setInt(1, musicians.get((musicianComboBox.getSelectedItem())));
                     }
-                    getEmployeesInfo.setNull(2, OracleTypes.VARCHAR);
-                    getEmployeesInfo.setNull(3, OracleTypes.VARCHAR);
-                    getEmployeesInfo.setNull(4, OracleTypes.VARCHAR);
                     if (genderComboBox.getSelectedItem().equals("-")) {
-                        getEmployeesInfo.setNull(5, OracleTypes.INTEGER);
+                        getMusiciansInfo.setNull(2, OracleTypes.INTEGER);
                     } else {
-                        getEmployeesInfo.setInt(5, genders.get(genderComboBox.getSelectedItem()));
+                        getMusiciansInfo.setInt(2, genders.get(genderComboBox.getSelectedItem()));
                     }
-                    getEmployeesInfo.setNull(6, OracleTypes.VARCHAR);
-                    getEmployeesInfo.setNull(7, OracleTypes.VARCHAR);
                     if (ageFrom.getText().isEmpty()) {
-                        getEmployeesInfo.setNull(8, OracleTypes.INTEGER);
+                        getMusiciansInfo.setNull(3, OracleTypes.INTEGER);
                     } else {
-                        getEmployeesInfo.setInt(8, Integer.parseInt(ageFrom.getText()));
+                        getMusiciansInfo.setInt(3, Integer.parseInt(ageFrom.getText()));
                     }
                     if (ageTo.getText().isEmpty()) {
-                        getEmployeesInfo.setNull(9, OracleTypes.INTEGER);
+                        getMusiciansInfo.setNull(4, OracleTypes.INTEGER);
                     } else {
-                        getEmployeesInfo.setInt(9, Integer.parseInt(ageTo.getText()));
+                        getMusiciansInfo.setInt(4, Integer.parseInt(ageTo.getText()));
                     }
-                    getEmployeesInfo.setNull(10, OracleTypes.INTEGER);
-                    getEmployeesInfo.setNull(11, OracleTypes.INTEGER);
-                    getEmployeesInfo.setNull(12, OracleTypes.INTEGER);
-                    getEmployeesInfo.setNull(13, OracleTypes.INTEGER);
-                    getEmployeesInfo.setNull(14, OracleTypes.DOUBLE);
-                    getEmployeesInfo.setNull(15, OracleTypes.DOUBLE);
-                    getEmployeesInfo.setNull(16, OracleTypes.INTEGER);
-                    if (jobTypeComboBox.getSelectedItem().equals("-")) {
-                        getEmployeesInfo.setInt(17, id_director_type);
+                    if (instrumentComboBox.getSelectedItem().equals("-")) {
+                        getMusiciansInfo.setNull(5, OracleTypes.INTEGER);
                     } else {
-                        getEmployeesInfo.setInt(17, directorTypes.get(jobTypeComboBox.getSelectedItem()));
+                        getMusiciansInfo.setInt(5, instruments.get(instrumentComboBox.getSelectedItem()));
                     }
-                    getEmployeesInfo.execute();
+                    getMusiciansInfo.execute();
 
                     // get results
-                    ResultSet results = (ResultSet) getEmployeesInfo.getObject(18);
-                    fillTableFromResultSet(resultTable, 2, employees, results);
+                    ResultSet results = (ResultSet) getMusiciansInfo.getObject(6);
+                    fillTableFromResultSet(resultTable, 2, musiciansInfo, results);
                     status.setText("Статус: Успех. Возвращено " + resultTable.getRowCount() + " записей.");
                 } catch (Exception exception) {
                     exception.printStackTrace();
@@ -238,7 +218,7 @@ public class Directors extends Theater {
                     DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
                     int selectedRow = resultTable.getSelectedRows()[0];
 
-                    jobTypeComboBox.setSelectedItem(model.getValueAt(selectedRow, 9));
+                    instrumentComboBox.setSelectedItem(model.getValueAt(selectedRow, 10));
 
                 } catch (Exception exception) {
                     exception.printStackTrace();
@@ -256,23 +236,14 @@ public class Directors extends Theater {
                         return;
                     }
                     int selectedRow = resultTable.getSelectedRows()[0];
-                    int job = directorTypes.get(jobTypeComboBox.getSelectedItem());
-                    if (job == 0) {
+                    int instrument = instruments.get(instrumentComboBox.getSelectedItem());
+                    if (instrument == 0) {
                         JOptionPane.showMessageDialog(mainPanel, "Не все поля заполнены!",
                                 "Ошибка редактирования", JOptionPane.ERROR_MESSAGE);
                     } else {
-                        updateEmployee.setNull(1, OracleTypes.VARCHAR);
-                        updateEmployee.setNull(2, OracleTypes.VARCHAR);
-                        updateEmployee.setNull(3, OracleTypes.VARCHAR);
-                        updateEmployee.setNull(4, OracleTypes.INTEGER);
-                        updateEmployee.setNull(5, OracleTypes.DATE);
-                        updateEmployee.setNull(6, OracleTypes.DATE);
-                        updateEmployee.setNull(7, OracleTypes.INTEGER);
-                        updateEmployee.setNull(8, OracleTypes.DOUBLE);
-                        updateEmployee.setNull(9, OracleTypes.INTEGER);
-                        updateEmployee.setInt(10, job);
-                        updateEmployee.setInt(11, employees.get(selectedRow));
-                        updateEmployee.execute();
+                        updateMusician.setInt(1, musiciansInfo.get(selectedRow));
+                        updateMusician.setInt(2, instrument);
+                        updateMusician.execute();
 
                         updateResultTable();
                         status.setText("Статус: запись обновлена успешно!");
@@ -318,7 +289,7 @@ public class Directors extends Theater {
                     } else {
                         getShowInfo.setInt(4, ageCategories.get(ageComboBox.getSelectedItem()));
                     }
-                    getShowInfo.setInt(5, employees.get(selectedRow));
+                    getShowInfo.setInt(5, musiciansInfo.get(selectedRow));
                     getShowInfo.execute();
 
                     ResultSet results = (ResultSet) getShowInfo.getObject(6);
@@ -345,7 +316,6 @@ public class Directors extends Theater {
 
     private void updateResultTable() {
         genderComboBox.setSelectedItem("-");
-        jobTypeComboBox.setSelectedItem("-");
         queryButton.doClick();
     }
 }

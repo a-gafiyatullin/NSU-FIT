@@ -6,12 +6,18 @@ import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
 public abstract class Theater extends JFrame {
 
     protected static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    protected static NumberFormat numberFormat = NumberFormat.getNumberInstance();
+
+    static {
+        numberFormat.setGroupingUsed(false);
+    }
 
     // get and update entries list from database
     protected static void showComboBoxListFromSQL(JComboBox comboBox, CallableStatement procedure, Map entries,

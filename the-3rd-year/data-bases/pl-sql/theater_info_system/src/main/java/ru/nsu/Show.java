@@ -13,7 +13,6 @@ import java.awt.event.ActionListener;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -112,10 +111,10 @@ public class Show extends Theater {
         getShowInfo = connection.prepareCall("{call show_info(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
         getShowInfo.registerOutParameter(15, OracleTypes.CURSOR);
 
-        getShowActorInfo = connection.prepareCall("{call actor_role_show_info(?, ?)}");
+        getShowActorInfo = connection.prepareCall("{call actor_role_in_show_info(?, ?)}");
         getShowActorInfo.registerOutParameter(2, OracleTypes.CURSOR);
 
-        getShowMusicianInfo = connection.prepareCall("{call musician_show_info(?, ?)}");
+        getShowMusicianInfo = connection.prepareCall("{call musicians_in_show_info(?, ?)}");
         getShowMusicianInfo.registerOutParameter(2, OracleTypes.CURSOR);
 
         showComboBoxListFromSQL(titles, getShowTitles, shows, "id_show", "name_show");
@@ -363,7 +362,7 @@ public class Show extends Theater {
     private void createUIComponents() {
         dateTo = new JFormattedTextField(dateFormat);
         dateFrom = new JFormattedTextField(dateFormat);
-        centuryFrom = new JFormattedTextField(NumberFormat.getNumberInstance());
-        centuryTo = new JFormattedTextField(NumberFormat.getNumberInstance());
+        centuryFrom = new JFormattedTextField(numberFormat);
+        centuryTo = new JFormattedTextField(numberFormat);
     }
 }
