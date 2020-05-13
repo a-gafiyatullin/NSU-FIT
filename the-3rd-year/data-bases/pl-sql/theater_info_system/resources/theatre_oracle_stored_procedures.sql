@@ -117,8 +117,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure author_delete(
-    id_author IN "Author"."id_author"%TYPE)
+CREATE OR REPLACE procedure author_delete(id_author IN "Author"."id_author"%TYPE)
     is
 begin
     DELETE FROM "Author" WHERE "id_author" = id_author;
@@ -166,7 +165,8 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure actor_role_show_info(id_show IN INT, list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure actor_role_show_info(id_show IN INT,
+                                                 list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -179,7 +179,8 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure musician_show_info(id_show IN INT, list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure musician_show_info(id_show IN INT,
+                                               list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -192,8 +193,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure get_genders_list(
-    list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_genders_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -212,8 +212,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure get_job_types_list(
-    list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_job_types_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -222,7 +221,38 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure employee_info(name IN "Employee"."name_employee"%TYPE,
+CREATE OR REPLACE function is_sub_job_type(id_parent_job_type IN "Job_types"."id_parent_job_type"%TYPE,
+                                           id_job_type IN "Job_types"."id_job_type"%TYPE)
+    return int
+    is
+    cursor job_cur is
+        select "id_job_type"
+        from "Job_types"
+        where "id_parent_job_type" = id_parent_job_type;
+    result int;
+begin
+    if id_parent_job_type = id_job_type then
+        return 1;
+    end if;
+
+    for job_rec in job_cur
+        loop
+            if job_rec."id_job_type" = id_job_type then
+                return 1;
+            else
+                result := is_sub_job_type(job_rec."id_job_type", id_job_type);
+                if result = 1 then
+                    return 1;
+                end if;
+            end if;
+        end loop;
+
+    return 0;
+end;
+/
+
+CREATE OR REPLACE procedure employee_info(id_employee IN "Employee"."id_employee"%TYPE,
+                                          name IN "Employee"."name_employee"%TYPE,
                                           surname IN "Employee"."surname_employee"%TYPE,
                                           middle_name IN "Employee"."middle_name_employee"%TYPE,
                                           id_gender IN "Employee"."id_gender"%TYPE,
@@ -256,56 +286,28 @@ begin
         from ((("Employee" inner join "Education" using ("id_education"))
             inner join "Gender" using ("id_gender"))
                  inner join "Job_types" using ("id_job_type"))
-        where ("name_employee" like '%' || name || '%' or name is null)
-          and ("surname_employee" like '%' || surname || '%' or surname is null)
-          and ("middle_name_employee" like '%' || middle_name || '%' or middle_name is null)
-          and "id_gender" = NVL(id_gender, "id_gender")
-          and "birthday_employee" >= NVL(birthday_from, "birthday_employee")
-          and "birthday_employee" <= NVL(birthday_to, "birthday_employee")
-          and TRUNC(((SELECT SYSDATE FROM DUAL) - "hire_date_employee")) >= NVL(experience_from,
-                                                                                TRUNC(((SELECT SYSDATE FROM DUAL) - "hire_date_employee")))
-          and TRUNC(((SELECT SYSDATE FROM DUAL) - "hire_date_employee")) <= NVL(experience_to,
-                                                                                TRUNC(((SELECT SYSDATE FROM DUAL) - "hire_date_employee")))
-          and TRUNC(((SELECT SYSDATE FROM DUAL) - "birthday_employee")) >= NVL(age_from,
-                                                                               TRUNC(((SELECT SYSDATE FROM DUAL) - "birthday_employee")))
-          and TRUNC(((SELECT SYSDATE FROM DUAL) - "birthday_employee")) <= NVL(age_to,
-                                                                               TRUNC(((SELECT SYSDATE FROM DUAL) - "birthday_employee")))
-          and "children_amount_employee" >= NVL(children_amount_from, "children_amount_employee")
-          and "children_amount_employee" <= NVL(children_amount_to, "children_amount_employee")
-          and "salary_employee" >= NVL(salary_from, "salary_employee")
-          and "salary_employee" <= NVL(salary_to, "salary_employee")
-          and "id_education" = NVL(id_education, "id_education")
-          and (id_job_type is null or is_sub_job_type(id_job_type, "id_job_type") = 1);
-end;
-/
-
-CREATE OR REPLACE function is_sub_job_type(id_parent_job_type IN "Job_types"."id_parent_job_type"%TYPE,
-                                           id_job_type IN "Job_types"."id_job_type"%TYPE)
-    return int
-    is
-    cursor job_cur is
-        select "id_job_type"
-        from "Job_types"
-        where "id_parent_job_type" = id_parent_job_type;
-    result int;
-begin
-    if id_parent_job_type = id_job_type then
-        return 1;
-    end if;
-
-    for job_rec in job_cur
-        loop
-            if job_rec."id_job_type" = id_job_type then
-                return 1;
-            else
-                result := is_sub_job_type(job_rec."id_job_type", id_job_type);
-                if result = 1 then
-                    return 1;
-                end if;
-            end if;
-        end loop;
-
-    return 0;
+        where (id_employee is not null and "id_employee" = id_employee)
+           or (id_employee is null and
+               (("name_employee" like '%' || name || '%' or name is null)
+                   and ("surname_employee" like '%' || surname || '%' or surname is null)
+                   and ("middle_name_employee" like '%' || middle_name || '%' or middle_name is null)
+                   and "id_gender" = NVL(id_gender, "id_gender")
+                   and "birthday_employee" >= NVL(birthday_from, "birthday_employee")
+                   and "birthday_employee" <= NVL(birthday_to, "birthday_employee")
+                   and TRUNC(((SELECT SYSDATE FROM DUAL) - "hire_date_employee")) >= NVL(experience_from,
+                                                                                         TRUNC(((SELECT SYSDATE FROM DUAL) - "hire_date_employee")))
+                   and TRUNC(((SELECT SYSDATE FROM DUAL) - "hire_date_employee")) <= NVL(experience_to,
+                                                                                         TRUNC(((SELECT SYSDATE FROM DUAL) - "hire_date_employee")))
+                   and TRUNC(((SELECT SYSDATE FROM DUAL) - "birthday_employee")) >= NVL(age_from,
+                                                                                        TRUNC(((SELECT SYSDATE FROM DUAL) - "birthday_employee")))
+                   and TRUNC(((SELECT SYSDATE FROM DUAL) - "birthday_employee")) <= NVL(age_to,
+                                                                                        TRUNC(((SELECT SYSDATE FROM DUAL) - "birthday_employee")))
+                   and "children_amount_employee" >= NVL(children_amount_from, "children_amount_employee")
+                   and "children_amount_employee" <= NVL(children_amount_to, "children_amount_employee")
+                   and "salary_employee" >= NVL(salary_from, "salary_employee")
+                   and "salary_employee" <= NVL(salary_to, "salary_employee")
+                   and "id_education" = NVL(id_education, "id_education")
+                   and (id_job_type is null or is_sub_job_type(id_job_type, "id_job_type") = 1)));
 end;
 /
 
@@ -343,15 +345,15 @@ CREATE OR REPLACE procedure employee_update(name IN "Employee"."name_employee"%T
     is
 begin
     UPDATE "Employee"
-    SET "name_employee"            = name,
-        "surname_employee"         = surname,
-        "middle_name_employee"     = middle_name,
+    SET "name_employee"            = NVL(name, "name_employee"),
+        "surname_employee"         = NVL(surname, "surname_employee"),
+        "middle_name_employee"     = NVL(middle_name, "middle_name_employee"),
         "id_gender"                = id_gender,
-        "birthday_employee"        = birthday,
-        "hire_date_employee"       = hire_date,
-        "children_amount_employee" = children_amount,
-        "salary_employee"          = salary,
-        "id_education"             = id_education,
+        "birthday_employee"        = NVL(birthday, "birthday_employee"),
+        "hire_date_employee"       = NVL(hire_date, "hire_date_employee"),
+        "children_amount_employee" = NVL(children_amount, "children_amount_employee"),
+        "salary_employee"          = NVL(salary, "salary_employee"),
+        "id_education"             = NVL(id_education, "id_education"),
         "id_job_type"              = id_job_type
     WHERE "id_employee" = id_employee;
 
@@ -359,8 +361,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure employee_delete(
-    id_employee IN "Employee"."id_employee"%TYPE)
+CREATE OR REPLACE procedure employee_delete(id_employee IN "Employee"."id_employee"%TYPE)
     is
 begin
     DELETE FROM "Employee" WHERE "id_employee" = id_employee;
@@ -369,8 +370,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure get_shows_list(
-    list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_shows_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -379,8 +379,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure get_genres_list(
-    list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_genres_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -389,8 +388,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure get_age_categories_list(
-    list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_age_categories_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -399,8 +397,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure get_authors_list(
-    list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_authors_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -409,8 +406,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure get_countries_list(
-    list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_countries_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -419,8 +415,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure get_employee_list(
-    list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_employee_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -431,8 +426,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure get_conductors_list(
-    list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_conductors_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -443,8 +437,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure get_designers_list(
-    list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_designers_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -455,8 +448,7 @@ begin
 end;
 /
 
-create or replace procedure get_directors_list(
-    list OUT SYS_REFCURSOR)
+create or replace procedure get_directors_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -467,8 +459,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure get_actors_list(
-    list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_actors_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -479,8 +470,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure get_rank_list(
-    list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_rank_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -489,8 +479,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure get_competition_list(
-    list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_competition_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
@@ -655,12 +644,84 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure get_characteristics_list(
-    list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_characteristics_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
         select "id_characteristic", "type_characteristic"
         from "Characteristic";
+end;
+/
+
+CREATE OR REPLACE procedure get_director_types_list(list OUT SYS_REFCURSOR, id_director_type OUT INT)
+    is
+begin
+    select "id_job_type"
+    into id_director_type
+    from "Job_types"
+    where "name_job_type" like 'постановщик';
+
+    open list for
+        select "id_job_type", "name_job_type"
+        from "Job_types"
+        where is_sub_job_type(id_director_type, "id_job_type") = 1;
+end;
+/
+
+CREATE OR REPLACE procedure get_all_types_directors_list(list OUT SYS_REFCURSOR)
+    is
+    id_director_job_type INT;
+begin
+    select "id_job_type"
+    into id_director_job_type
+    from "Job_types"
+    where "name_job_type" like 'постановщик';
+
+    open list for
+        select "id_employee", ("name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee") as name
+        from ("Employee"
+                 inner join "Job_types" using ("id_job_type"))
+        where is_sub_job_type(id_director_job_type, "id_job_type") = 1;
+end;
+/
+
+CREATE OR REPLACE procedure director_shows(from_date_show IN "Repertoire"."performance_date_repertoire"%TYPE,
+                                           to_date_show IN "Repertoire"."performance_date_repertoire"%TYPE,
+                                           id_genre IN "Genre"."id_genre"%TYPE,
+                                           id_age_category IN "Age_category"."id_age_category"%TYPE,
+                                           id_director IN "Author"."id_author"%TYPE,
+                                           show_cur OUT SYS_REFCURSOR)
+    is
+begin
+    open show_cur for
+        select "id_show",
+               "name_show"                                                               as "Название",
+               (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
+                from "Employee"
+                where "id_employee" = "id_director")                                     as "Режиссер-постановщик",
+               (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
+                from "Employee"
+                where "id_employee" = "id_conductor")                                    as "Диpижеp-постановщик",
+               (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
+                from "Employee"
+                where "id_employee" = "id_production_designer")                          as "Художник-постановщик",
+               ("name_author" || ' ' || "surname_author" || ' ' || "middle_name_author") as "Автор",
+               "name_genre"                                                              as "Жанр",
+               "century_show"                                                            as "Век спектакля",
+               "premier_date_show"                                                       as "Дата премьеры",
+               "name_age_category"                                                       as "Возратсная категория"
+        from (("Show" inner join "Author" using ("id_author"))
+            inner join "Genre" using ("id_genre"))
+                 inner join "Age_category" using ("id_age_category")
+        where "id_show" in (select "id_show"
+                            from (("Repertoire" inner join "Show" using ("id_show"))
+                                     inner join "Author" using ("id_author"))
+                            where ("performance_date_repertoire" <= NVL(to_date_show, "performance_date_repertoire")
+                                and "performance_date_repertoire" >= NVL(from_date_show, "performance_date_repertoire")
+                                and "id_genre" = NVL(id_genre, "id_genre")
+                                and "id_age_category" = NVL(id_age_category, "id_age_category")
+                                and ("id_director" = id_director or "id_production_designer" = id_director
+                                    or "id_conductor" = id_director))
+                            group by "id_show");
 end;
 /

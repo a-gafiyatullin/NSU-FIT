@@ -26,5 +26,6 @@ public class Authorization {
         Employee employee = new Employee(connection);
         ActorsInfo actors_info = new ActorsInfo(connection);
         ActorsEditing actorsEditing = new ActorsEditing(connection);
+        Directors directors = new Directors(connection);
     }
 }

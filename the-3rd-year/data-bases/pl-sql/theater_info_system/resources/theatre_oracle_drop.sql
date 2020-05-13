@@ -127,5 +127,8 @@ drop procedure ACTOR_RANK_INSERT;
 drop procedure ACTOR_RANK_DELETE;
 drop procedure ACTOR_CHARACTERISTIC_INSERT;
 drop procedure ACTOR_CHARACTERISTIC_DELETE;
+DROP procedure get_director_types_list;
+DROP procedure get_all_types_directors_list;
+DROP procedure director_shows;
 
 COMMIT;

@@ -76,8 +76,8 @@ public class Employee extends Theater {
         getJobs = connection.prepareCall("{call get_job_types_list(?)}");
         getJobs.registerOutParameter("list", OracleTypes.CURSOR);
 
-        getEmployeesInfo = connection.prepareCall("{call employee_info(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
-        getEmployeesInfo.registerOutParameter(17, OracleTypes.CURSOR);
+        getEmployeesInfo = connection.prepareCall("{call employee_info(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
+        getEmployeesInfo.registerOutParameter(18, OracleTypes.CURSOR);
 
         addEmployee = connection.prepareCall("{call employee_insert(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
 
@@ -150,93 +150,93 @@ public class Employee extends Theater {
             public void actionPerformed(ActionEvent e) {
                 try {
                     // process query
+                    getEmployeesInfo.setNull(1, OracleTypes.INTEGER);
                     if (nameTextField.getText().isEmpty()) {
-                        getEmployeesInfo.setNull(1, OracleTypes.VARCHAR);
-                    } else {
-                        getEmployeesInfo.setString(1, nameTextField.getText());
-                    }
-                    if (surnameTextField.getText().isEmpty()) {
                         getEmployeesInfo.setNull(2, OracleTypes.VARCHAR);
                     } else {
-                        getEmployeesInfo.setString(2, surnameTextField.getText());
+                        getEmployeesInfo.setString(2, nameTextField.getText());
                     }
-                    if (middleNameTextField.getText().isEmpty()) {
+                    if (surnameTextField.getText().isEmpty()) {
                         getEmployeesInfo.setNull(3, OracleTypes.VARCHAR);
                     } else {
-                        getEmployeesInfo.setString(3, middleNameTextField.getText());
+                        getEmployeesInfo.setString(3, surnameTextField.getText());
+                    }
+                    if (middleNameTextField.getText().isEmpty()) {
+                        getEmployeesInfo.setNull(4, OracleTypes.VARCHAR);
+                    } else {
+                        getEmployeesInfo.setString(4, middleNameTextField.getText());
                     }
                     if (genderComboBox.getSelectedItem().equals("-")) {
-                        getEmployeesInfo.setNull(4, OracleTypes.INTEGER);
+                        getEmployeesInfo.setNull(5, OracleTypes.INTEGER);
                     } else {
-                        getEmployeesInfo.setInt(4, genders.get(genderComboBox.getSelectedItem()));
+                        getEmployeesInfo.setInt(5, genders.get(genderComboBox.getSelectedItem()));
                     }
                     if (birthdayFromTextField.getText().isEmpty()) {
-                        getEmployeesInfo.setNull(5, OracleTypes.VARCHAR);
-                    } else {
-                        getEmployeesInfo.setDate(5,
-                                new java.sql.Date(dateFormat.parse(birthdayFromTextField.getText()).getTime()));
-                    }
-                    if (birthdayToTextField.getText().isEmpty()) {
                         getEmployeesInfo.setNull(6, OracleTypes.VARCHAR);
                     } else {
                         getEmployeesInfo.setDate(6,
+                                new java.sql.Date(dateFormat.parse(birthdayFromTextField.getText()).getTime()));
+                    }
+                    if (birthdayToTextField.getText().isEmpty()) {
+                        getEmployeesInfo.setNull(7, OracleTypes.VARCHAR);
+                    } else {
+                        getEmployeesInfo.setDate(7,
                                 new java.sql.Date(dateFormat.parse(birthdayToTextField.getText()).getTime()));
                     }
                     if (ageFromTextField.getText().isEmpty()) {
-                        getEmployeesInfo.setNull(7, OracleTypes.INTEGER);
-                    } else {
-                        getEmployeesInfo.setInt(7, Integer.parseInt(ageFromTextField.getText()));
-                    }
-                    if (ageToTextField.getText().isEmpty()) {
                         getEmployeesInfo.setNull(8, OracleTypes.INTEGER);
                     } else {
-                        getEmployeesInfo.setInt(8, Integer.parseInt(ageToTextField.getText()));
+                        getEmployeesInfo.setInt(8, Integer.parseInt(ageFromTextField.getText()));
                     }
-                    if (experienceFromTextField.getText().isEmpty()) {
+                    if (ageToTextField.getText().isEmpty()) {
                         getEmployeesInfo.setNull(9, OracleTypes.INTEGER);
                     } else {
-                        getEmployeesInfo.setInt(9, Integer.parseInt(experienceFromTextField.getText()));
+                        getEmployeesInfo.setInt(9, Integer.parseInt(ageToTextField.getText()));
                     }
-                    if (experienceToTextField.getText().isEmpty()) {
+                    if (experienceFromTextField.getText().isEmpty()) {
                         getEmployeesInfo.setNull(10, OracleTypes.INTEGER);
                     } else {
-                        getEmployeesInfo.setInt(10, Integer.parseInt(experienceToTextField.getText()));
+                        getEmployeesInfo.setInt(10, Integer.parseInt(experienceFromTextField.getText()));
                     }
-                    if (childrenFromTextField.getText().isEmpty()) {
+                    if (experienceToTextField.getText().isEmpty()) {
                         getEmployeesInfo.setNull(11, OracleTypes.INTEGER);
                     } else {
-                        getEmployeesInfo.setInt(11, Integer.parseInt(childrenFromTextField.getText()));
+                        getEmployeesInfo.setInt(11, Integer.parseInt(experienceToTextField.getText()));
                     }
-                    if (childrenToTextField.getText().isEmpty()) {
+                    if (childrenFromTextField.getText().isEmpty()) {
                         getEmployeesInfo.setNull(12, OracleTypes.INTEGER);
                     } else {
-                        getEmployeesInfo.setInt(12, Integer.parseInt(childrenToTextField.getText()));
+                        getEmployeesInfo.setInt(12, Integer.parseInt(childrenFromTextField.getText()));
+                    }
+                    if (childrenToTextField.getText().isEmpty()) {
+                        getEmployeesInfo.setNull(13, OracleTypes.INTEGER);
+                    } else {
+                        getEmployeesInfo.setInt(13, Integer.parseInt(childrenToTextField.getText()));
                     }
                     if (salaryFromTextField.getText().isEmpty()) {
-                        getEmployeesInfo.setNull(13, OracleTypes.DOUBLE);
-                    } else {
-                        getEmployeesInfo.setDouble(13, Double.parseDouble(salaryFromTextField.getText()));
-                    }
-                    if (salaryToTextField.getText().isEmpty()) {
                         getEmployeesInfo.setNull(14, OracleTypes.DOUBLE);
                     } else {
-                        getEmployeesInfo.setDouble(14, Double.parseDouble(salaryToTextField.getText()));
+                        getEmployeesInfo.setDouble(14, Double.parseDouble(salaryFromTextField.getText()));
+                    }
+                    if (salaryToTextField.getText().isEmpty()) {
+                        getEmployeesInfo.setNull(15, OracleTypes.DOUBLE);
+                    } else {
+                        getEmployeesInfo.setDouble(15, Double.parseDouble(salaryToTextField.getText()));
                     }
                     if (educationComboBox.getSelectedItem().equals("-")) {
-                        getEmployeesInfo.setNull(15, OracleTypes.INTEGER);
-                    } else {
-                        getEmployeesInfo.setInt(15, educations.get(educationComboBox.getSelectedItem()));
-                    }
-                    if (jobTypeComboBox.getSelectedItem().equals("-")) {
                         getEmployeesInfo.setNull(16, OracleTypes.INTEGER);
                     } else {
-                        System.out.println(jobs.get(jobTypeComboBox.getSelectedItem()));
-                        getEmployeesInfo.setInt(16, jobs.get(jobTypeComboBox.getSelectedItem()));
+                        getEmployeesInfo.setInt(16, educations.get(educationComboBox.getSelectedItem()));
+                    }
+                    if (jobTypeComboBox.getSelectedItem().equals("-")) {
+                        getEmployeesInfo.setNull(17, OracleTypes.INTEGER);
+                    } else {
+                        getEmployeesInfo.setInt(17, jobs.get(jobTypeComboBox.getSelectedItem()));
                     }
                     getEmployeesInfo.execute();
 
                     // get results
-                    ResultSet results = (ResultSet) getEmployeesInfo.getObject(17);
+                    ResultSet results = (ResultSet) getEmployeesInfo.getObject(18);
                     fillTableFromResultSet(resultTable, 2, employees, results);
                     status.setText("Статус: Успех. Возвращено " + resultTable.getRowCount() + " записей.");
                 } catch (Exception exception) {
