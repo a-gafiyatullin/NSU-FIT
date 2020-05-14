@@ -12,7 +12,7 @@ import java.util.Map;
 
 public abstract class Theater extends JFrame {
 
-    protected static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    protected static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.S");
     protected static NumberFormat numberFormat = NumberFormat.getNumberInstance();
 
     static {

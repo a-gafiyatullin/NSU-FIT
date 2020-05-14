@@ -1,19 +1,19 @@
 INSERT INTO "Job_types"
-VALUES (0, NULL, 'актер'); /* должно выполниться */
+VALUES (0, NULL, 'актер', 1); /* должно выполниться */
 INSERT INTO "Job_types"
-VALUES (0, NULL, 'постановщик'); /* должно выполниться */
+VALUES (0, NULL, 'постановщик', 1); /* должно выполниться */
 INSERT INTO "Job_types"
-VALUES (0, 2, 'pежиссеp-постановщик'); /* должно выполниться */
+VALUES (0, 2, 'pежиссеp-постановщик', 1); /* должно выполниться */
 INSERT INTO "Job_types"
-VALUES (0, 2, 'художник-постановщик'); /* должно выполниться */
+VALUES (0, 2, 'художник-постановщик', 1); /* должно выполниться */
 INSERT INTO "Job_types"
-VALUES (0, 2, 'диpижеp-постановщик'); /* должно выполниться */
+VALUES (0, 2, 'диpижеp-постановщик', 1); /* должно выполниться */
 INSERT INTO "Job_types"
-VALUES (0, NULL, 'музыкант'); /* должно выполниться */
+VALUES (0, NULL, 'музыкант', 1); /* должно выполниться */
 INSERT INTO "Job_types"
-VALUES (0, NULL, 'уборщик'); /* должно выполниться */
+VALUES (0, NULL, 'уборщик', 0); /* должно выполниться */
 INSERT INTO "Job_types"
-VALUES (0, NULL, 'NoName'); /* должно выполниться */
+VALUES (0, NULL, 'NoName', 0); /* должно выполниться */
 DELETE
 FROM "Job_types"
 WHERE "name_job_type" LIKE 'NoName'; /* должно выполниться */

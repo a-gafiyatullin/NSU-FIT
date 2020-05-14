@@ -5,10 +5,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class Authorization {
-    private static final String passwordDB = "accesssosat";
-    private static final String loginDB = "c##gafiyatullin";
-    private static final String addressDB = "192.168.56.2:1521";
-    private static final String SID = "orcl";
+    private static final String passwordDB = "123456789";
+    private static final String loginDB = "17208-gafiyatullin";
+    private static final String addressDB = "84.237.50.81:1521";
+    private static final String SID = "XE";
     private JPanel mainPanel;
     private JTextField loginTextField;
     private JPasswordField passwordField1;
@@ -28,5 +28,6 @@ public class Authorization {
         ActorsEditing actorsEditing = new ActorsEditing(connection);
         Directors directors = new Directors(connection);
         Musicians musicians = new Musicians(connection);
+        Tour tour = new Tour(connection);
     }
 }

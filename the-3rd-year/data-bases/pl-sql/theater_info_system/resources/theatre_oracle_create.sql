@@ -75,36 +75,44 @@ begin
 end;
 /
 
-CREATE TABLE "Actor-Rank" (
-	"id_actor" INT NOT NULL,
-	"id_rank" INT NOT NULL,
-	"obtaining_date_actor_rank" DATE NOT NULL,
-	"id_competition" INT,
-	constraint ACTOR_RANK_PK PRIMARY KEY ("id_actor","id_rank"));
+CREATE TABLE "Actor-Rank"
+(
+    "id_actor"                  INT  NOT NULL,
+    "id_rank"                   INT  NOT NULL,
+    "obtaining_date_actor_rank" DATE NOT NULL,
+    "id_competition"            INT,
+    constraint ACTOR_RANK_PK PRIMARY KEY ("id_actor", "id_rank")
+);
 /
 
-CREATE TABLE "Characteristic" (
-	"id_characteristic" INT PRIMARY KEY,
-	"type_characteristic" VARCHAR2(255) UNIQUE NOT NULL);
+CREATE TABLE "Characteristic"
+(
+    "id_characteristic"   INT PRIMARY KEY,
+    "type_characteristic" VARCHAR2(255) UNIQUE NOT NULL
+);
 
-CREATE sequence "CHARACTERISTIC_ID_CHARACTERISTIC_SEQ";
+CREATE sequence "CHARACTER_ID_CHARACTER_SEQ";
 
-CREATE trigger "BI_CHARACTERISTIC_ID_CHARACTERISTIC"
-    before insert on "Characteristic"
+CREATE trigger "BI_CHARACTER_ID_CHARACTER"
+    before insert
+    on "Characteristic"
     for each row
 begin
-    select "CHARACTERISTIC_ID_CHARACTERISTIC_SEQ".nextval into :NEW."id_characteristic" from dual;
+    select "CHARACTER_ID_CHARACTER_SEQ".nextval into :NEW."id_characteristic" from dual;
 end;
 /
 
-CREATE TABLE "Education" (
-	"id_education" INT PRIMARY KEY,
-	"name_education" VARCHAR2(255) UNIQUE NOT NULL);
+CREATE TABLE "Education"
+(
+    "id_education"   INT PRIMARY KEY,
+    "name_education" VARCHAR2(255) UNIQUE NOT NULL
+);
 
 CREATE sequence "EDUCATION_ID_EDUCATION_SEQ";
 
 CREATE trigger "BI_EDUCATION_ID_EDUCATION"
-    before insert on "Education"
+    before insert
+    on "Education"
     for each row
 begin
     select "EDUCATION_ID_EDUCATION_SEQ".nextval into :NEW."id_education" from dual;
@@ -165,70 +173,86 @@ CREATE TABLE "Genre" (
 CREATE sequence "GENRE_ID_GENRE_SEQ";
 
 CREATE trigger "BI_GENRE_ID_GENRE"
-    before insert on "Genre"
+    before insert
+    on "Genre"
     for each row
 begin
     select "GENRE_ID_GENRE_SEQ".nextval into :NEW."id_genre" from dual;
 end;
 /
 
-CREATE TABLE "Age_category" (
-	"id_age_category" INT PRIMARY KEY,
-	"name_age_category" VARCHAR2(255) UNIQUE NOT NULL);
+CREATE TABLE "Age_category"
+(
+    "id_age_category"   INT PRIMARY KEY,
+    "name_age_category" VARCHAR2(255) UNIQUE NOT NULL
+);
 
-CREATE sequence "AGE_CATEGORY_ID_AGE_CATEGORY_SEQ";
+CREATE sequence "AGE_ID_AGE_CATEGORY_SEQ";
 
-CREATE trigger "BI_AGE_CATEGORY_ID_AGE_CATEGORY"
-    before insert on "Age_category"
+CREATE trigger "BI_AGE_ID_AGE_CATEGORY"
+    before insert
+    on "Age_category"
     for each row
 begin
-    select "AGE_CATEGORY_ID_AGE_CATEGORY_SEQ".nextval into :NEW."id_age_category" from dual;
+    select "AGE_ID_AGE_CATEGORY_SEQ".nextval into :NEW."id_age_category" from dual;
 end;
 /
 
-CREATE TABLE "Ticket" (
-	"id_ticket" INT PRIMARY KEY,
-	"id_performance" INT NOT NULL,
-	"seat_number_ticket" INT NOT NULL CHECK("seat_number_ticket" >= 0),
-	"cost_ticket" NUMERIC NOT NULL CHECK("cost_ticket" >= 0),
-    "is_sold" INT NOT NULL,
-    "date_sale" DATE);
+CREATE TABLE "Ticket"
+(
+    "id_ticket"          INT PRIMARY KEY,
+    "id_performance"     INT     NOT NULL,
+    "seat_number_ticket" INT     NOT NULL CHECK ("seat_number_ticket" >= 0),
+    "cost_ticket"        NUMERIC NOT NULL CHECK ("cost_ticket" >= 0),
+    "is_sold"            INT     NOT NULL,
+    "date_sale"          DATE
+);
 
 CREATE sequence "TICKET_ID_TICKET_SEQ";
 /
 
-CREATE TABLE "Repertoire" (
-	"id_performance" INT PRIMARY KEY,
-	"id_show" INT NOT NULL,
-	"performance_date_repertoire" DATE NOT NULL);
+CREATE TABLE "Repertoire"
+(
+    "id_performance"              INT PRIMARY KEY,
+    "id_show"                     INT  NOT NULL,
+    "performance_date_repertoire" DATE NOT NULL
+);
 
 CREATE sequence "REPERTOIRE_ID_PERFORMANCE_SEQ";
 /
 
-CREATE TABLE "Direction" (
-	"id_actor" INT NOT NULL,
-	"id_role" INT NOT NULL,
-	"is_understudy_direction" INT NOT NULL,
-	constraint DIRECTION_PK PRIMARY KEY ("id_actor","id_role"));
+CREATE TABLE "Direction"
+(
+    "id_actor"                INT NOT NULL,
+    "id_role"                 INT NOT NULL,
+    "is_understudy_direction" INT NOT NULL,
+    constraint DIRECTION_PK PRIMARY KEY ("id_actor", "id_role")
+);
 /
 
-CREATE TABLE "Tour" (
-	"id_employee" INT NOT NULL,
-	"id_show" INT NOT NULL,
-	"from_date_tour" DATE NOT NULL,
-	"to_date_tour" DATE NOT NULL,
-	"is_visiting_tour" INT NOT NULL);
+CREATE TABLE "Tour"
+(
+    "id_employee"      INT  NOT NULL,
+    "id_show"          INT  NOT NULL,
+    "from_date_tour"   DATE NOT NULL,
+    "to_date_tour"     DATE NOT NULL,
+    "is_visiting_tour" INT  NOT NULL
+);
 /
 
-CREATE TABLE "Job_types" (
-	"id_job_type" INT PRIMARY KEY,
-    "id_parent_job_type" INT, 
-	"name_job_type" VARCHAR2(255) UNIQUE NOT NULL);
+CREATE TABLE "Job_types"
+(
+    "id_job_type"        INT PRIMARY KEY,
+    "id_parent_job_type" INT,
+    "name_job_type"      VARCHAR2(255) UNIQUE NOT NULL,
+    "is_art_job_type"    INT                  NOT NULL
+);
 
 CREATE sequence "JOB_TYPES_ID_JOB_TYPE_SEQ";
 
 CREATE trigger "BI_JOB_TYPES_ID_JOB_TYPE"
-    before insert on "Job_types"
+    before insert
+    on "Job_types"
     for each row
 begin
     select "JOB_TYPES_ID_JOB_TYPE_SEQ".nextval into :NEW."id_job_type" from dual;
@@ -250,45 +274,55 @@ CREATE TABLE "Role" (
 CREATE sequence "ROLE_ID_ROLE_SEQ";
 
 CREATE trigger "BI_ROLE_ID_ROLE"
-    before insert on "Role"
+    before insert
+    on "Role"
     for each row
 begin
     select "ROLE_ID_ROLE_SEQ".nextval into :NEW."id_role" from dual;
 end;
 /
 
-CREATE TABLE "Subscription" (
-	"id_subscription" INT PRIMARY KEY,
-	"id_genre" INT,
-	"id_author" INT);
+CREATE TABLE "Subscription"
+(
+    "id_subscription" INT PRIMARY KEY,
+    "id_genre"        INT,
+    "id_author"       INT
+);
 
-CREATE sequence "SUBSCRIPTION_ID_SUBSCRIPTION_SEQ";
+CREATE sequence "SUBSCR_ID_SUBSCR_SEQ";
 /
 
-CREATE TABLE "Ticket-Subscription" (
-	"id_ticket" INT NOT NULL,
-	"id_subscription" INT NOT NULL,
-	constraint TICKET_SUBSCRIPTION_PK PRIMARY KEY ("id_ticket","id_subscription"));
+CREATE TABLE "Ticket-Subscription"
+(
+    "id_ticket"       INT NOT NULL,
+    "id_subscription" INT NOT NULL,
+    constraint TICKET_SUBSCRIPTION_PK PRIMARY KEY ("id_ticket", "id_subscription")
+);
 /
 
-CREATE TABLE "Musical_instruments" (
-    "id_instrument" INT PRIMARY KEY,
-    "name_instrument" VARCHAR2(255) UNIQUE NOT NULL);
+CREATE TABLE "Musical_instruments"
+(
+    "id_instrument"   INT PRIMARY KEY,
+    "name_instrument" VARCHAR2(255) UNIQUE NOT NULL
+);
 
-CREATE sequence "MUSICAL_INSTRUMENTS_ID_INSTRUMENT_SEQ";
+CREATE sequence "INSTR_ID_INSTR_SEQ";
 
-CREATE trigger "BI_MUSICAL_INSTRUMENTS_ID_INSTRUMENT"
-    before insert on "Musical_instruments"
+CREATE trigger "BI_INSTR_ID_INSTR"
+    before insert
+    on "Musical_instruments"
     for each row
 begin
-    select "MUSICAL_INSTRUMENTS_ID_INSTRUMENT_SEQ".nextval into :NEW."id_instrument" from dual;
+    select "INSTR_ID_INSTR_SEQ".nextval into :NEW."id_instrument" from dual;
 end;
 /
 
-CREATE TABLE "Musician-Instrument" (
-    "id_musician" INT NOT NULL,
+CREATE TABLE "Musician-Instrument"
+(
+    "id_musician"   INT NOT NULL,
     "id_instrument" INT NOT NULL,
-    constraint MUSICIAN_INSTRUMENT_PK PRIMARY KEY ("id_musician","id_instrument"))
+    constraint MUSICIAN_INSTRUMENT_PK PRIMARY KEY ("id_musician", "id_instrument")
+)
 /
 
 ALTER TABLE "Employee" ADD CONSTRAINT "Employee_fk0" FOREIGN KEY ("id_gender") REFERENCES "Gender"("id_gender");

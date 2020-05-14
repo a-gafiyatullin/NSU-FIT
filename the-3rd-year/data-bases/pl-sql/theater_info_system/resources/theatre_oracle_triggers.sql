@@ -96,31 +96,29 @@ CREATE OR REPLACE trigger "TOUR-INSERT"
     before insert on "Tour"
     for each row
 declare
-    today_date DATE;
+    today_date        DATE;
     employee_job_type VARCHAR2(255);
-    counter_director INT;
-    counter_musician INT;
-    counter_actor INT;
+    counter_director  INT;
+    counter_musician  INT;
+    counter_actor     INT;
     cursor tour_cur
-    is
+        is
         select *
         from "Tour"
         where "id_employee" = :NEW."id_employee";
 begin
-    select "name_job_type" into employee_job_type
-    from ("Employee" inner join "Job_types" using("id_job_type"))
+    select "is_art_job_type"
+    into employee_job_type
+    from ("Employee"
+             inner join "Job_types" using ("id_job_type"))
     where "id_employee" = :NEW."id_employee";
 
-    if employee_job_type != 'актер'
-        and employee_job_type != 'музыкант'
-        and employee_job_type != 'pежиссеp-постановщик'
-        and employee_job_type != 'художник-постановщик'
-        and employee_job_type != 'диpижеp-постановщик' then
+    if employee_job_type = 0 then
         raise_application_error(-20007, 'Человек с данной профессией не может уезжать на гастроли!');
     end if;
-  
+
     select CURRENT_DATE into today_date from dual;
-  
+
     if :NEW."to_date_tour" < :NEW."from_date_tour" or :NEW."from_date_tour" < today_date then
         raise_application_error(-20008, 'Дата начала гастролей позже даты конца или раньше сегодняшнего дня!');
     end if;
@@ -394,7 +392,7 @@ begin
     end if;
     
     if inserting then
-        select "SUBSCRIPTION_ID_SUBSCRIPTION_SEQ".nextval into :NEW."id_subscription" from dual;
+        select "SUBSCR_ID_SUBSCR_SEQ".nextval into :NEW."id_subscription" from dual;
     end if;
 end;
 /
@@ -635,11 +633,12 @@ begin
 end;
 /
 
-CREATE OR REPLACE trigger "ROLE-CHARACTERISTIC-INSERT-UPDATE-DELETE"
-    before insert or update or delete on "Role-Characteristic"
+CREATE OR REPLACE trigger "ROLE-CHARACTER-INS-UPD-DEL"
+    before insert or update or delete
+    on "Role-Characteristic"
     for each row
 declare
-    cnt INT;
+    cnt     INT;
     id_role INT;
 begin
     if inserting or updating then
@@ -647,10 +646,11 @@ begin
     else
         id_role := :OLD."id_role";
     end if;
-    select count(*) into cnt
+    select count(*)
+    into cnt
     from "Direction"
     where "id_role" = id_role;
-    
+
     if cnt != 0 then
         raise_application_error(-20042, 'Данная запись используется!');
     end if;

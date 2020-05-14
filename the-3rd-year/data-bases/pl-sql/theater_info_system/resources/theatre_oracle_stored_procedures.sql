@@ -20,13 +20,13 @@ begin
                "name_show"                                                               as "Название",
                (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
                 from "Employee"
-                where "id_employee" = "id_director")                                     as "Режиссер-постановщик",
+                where "id_employee" = "id_director")                                     as "Режиссер",
                (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
                 from "Employee"
-                where "id_employee" = "id_conductor")                                    as "Диpижеp-постановщик",
+                where "id_employee" = "id_conductor")                                    as "Диpижеp",
                (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
                 from "Employee"
-                where "id_employee" = "id_production_designer")                          as "Художник-постановщик",
+                where "id_employee" = "id_production_designer")                          as "Художник",
                ("name_author" || ' ' || "surname_author" || ' ' || "middle_name_author") as "Автор",
                "name_genre"                                                              as "Жанр",
                "century_show"                                                            as "Век спектакля",
@@ -138,13 +138,13 @@ begin
                "name_show"                                                               as "Название",
                (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
                 from "Employee"
-                where "id_employee" = "id_director")                                     as "Режиссер-постановщик",
+                where "id_employee" = "id_director")                                     as "Режиссер",
                (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
                 from "Employee"
-                where "id_employee" = "id_conductor")                                    as "Диpижеp-постановщик",
+                where "id_employee" = "id_conductor")                                    as "Диpижеp",
                (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
                 from "Employee"
-                where "id_employee" = "id_production_designer")                          as "Художник-постановщик",
+                where "id_employee" = "id_production_designer")                          as "Художник",
                ("name_author" || ' ' || "surname_author" || ' ' || "middle_name_author") as "автор",
                "name_genre"                                                              as "Жанр",
                "century_show"                                                            as "Век спектакля",
@@ -419,9 +419,7 @@ CREATE OR REPLACE procedure get_employees_list(list OUT SYS_REFCURSOR)
 begin
     open list for
         select "id_employee", ("name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee") as name
-        from ("Employee"
-                 inner join "Job_types" using ("id_job_type"))
-        where "name_job_type" like 'pежиссеp-постановщик';
+        from "Employee";
 end;
 /
 
@@ -615,10 +613,10 @@ begin
                "name_role"                                                                     as "Роль",
                "name_show"                                                                     as "Спектакль",
                "name_genre"                                                                    as "Жанр",
-               "name_age_category"                                                             as "Возрастная категория",
+               "name_age_category"                                                             as "Возраст",
                (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
                 from "Employee"
-                where "id_employee" = "id_director")                                           as "Режиссер-постановщик"
+                where "id_employee" = "id_director")                                           as "Режиссер"
         from (((("Direction"
             inner join "Employee" on "id_actor" = "id_employee")
             inner join "Role" using ("id_role"))
@@ -696,18 +694,18 @@ begin
                "name_show"                                                               as "Название",
                (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
                 from "Employee"
-                where "id_employee" = "id_director")                                     as "Режиссер-постановщик",
+                where "id_employee" = "id_director")                                     as "Режиссер",
                (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
                 from "Employee"
-                where "id_employee" = "id_conductor")                                    as "Диpижеp-постановщик",
+                where "id_employee" = "id_conductor")                                    as "Диpижеp",
                (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
                 from "Employee"
-                where "id_employee" = "id_production_designer")                          as "Художник-постановщик",
+                where "id_employee" = "id_production_designer")                          as "Художник",
                ("name_author" || ' ' || "surname_author" || ' ' || "middle_name_author") as "Автор",
                "name_genre"                                                              as "Жанр",
                "century_show"                                                            as "Век спектакля",
                "premier_date_show"                                                       as "Дата премьеры",
-               "name_age_category"                                                       as "Возратсная категория"
+               "name_age_category"                                                       as "Возраст"
         from (("Show" inner join "Author" using ("id_author"))
             inner join "Genre" using ("id_genre"))
                  inner join "Age_category" using ("id_age_category")
@@ -800,18 +798,18 @@ begin
                "name_show"                                                               as "Название",
                (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
                 from "Employee"
-                where "id_employee" = "id_director")                                     as "Режиссер-постановщик",
+                where "id_employee" = "id_director")                                     as "Режиссер",
                (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
                 from "Employee"
-                where "id_employee" = "id_conductor")                                    as "Диpижеp-постановщик",
+                where "id_employee" = "id_conductor")                                    as "Диpижеp",
                (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
                 from "Employee"
-                where "id_employee" = "id_production_designer")                          as "Художник-постановщик",
+                where "id_employee" = "id_production_designer")                          as "Художник",
                ("name_author" || ' ' || "surname_author" || ' ' || "middle_name_author") as "Автор",
                "name_genre"                                                              as "Жанр",
                "century_show"                                                            as "Век спектакля",
                "premier_date_show"                                                       as "Дата премьеры",
-               "name_age_category"                                                       as "Возратсная категория"
+               "name_age_category"                                                       as "Возраст"
         from (("Show" inner join "Author" using ("id_author"))
             inner join "Genre" using ("id_genre"))
                  inner join "Age_category" using ("id_age_category")
@@ -841,6 +839,88 @@ begin
     else
         UPDATE "Musician-Instrument" SET "id_instrument" = id_instrument WHERE "id_musician" = id_musician;
     end if;
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure get_art_employees_list(list OUT SYS_REFCURSOR)
+    is
+begin
+    open list for
+        select "id_employee", ("name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee") as name
+        from ("Employee"
+                 inner join "Job_types" using ("id_job_type"))
+        where "is_art_job_type" != 0;
+end;
+/
+
+CREATE OR REPLACE procedure get_job_types_list(list OUT SYS_REFCURSOR)
+    is
+begin
+    open list for
+        select "id_job_type", "name_job_type"
+        from "Job_types"
+        where "is_art_job_type" != 0;
+end;
+/
+
+CREATE OR REPLACE procedure tours_info(id_employee IN "Tour"."id_employee"%TYPE,
+                                       id_show IN "Tour"."id_show"%TYPE,
+                                       from_date IN "Tour"."from_date_tour"%TYPE,
+                                       to_date IN "Tour"."to_date_tour"%TYPE,
+                                       is_visiting_tour IN "Tour"."is_visiting_tour"%TYPE,
+                                       id_job_type IN "Employee"."id_job_type"%TYPE,
+                                       tour_cur OUT SYS_REFCURSOR)
+    is
+begin
+    open tour_cur for
+        select "id_employee",
+               "id_show",
+               ("name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee") as "Сотрудник",
+               "name_job_type"                                                                 as "Профессия",
+               "name_show"                                                                     as "Спектакль",
+               "from_date_tour"                                                                as "Дата начала",
+               "to_date_tour"                                                                  as "Дата конца",
+               ((select 'выездные' from dual where "is_visiting_tour" != 0)
+                   || (select 'приездные' from dual where "is_visiting_tour" = 0))             as "Тип"
+        from ((("Tour" inner join "Employee" using ("id_employee"))
+            inner join "Job_types" using ("id_job_type")))
+                 inner join "Show" using ("id_show")
+        where "id_employee" = NVL(id_employee, "id_employee")
+          and "id_show" = NVL(id_show, "id_show")
+          and "from_date_tour" >= NVL(from_date, "from_date_tour")
+          and "to_date_tour" <= NVL(to_date, "to_date_tour")
+          and "is_visiting_tour" = NVL(is_visiting_tour, "is_visiting_tour")
+          and ("id_job_type" = NVL(id_job_type, "id_job_type") or is_sub_job_type(id_job_type, "id_job_type") = 1);
+end;
+/
+
+CREATE OR REPLACE procedure tours_insert(id_employee IN "Tour"."id_employee"%TYPE,
+                                         id_show IN "Tour"."id_show"%TYPE,
+                                         from_date IN "Tour"."from_date_tour"%TYPE,
+                                         to_date IN "Tour"."to_date_tour"%TYPE,
+                                         is_visiting_tour IN "Tour"."is_visiting_tour"%TYPE)
+    is
+begin
+    INSERT INTO "Tour" VALUES (id_employee, id_show, from_date, to_date, is_visiting_tour);
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure tours_delete(id_employee IN "Tour"."id_employee"%TYPE,
+                                         id_show IN "Tour"."id_show"%TYPE,
+                                         from_date IN "Tour"."from_date_tour"%TYPE,
+                                         to_date IN "Tour"."to_date_tour"%TYPE)
+    is
+begin
+    DELETE
+    FROM "Tour"
+    where "id_employee" = id_employee
+      and "id_show" = id_show
+      and "from_date_tour" = from_date
+      and "to_date_tour" = to_date;
 
     COMMIT;
 end;
