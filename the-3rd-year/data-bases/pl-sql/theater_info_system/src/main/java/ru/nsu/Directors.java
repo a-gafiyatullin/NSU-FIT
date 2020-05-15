@@ -16,7 +16,7 @@ import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Directors extends Theater {
+public class Directors extends DatabaseUtils {
     private final Map<String, Integer> directors = new HashMap<>();
     private final CallableStatement getDirectors;
     private final Map<String, Integer> genders = new HashMap<>();
@@ -48,7 +48,11 @@ public class Directors extends Theater {
     private JButton queryButton2;
     private int id_director_type;
 
-    Directors(final Connection connection) throws Exception {
+    Directors(final Connection connection, String role) throws Exception {
+        if (!role.equals("headmaster")) {
+            saveButton.setVisible(false);
+        }
+
         resultTable.getTableHeader().setReorderingAllowed(false);
         resultTable.setModel(new DefaultTableModel() {
 

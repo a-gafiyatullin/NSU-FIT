@@ -1,71 +1,175 @@
 package ru.nsu;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Map;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
 
-public abstract class Theater extends JFrame {
+public class Theater extends JFrame {
+    private JPanel mainPanel;
+    private JButton actorInfo;
+    private JButton authors;
+    private JButton directors;
+    private JButton showsInfo;
+    private JButton tours;
+    private JButton employees;
+    private JButton musicians;
+    private JButton actorsEditinig;
+    private JButton showsEditing;
+    private JButton ticketsAdding;
+    private JButton ticketsSelling;
+    private JButton statistics;
 
-    protected static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.S");
-    protected static NumberFormat numberFormat = NumberFormat.getNumberInstance();
+    public Theater(final Connection connection, final String role) {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-    static {
-        numberFormat.setGroupingUsed(false);
+        switch (role) {
+            case "user":
+                ticketsSelling.setVisible(false);
+                statistics.setVisible(false);
+                employees.setVisible(false);
+                actorsEditinig.setVisible(false);
+                showsEditing.setVisible(false);
+                ticketsAdding.setVisible(false);
+                break;
+            case "admin":
+                ticketsSelling.setVisible(false);
+                employees.setVisible(false);
+                actorsEditinig.setVisible(false);
+                showsEditing.setVisible(false);
+                ticketsAdding.setVisible(false);
+                break;
+            case "headmaster":
+                ticketsSelling.setVisible(false);
+                break;
+            case "cashier":
+                statistics.setVisible(false);
+                employees.setVisible(false);
+                actorsEditinig.setVisible(false);
+                showsEditing.setVisible(false);
+                ticketsAdding.setVisible(false);
+                break;
+        }
+
+        actorInfo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    new ActorsInfo(connection);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+        });
+
+        authors.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    new Authors(connection, role);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+        });
+
+        directors.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    new Directors(connection, role);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+        });
+
+        musicians.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    new Musicians(connection, role);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+        });
+
+        showsInfo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    new ShowsInfo(connection);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+        });
+
+        tours.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    new Tours(connection, role);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+        });
+
+        ticketsSelling.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        statistics.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        employees.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    new Employees(connection);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+        });
+
+        actorsEditinig.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    new ActorsEditing(connection);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+        });
+
+        showsEditing.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        ticketsAdding.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        setContentPane(mainPanel);
+        pack();
+        setVisible(true);
     }
 
-    // get and update entries list from database
-    protected static void showComboBoxListFromSQL(JComboBox comboBox, CallableStatement procedure, Map entries,
-                                                  String id_str, String name_str) {
-        try {
-            procedure.execute();
-            comboBox.removeAllItems();
-            entries.clear();
-            ResultSet resultSet = (ResultSet) procedure.getObject("list");
-            comboBox.addItem("-");
-            while (resultSet.next()) {
-                String title = resultSet.getString(name_str);
-                entries.put(title, resultSet.getInt(id_str));
-                comboBox.addItem(title);
-            }
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-    }
-
-    protected static void fillTableFromResultSet(JTable table, int start_idx, Map<Integer, Integer> map, ResultSet set)
-            throws Exception {
-        // get results
-        ResultSetMetaData metaData = set.getMetaData();
-        int column_num = metaData.getColumnCount();
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-        model.getDataVector().removeAllElements();
-        model.setColumnCount(0);
-        model.fireTableDataChanged();
-        // set column names
-        for (int i = start_idx; i <= column_num; i++) {
-            model.addColumn(metaData.getColumnName(i));
-        }
-        // set table data
-        int j = 0;
-        if (map != null) {
-            map.clear();
-        }
-        while (set.next()) {
-            Object[] row = new Object[column_num];
-            if (map != null) {
-                map.put(j, set.getInt(1));
-            }
-            for (int i = start_idx; i <= column_num; i++) {
-                row[i - start_idx] = set.getString(i);
-            }
-            model.addRow(row.clone());
-            j++;
-        }
-    }
 }
