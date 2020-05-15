@@ -16,7 +16,7 @@ import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Authors extends Theater {
+public class Authors extends DatabaseUtils {
     private final Map<String, Integer> genres = new HashMap<>();
     private final CallableStatement getGenres;
     private final Map<String, Integer> countries = new HashMap<>();
@@ -46,7 +46,13 @@ public class Authors extends Theater {
     private JLabel status;
     private JFormattedTextField centuryFrom;
 
-    public Authors(final Connection connection) throws Exception {
+    public Authors(final Connection connection, String role) throws Exception {
+        if (!role.equals("headmaster")) {
+            saveButton.setVisible(false);
+            addButton.setVisible(false);
+            deleteButton.setVisible(false);
+        }
+
         resultTable.getTableHeader().setReorderingAllowed(false);
         resultTable.setModel(new DefaultTableModel() {
 

@@ -15,7 +15,7 @@ import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ActorsEditing extends Theater {
+public class ActorsEditing extends DatabaseUtils {
     private final Map<String, Integer> actors = new HashMap<>();
     private final CallableStatement getActors;
     private final Map<String, Integer> ranks = new HashMap<>();

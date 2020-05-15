@@ -15,7 +15,7 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Tour extends Theater {
+public class Tours extends DatabaseUtils {
     private final CallableStatement getEmployees;
     private final Map<String, Integer> employees = new HashMap<>();
     private final Map<String, Integer> shows = new HashMap<>();
@@ -39,7 +39,12 @@ public class Tour extends Theater {
     private JButton queryButton;
     private JButton deleteButton;
 
-    public Tour(final Connection connection) throws Exception {
+    public Tours(final Connection connection, String role) throws Exception {
+        if (!role.equals("headmaster")) {
+            addButton.setVisible(false);
+            deleteButton.setVisible(false);
+        }
+
         resultTable.getTableHeader().setReorderingAllowed(false);
         resultTable.setModel(new DefaultTableModel() {
 

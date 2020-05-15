@@ -13,7 +13,7 @@ import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ActorsInfo extends Theater {
+public class ActorsInfo extends DatabaseUtils {
     private final Map<String, Integer> actors = new HashMap<>();
     private final CallableStatement getActors;
     private final Map<String, Integer> genders = new HashMap<>();

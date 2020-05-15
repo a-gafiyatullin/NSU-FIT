@@ -1,13 +1,132 @@
+CREATE OR REPLACE trigger "BI_RANK_ID_RANK"
+    before insert
+    on "Rank"
+    for each row
+begin
+    select "RANK_ID_RANK_SEQ".nextval into :NEW."id_rank" from dual;
+end;
+/
+
+CREATE OR REPLACE trigger "BI_GENDER_ID_GENDER"
+    before insert
+    on "Gender"
+    for each row
+begin
+    select "GENDER_ID_GENDER_SEQ".nextval into :NEW."id_gender" from dual;
+end;
+/
+
+CREATE OR REPLACE trigger "BI_CHARACTER_ID_CHARACTER"
+    before insert
+    on "Characteristic"
+    for each row
+begin
+    select "CHARACTER_ID_CHARACTER_SEQ".nextval into :NEW."id_characteristic" from dual;
+end;
+/
+
+CREATE OR REPLACE trigger "BI_COMPETITION_ID_COMPETITON"
+    before insert
+    on "Competition"
+    for each row
+begin
+    select "COMPETITION_ID_COMPETITON_SEQ".nextval into :NEW."id_competition" from dual;
+end;
+/
+
+CREATE OR REPLACE trigger "BI_AUTHOR_ID_AUTHOR"
+    before insert
+    on "Author"
+    for each row
+begin
+    select "AUTHOR_ID_AUTHOR_SEQ".nextval into :NEW."id_author" from dual;
+end;
+/
+
+CREATE OR REPLACE trigger "BI_COUNTRY_ID_COUNTRY"
+    before insert
+    on "Country"
+    for each row
+begin
+    select "COUNTRY_ID_COUNTRY_SEQ".nextval into :NEW."id_country" from dual;
+end;
+/
+
+CREATE OR REPLACE trigger "BI_GENRE_ID_GENRE"
+    before insert
+    on "Genre"
+    for each row
+begin
+    select "GENRE_ID_GENRE_SEQ".nextval into :NEW."id_genre" from dual;
+end;
+/
+
+CREATE OR REPLACE trigger "BI_AGE_ID_AGE_CATEGORY"
+    before insert
+    on "Age_category"
+    for each row
+begin
+    select "AGE_ID_AGE_CATEGORY_SEQ".nextval into :NEW."id_age_category" from dual;
+end;
+/
+
+CREATE OR REPLACE trigger "BI_EDUCATION_ID_EDUCATION"
+    before insert
+    on "Education"
+    for each row
+begin
+    select "EDUCATION_ID_EDUCATION_SEQ".nextval into :NEW."id_education" from dual;
+end;
+/
+
+CREATE OR REPLACE trigger "BI_JOB_TYPES_ID_JOB_TYPE"
+    before insert
+    on "Job_types"
+    for each row
+begin
+    select "JOB_TYPES_ID_JOB_TYPE_SEQ".nextval into :NEW."id_job_type" from dual;
+end;
+/
+
+CREATE OR REPLACE trigger "BI_ROLE_ID_ROLE"
+    before insert
+    on "Role"
+    for each row
+begin
+    select "ROLE_ID_ROLE_SEQ".nextval into :NEW."id_role" from dual;
+end;
+/
+
+CREATE OR REPLACE trigger "BI_INSTR_ID_INSTR"
+    before insert
+    on "Musical_instruments"
+    for each row
+begin
+    select "INSTR_ID_INSTR_SEQ".nextval into :NEW."id_instrument" from dual;
+end;
+/
+
+CREATE OR REPLACE trigger "BI_USER_ROLE_ID_USER"
+    before insert
+    on "User_Role"
+    for each row
+begin
+    select "USER_ROLE_ID_ROLE_SEQ".nextval into :NEW."id_user_role" from dual;
+end;
+/
+
 CREATE OR REPLACE trigger "ACTOR-RANK-INSERT-UPDATE"
-    before insert or update on "Actor-Rank"
+    before insert or update
+    on "Actor-Rank"
     for each row
 declare
     birthday DATE;
 begin
-    select "birthday_employee" into birthday
+    select "birthday_employee"
+    into birthday
     from "Employee"
     where "id_employee" = :NEW."id_actor";
-    
+
     if :NEW."obtaining_date_actor_rank" < birthday then
         raise_application_error(-20000, 'Получение звания не может произойти раньше рождения!');
     end if;

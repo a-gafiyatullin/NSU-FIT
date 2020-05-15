@@ -3,13 +3,6 @@ CREATE TABLE "Rank" (
 	"name_rank" VARCHAR2(255) UNIQUE NOT NULL);
 
 CREATE sequence "RANK_ID_RANK_SEQ";
-
-CREATE trigger "BI_RANK_ID_RANK"
-    before insert on "Rank"
-    for each row
-begin
-    select "RANK_ID_RANK_SEQ".nextval into :NEW."id_rank" from dual;
-end;
 /
 
 CREATE TABLE "Employee" (
@@ -39,14 +32,6 @@ CREATE TABLE "Gender" (
 	"name_gender" VARCHAR2(255) UNIQUE NOT NULL);
 
 CREATE sequence "GENDER_ID_GENDER_SEQ";
-
-CREATE trigger "BI_GENDER_ID_GENDER"
-    before insert
-    on "Gender"
-    for each row
-begin
-    select "GENDER_ID_GENDER_SEQ".nextval into :NEW."id_gender" from dual;
-end;
 /
 
 CREATE TABLE "Actor-Characteristic"
@@ -65,14 +50,6 @@ CREATE TABLE "Competition"
 );
 
 CREATE sequence "COMPETITION_ID_COMPETITON_SEQ";
-
-CREATE trigger "BI_COMPETITION_ID_COMPETITON"
-    before insert
-    on "Competition"
-    for each row
-begin
-    select "COMPETITION_ID_COMPETITON_SEQ".nextval into :NEW."id_competition" from dual;
-end;
 /
 
 CREATE TABLE "Actor-Rank"
@@ -92,14 +69,6 @@ CREATE TABLE "Characteristic"
 );
 
 CREATE sequence "CHARACTER_ID_CHARACTER_SEQ";
-
-CREATE trigger "BI_CHARACTER_ID_CHARACTER"
-    before insert
-    on "Characteristic"
-    for each row
-begin
-    select "CHARACTER_ID_CHARACTER_SEQ".nextval into :NEW."id_characteristic" from dual;
-end;
 /
 
 CREATE TABLE "Education"
@@ -109,14 +78,6 @@ CREATE TABLE "Education"
 );
 
 CREATE sequence "EDUCATION_ID_EDUCATION_SEQ";
-
-CREATE trigger "BI_EDUCATION_ID_EDUCATION"
-    before insert
-    on "Education"
-    for each row
-begin
-    select "EDUCATION_ID_EDUCATION_SEQ".nextval into :NEW."id_education" from dual;
-end;
 /
 
 CREATE TABLE "Show" (
@@ -143,13 +104,6 @@ CREATE TABLE "Author" (
 	"id_country" INT NOT NULL);
 
 CREATE sequence "AUTHOR_ID_AUTHOR_SEQ";
-
-CREATE trigger "BI_AUTHOR_ID_AUTHOR"
-    before insert on "Author"
-    for each row
-begin
-    select "AUTHOR_ID_AUTHOR_SEQ".nextval into :NEW."id_author" from dual;
-end;
 /
 
 CREATE TABLE "Country" (
@@ -157,13 +111,6 @@ CREATE TABLE "Country" (
 	"name_country" VARCHAR2(255) UNIQUE NOT NULL);
 
 CREATE sequence "COUNTRY_ID_COUNTRY_SEQ";
-
-CREATE trigger "BI_COUNTRY_ID_COUNTRY"
-    before insert on "Country"
-    for each row
-begin
-    select "COUNTRY_ID_COUNTRY_SEQ".nextval into :NEW."id_country" from dual;
-end;
 /
 
 CREATE TABLE "Genre" (
@@ -171,14 +118,6 @@ CREATE TABLE "Genre" (
 	"name_genre" VARCHAR2(255) UNIQUE NOT NULL);
 
 CREATE sequence "GENRE_ID_GENRE_SEQ";
-
-CREATE trigger "BI_GENRE_ID_GENRE"
-    before insert
-    on "Genre"
-    for each row
-begin
-    select "GENRE_ID_GENRE_SEQ".nextval into :NEW."id_genre" from dual;
-end;
 /
 
 CREATE TABLE "Age_category"
@@ -188,14 +127,6 @@ CREATE TABLE "Age_category"
 );
 
 CREATE sequence "AGE_ID_AGE_CATEGORY_SEQ";
-
-CREATE trigger "BI_AGE_ID_AGE_CATEGORY"
-    before insert
-    on "Age_category"
-    for each row
-begin
-    select "AGE_ID_AGE_CATEGORY_SEQ".nextval into :NEW."id_age_category" from dual;
-end;
 /
 
 CREATE TABLE "Ticket"
@@ -249,14 +180,6 @@ CREATE TABLE "Job_types"
 );
 
 CREATE sequence "JOB_TYPES_ID_JOB_TYPE_SEQ";
-
-CREATE trigger "BI_JOB_TYPES_ID_JOB_TYPE"
-    before insert
-    on "Job_types"
-    for each row
-begin
-    select "JOB_TYPES_ID_JOB_TYPE_SEQ".nextval into :NEW."id_job_type" from dual;
-end;
 /
 
 CREATE TABLE "Role-Characteristic" (
@@ -272,14 +195,6 @@ CREATE TABLE "Role" (
 	"is_main_role" INT NOT NULL);
 
 CREATE sequence "ROLE_ID_ROLE_SEQ";
-
-CREATE trigger "BI_ROLE_ID_ROLE"
-    before insert
-    on "Role"
-    for each row
-begin
-    select "ROLE_ID_ROLE_SEQ".nextval into :NEW."id_role" from dual;
-end;
 /
 
 CREATE TABLE "Subscription"
@@ -307,14 +222,6 @@ CREATE TABLE "Musical_instruments"
 );
 
 CREATE sequence "INSTR_ID_INSTR_SEQ";
-
-CREATE trigger "BI_INSTR_ID_INSTR"
-    before insert
-    on "Musical_instruments"
-    for each row
-begin
-    select "INSTR_ID_INSTR_SEQ".nextval into :NEW."id_instrument" from dual;
-end;
 /
 
 CREATE TABLE "Musician-Instrument"
@@ -325,31 +232,63 @@ CREATE TABLE "Musician-Instrument"
 )
 /
 
-ALTER TABLE "Employee" ADD CONSTRAINT "Employee_fk0" FOREIGN KEY ("id_gender") REFERENCES "Gender"("id_gender");
-ALTER TABLE "Employee" ADD CONSTRAINT "Employee_fk1" FOREIGN KEY ("id_education") REFERENCES "Education"("id_education");
-ALTER TABLE "Employee" ADD CONSTRAINT "Employee_fk2" FOREIGN KEY ("id_job_type") REFERENCES "Job_types"("id_job_type");
+CREATE TABLE "Users"
+(
+    "login"        VARCHAR2(255) PRIMARY KEY,
+    "password"     VARCHAR2(255) NOT NULL,
+    "id_user_role" INT           NOT NULL
+)
+/
 
-ALTER TABLE "Musician-Show" ADD CONSTRAINT "Musician-Show_fk0" FOREIGN KEY ("id_musician") REFERENCES "Employee"("id_employee");
-ALTER TABLE "Musician-Show" ADD CONSTRAINT "Musician-Show_fk1" FOREIGN KEY ("id_show") REFERENCES "Show"("id_show")
-    ON DELETE CASCADE;
+CREATE TABLE "User_Role"
+(
+    "id_user_role"   INT PRIMARY KEY,
+    "name_user_role" VARCHAR2(255) NOT NULL UNIQUE
+)
+/
 
-ALTER TABLE "Job_types" ADD CONSTRAINT "Job_types_fk0" FOREIGN KEY ("id_parent_job_type") REFERENCES "Job_types"("id_job_type")
-    ON DELETE CASCADE;
+CREATE sequence "USER_ROLE_ID_ROLE_SEQ";
 
-ALTER TABLE "Actor-Characteristic" ADD CONSTRAINT "Actor-Characteristic_fk0" FOREIGN KEY ("id_actor")
-    REFERENCES "Employee"("id_employee") ON DELETE CASCADE;
-ALTER TABLE "Actor-Characteristic" ADD CONSTRAINT "Actor-Characteristic_fk1" FOREIGN KEY ("id_characteristic")
-    REFERENCES "Characteristic"("id_characteristic");
+ALTER TABLE "Employee"
+    ADD CONSTRAINT "Employee_fk0" FOREIGN KEY ("id_gender") REFERENCES "Gender" ("id_gender");
+ALTER TABLE "Employee"
+    ADD CONSTRAINT "Employee_fk1" FOREIGN KEY ("id_education") REFERENCES "Education" ("id_education");
+ALTER TABLE "Employee"
+    ADD CONSTRAINT "Employee_fk2" FOREIGN KEY ("id_job_type") REFERENCES "Job_types" ("id_job_type");
 
-ALTER TABLE "Actor-Rank" ADD CONSTRAINT "Actor-Rank_fk0" FOREIGN KEY ("id_actor") REFERENCES "Employee"("id_employee")
-    ON DELETE CASCADE;
-ALTER TABLE "Actor-Rank" ADD CONSTRAINT "Actor-Rank_fk1" FOREIGN KEY ("id_rank") REFERENCES "Rank"("id_rank");
-ALTER TABLE "Actor-Rank" ADD CONSTRAINT "Actor-Rank_fk2" FOREIGN KEY ("id_competition") REFERENCES "Competition"("id_competition");
+ALTER TABLE "Musician-Show"
+    ADD CONSTRAINT "Musician-Show_fk0" FOREIGN KEY ("id_musician") REFERENCES "Employee" ("id_employee");
+ALTER TABLE "Musician-Show"
+    ADD CONSTRAINT "Musician-Show_fk1" FOREIGN KEY ("id_show") REFERENCES "Show" ("id_show")
+        ON DELETE CASCADE;
 
-ALTER TABLE "Show" ADD CONSTRAINT "Show_fk0" FOREIGN KEY ("id_director") REFERENCES "Employee"("id_employee");
-ALTER TABLE "Show" ADD CONSTRAINT "Show_fk1" FOREIGN KEY ("id_production_designer") REFERENCES "Employee"("id_employee");
-ALTER TABLE "Show" ADD CONSTRAINT "Show_fk2" FOREIGN KEY ("id_conductor") REFERENCES "Employee"("id_employee");
-ALTER TABLE "Show" ADD CONSTRAINT "Show_fk3" FOREIGN KEY ("id_author") REFERENCES "Author"("id_author");
+ALTER TABLE "Job_types"
+    ADD CONSTRAINT "Job_types_fk0" FOREIGN KEY ("id_parent_job_type") REFERENCES "Job_types" ("id_job_type")
+        ON DELETE CASCADE;
+
+ALTER TABLE "Actor-Characteristic"
+    ADD CONSTRAINT "Actor-Characteristic_fk0" FOREIGN KEY ("id_actor")
+        REFERENCES "Employee" ("id_employee") ON DELETE CASCADE;
+ALTER TABLE "Actor-Characteristic"
+    ADD CONSTRAINT "Actor-Characteristic_fk1" FOREIGN KEY ("id_characteristic")
+        REFERENCES "Characteristic" ("id_characteristic");
+
+ALTER TABLE "Actor-Rank"
+    ADD CONSTRAINT "Actor-Rank_fk0" FOREIGN KEY ("id_actor") REFERENCES "Employee" ("id_employee")
+        ON DELETE CASCADE;
+ALTER TABLE "Actor-Rank"
+    ADD CONSTRAINT "Actor-Rank_fk1" FOREIGN KEY ("id_rank") REFERENCES "Rank" ("id_rank");
+ALTER TABLE "Actor-Rank"
+    ADD CONSTRAINT "Actor-Rank_fk2" FOREIGN KEY ("id_competition") REFERENCES "Competition" ("id_competition");
+
+ALTER TABLE "Show"
+    ADD CONSTRAINT "Show_fk0" FOREIGN KEY ("id_director") REFERENCES "Employee" ("id_employee");
+ALTER TABLE "Show"
+    ADD CONSTRAINT "Show_fk1" FOREIGN KEY ("id_production_designer") REFERENCES "Employee" ("id_employee");
+ALTER TABLE "Show"
+    ADD CONSTRAINT "Show_fk2" FOREIGN KEY ("id_conductor") REFERENCES "Employee" ("id_employee");
+ALTER TABLE "Show"
+    ADD CONSTRAINT "Show_fk3" FOREIGN KEY ("id_author") REFERENCES "Author" ("id_author");
 ALTER TABLE "Show" ADD CONSTRAINT "Show_fk4" FOREIGN KEY ("id_genre") REFERENCES "Genre"("id_genre");
 ALTER TABLE "Show" ADD CONSTRAINT "Show_fk5" FOREIGN KEY ("id_age_category") REFERENCES "Age_category"("id_age_category");
 
@@ -357,35 +296,52 @@ ALTER TABLE "Author" ADD CONSTRAINT "Author_fk0" FOREIGN KEY ("id_country") REFE
 
 ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_fk0" FOREIGN KEY ("id_performance") REFERENCES "Repertoire"("id_performance");
 
-ALTER TABLE "Repertoire" ADD CONSTRAINT "Repertoire_fk0" FOREIGN KEY ("id_show") REFERENCES "Show"("id_show");
+ALTER TABLE "Repertoire"
+    ADD CONSTRAINT "Repertoire_fk0" FOREIGN KEY ("id_show") REFERENCES "Show" ("id_show");
 
-ALTER TABLE "Direction" ADD CONSTRAINT "Direction_fk0" FOREIGN KEY ("id_actor") REFERENCES "Employee"("id_employee");
-ALTER TABLE "Direction" ADD CONSTRAINT "Direction_fk1" FOREIGN KEY ("id_role") REFERENCES "Role"("id_role");
+ALTER TABLE "Direction"
+    ADD CONSTRAINT "Direction_fk0" FOREIGN KEY ("id_actor") REFERENCES "Employee" ("id_employee");
+ALTER TABLE "Direction"
+    ADD CONSTRAINT "Direction_fk1" FOREIGN KEY ("id_role") REFERENCES "Role" ("id_role");
 
-ALTER TABLE "Tour" ADD CONSTRAINT "Tour_fk0" FOREIGN KEY ("id_employee") REFERENCES "Employee"("id_employee");
-ALTER TABLE "Tour" ADD CONSTRAINT "Tour_fk1" FOREIGN KEY ("id_show") REFERENCES "Show"("id_show");
+ALTER TABLE "Tour"
+    ADD CONSTRAINT "Tour_fk0" FOREIGN KEY ("id_employee") REFERENCES "Employee" ("id_employee");
+ALTER TABLE "Tour"
+    ADD CONSTRAINT "Tour_fk1" FOREIGN KEY ("id_show") REFERENCES "Show" ("id_show");
 
-ALTER TABLE "Role-Characteristic" ADD CONSTRAINT "Role-Characteristic_fk0" FOREIGN KEY ("id_characteristic")
-    REFERENCES "Characteristic"("id_characteristic");
-ALTER TABLE "Role-Characteristic" ADD CONSTRAINT "Role-Characteristic_fk1" FOREIGN KEY ("id_role")
-    REFERENCES "Role"("id_role") ON DELETE CASCADE;
+ALTER TABLE "Role-Characteristic"
+    ADD CONSTRAINT "Role-Characteristic_fk0" FOREIGN KEY ("id_characteristic")
+        REFERENCES "Characteristic" ("id_characteristic");
+ALTER TABLE "Role-Characteristic"
+    ADD CONSTRAINT "Role-Characteristic_fk1" FOREIGN KEY ("id_role")
+        REFERENCES "Role" ("id_role") ON DELETE CASCADE;
 
-ALTER TABLE "Role" ADD CONSTRAINT "Role_fk0" FOREIGN KEY ("id_show") REFERENCES "Show"("id_show") ON DELETE CASCADE;
+ALTER TABLE "Role"
+    ADD CONSTRAINT "Role_fk0" FOREIGN KEY ("id_show") REFERENCES "Show" ("id_show") ON DELETE CASCADE;
 
-ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_fk0" FOREIGN KEY ("id_genre") REFERENCES "Genre"("id_genre")
-    ON DELETE CASCADE;
-ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_fk1" FOREIGN KEY ("id_author") REFERENCES "Author"("id_author")
-    ON DELETE CASCADE;
+ALTER TABLE "Subscription"
+    ADD CONSTRAINT "Subscription_fk0" FOREIGN KEY ("id_genre") REFERENCES "Genre" ("id_genre")
+        ON DELETE CASCADE;
+ALTER TABLE "Subscription"
+    ADD CONSTRAINT "Subscription_fk1" FOREIGN KEY ("id_author") REFERENCES "Author" ("id_author")
+        ON DELETE CASCADE;
 
-ALTER TABLE "Ticket-Subscription" ADD CONSTRAINT "Ticket-Subscription_fk0" FOREIGN KEY ("id_ticket")
-    REFERENCES "Ticket"("id_ticket") ON DELETE CASCADE;
-ALTER TABLE "Ticket-Subscription" ADD CONSTRAINT "Ticket-Subscription_fk1" FOREIGN KEY ("id_subscription")
-    REFERENCES "Subscription"("id_subscription") ON DELETE CASCADE;
-    
-ALTER TABLE "Musician-Instrument" ADD CONSTRAINT "Musician-Instrument_fk0" FOREIGN KEY ("id_musician")
-    REFERENCES "Employee"("id_employee") ON DELETE CASCADE;
-ALTER TABLE "Musician-Instrument" ADD CONSTRAINT "Musician-Instrument_fk1" FOREIGN KEY ("id_instrument")
-    REFERENCES "Musical_instruments"("id_instrument");
+ALTER TABLE "Ticket-Subscription"
+    ADD CONSTRAINT "Ticket-Subscription_fk0" FOREIGN KEY ("id_ticket")
+        REFERENCES "Ticket" ("id_ticket") ON DELETE CASCADE;
+ALTER TABLE "Ticket-Subscription"
+    ADD CONSTRAINT "Ticket-Subscription_fk1" FOREIGN KEY ("id_subscription")
+        REFERENCES "Subscription" ("id_subscription") ON DELETE CASCADE;
+
+ALTER TABLE "Musician-Instrument"
+    ADD CONSTRAINT "Musician-Instrument_fk0" FOREIGN KEY ("id_musician")
+        REFERENCES "Employee" ("id_employee") ON DELETE CASCADE;
+ALTER TABLE "Musician-Instrument"
+    ADD CONSTRAINT "Musician-Instrument_fk1" FOREIGN KEY ("id_instrument")
+        REFERENCES "Musical_instruments" ("id_instrument");
+
+ALTER TABLE "Users"
+    ADD CONSTRAINT "Users_fk0" FOREIGN KEY ("id_user_role") REFERENCES "User_Role" ("id_user_role");
 /
 
 COMMIT;

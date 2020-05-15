@@ -16,7 +16,7 @@ import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Employee extends Theater {
+public class Employees extends DatabaseUtils {
     private final Map<String, Integer> genders = new HashMap<>();
     private final CallableStatement getGenders;
     private final Map<String, Integer> educations = new HashMap<>();
@@ -56,7 +56,7 @@ public class Employee extends Theater {
     private JPanel mainPanel;
     private JLabel status;
 
-    public Employee(final Connection connection) throws Exception {
+    public Employees(final Connection connection) throws Exception {
         resultTable.getTableHeader().setReorderingAllowed(false);
         resultTable.setModel(new DefaultTableModel() {
 

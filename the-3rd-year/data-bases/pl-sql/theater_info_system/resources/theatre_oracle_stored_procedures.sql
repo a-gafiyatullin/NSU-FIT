@@ -925,3 +925,20 @@ begin
     COMMIT;
 end;
 /
+
+CREATE OR REPLACE procedure login(login IN "Users"."login"%TYPE,
+                                  password IN "Users"."password"%TYPE,
+                                  role OUT "User_Role"."name_user_role"%TYPE)
+    is
+begin
+    select "name_user_role"
+    into role
+    from "Users"
+             inner join "User_Role" using ("id_user_role")
+    where "login" like login
+      and "password" like password;
+exception
+    when NO_DATA_FOUND then
+        raise_application_error(-20045, 'Нет такого логина или пароля!');
+end;
+/

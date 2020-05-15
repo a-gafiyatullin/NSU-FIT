@@ -16,7 +16,7 @@ import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Musicians extends Theater {
+public class Musicians extends DatabaseUtils {
     private final Map<String, Integer> musicians = new HashMap<>();
     private final CallableStatement getMusicians;
     private final Map<String, Integer> instruments = new HashMap<>();
@@ -47,7 +47,11 @@ public class Musicians extends Theater {
     private JButton queryButton2;
     private JLabel status;
 
-    public Musicians(final Connection connection) throws Exception {
+    public Musicians(final Connection connection, String role) throws Exception {
+        if (!role.equals("headmaster")) {
+            saveButton.setVisible(false);
+        }
+
         resultTable.getTableHeader().setReorderingAllowed(false);
         resultTable.setModel(new DefaultTableModel() {
 

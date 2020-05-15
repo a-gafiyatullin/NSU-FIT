@@ -16,7 +16,7 @@ import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Show extends Theater {
+public class ShowsInfo extends DatabaseUtils {
     private final Map<String, Integer> shows = new HashMap<>();
     private final CallableStatement getShowTitles;
     private final Map<String, Integer> genres = new HashMap<>();
@@ -58,7 +58,7 @@ public class Show extends Theater {
     private JTable musicianTable;
     private JLabel status;
 
-    public Show(final Connection connection) throws Exception {
+    public ShowsInfo(final Connection connection) throws Exception {
         musicianTable.getTableHeader().setReorderingAllowed(false);
         musicianTable.setModel(new DefaultTableModel() {
 

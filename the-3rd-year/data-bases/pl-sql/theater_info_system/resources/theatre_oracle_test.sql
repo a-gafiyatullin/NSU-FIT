@@ -1,3 +1,16 @@
+INSERT INTO "User_Role"
+VALUES (0, 'headmaster'); /* должно выполниться */
+INSERT INTO "User_Role"
+VALUES (0, 'admin'); /* должно выполниться */
+INSERT INTO "User_Role"
+VALUES (0, 'cashier'); /* должно выполниться */
+INSERT INTO "Users"
+VALUES ('xp10rd', '1234', 1); /* должно выполниться */
+INSERT INTO "Users"
+VALUES ('admin', '1234', 2); /* должно выполниться */
+INSERT INTO "Users"
+VALUES ('slave', '1234', 3); /* должно выполниться */
+
 INSERT INTO "Job_types"
 VALUES (0, NULL, 'актер', 1); /* должно выполниться */
 INSERT INTO "Job_types"

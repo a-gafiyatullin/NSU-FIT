@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="ru.nsu.Theater">
+  <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="3" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="0" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="20" y="20" width="744" height="548"/>
+    </constraints>
+    <properties/>
+    <border type="none" title="Информационная система театра."/>
+    <children>
+      <component id="23ea1" class="javax.swing.JButton" binding="authors">
+        <constraints>
+          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Авторы"/>
+        </properties>
+      </component>
+      <component id="f93dc" class="javax.swing.JButton" binding="directors">
+        <constraints>
+          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Постановщики"/>
+        </properties>
+      </component>
+      <component id="5b24d" class="javax.swing.JButton" binding="showsInfo">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Спектакли. Информация"/>
+        </properties>
+      </component>
+      <component id="c82ff" class="javax.swing.JButton" binding="tours">
+        <constraints>
+          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Гастроли"/>
+        </properties>
+      </component>
+      <component id="3fe60" class="javax.swing.JButton" binding="musicians">
+        <constraints>
+          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Музыканты"/>
+        </properties>
+      </component>
+      <component id="f93ee" class="javax.swing.JButton" binding="employees">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Персонал"/>
+        </properties>
+      </component>
+      <component id="e6f68" class="javax.swing.JButton" binding="actorsEditinig">
+        <constraints>
+          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Актеры. Редактирование"/>
+        </properties>
+      </component>
+      <component id="46e00" class="javax.swing.JButton" binding="showsEditing">
+        <constraints>
+          <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Спектакли. Редактирование"/>
+        </properties>
+      </component>
+      <component id="2607b" class="javax.swing.JButton" binding="ticketsAdding">
+        <constraints>
+          <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Билеты. Добавление"/>
+        </properties>
+      </component>
+      <component id="5df40" class="javax.swing.JButton" binding="ticketsSelling">
+        <constraints>
+          <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Билеты. Продажа"/>
+        </properties>
+      </component>
+      <component id="f6d4" class="javax.swing.JButton" binding="actorInfo">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Актеры. Информация"/>
+        </properties>
+      </component>
+      <component id="88768" class="javax.swing.JButton" binding="statistics">
+        <constraints>
+          <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Экономические показатели"/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>
