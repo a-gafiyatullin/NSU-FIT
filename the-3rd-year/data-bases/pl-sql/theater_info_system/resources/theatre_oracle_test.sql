@@ -394,11 +394,11 @@ VALUES (2, 2, TO_DATE('2023/03/01', 'yyyy/mm/dd'),
 /* должно выполниться */
 /* тест Subscription ---------------------------------------------------------------------------------------------------------*/
 INSERT INTO "Subscription"
-VALUES (0, 1, 1); /* не должно выполниться */
+VALUES (0, 1, 1, 0); /* не должно выполниться */
 INSERT INTO "Subscription"
-VALUES (0, 1, NULL); /* должно выполниться */
+VALUES (0, 1, NULL, 0); /* должно выполниться */
 INSERT INTO "Subscription"
-VALUES (0, NULL, 1); /* должно выполниться */
+VALUES (0, NULL, 1, 0); /* должно выполниться */
 UPDATE "Subscription"
 SET "id_genre" = 1
 WHERE "id_subscription" = 2; /* не должно выполниться */
@@ -412,7 +412,7 @@ UPDATE "Subscription"
 SET "id_author" = 2
 WHERE "id_subscription" = 2; /* должно выполниться */
 INSERT INTO "Subscription"
-VALUES (0, NULL, 1);
+VALUES (0, NULL, 1, 0);
 /* должно выполниться */
 /* тест Ticket-Subscription --------------------------------------------------------------------------------------------------*/
 INSERT INTO "Ticket-Subscription"

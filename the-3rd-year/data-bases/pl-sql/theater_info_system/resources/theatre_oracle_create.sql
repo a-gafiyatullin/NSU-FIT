@@ -201,7 +201,8 @@ CREATE TABLE "Subscription"
 (
     "id_subscription" INT PRIMARY KEY,
     "id_genre"        INT,
-    "id_author"       INT
+    "id_author"       INT,
+    "is_sold"         INT NOT NULL
 );
 
 CREATE sequence "SUBSCR_ID_SUBSCR_SEQ";

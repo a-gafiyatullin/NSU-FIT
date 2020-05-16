@@ -942,3 +942,166 @@ exception
         raise_application_error(-20045, 'Нет такого логина или пароля!');
 end;
 /
+
+CREATE OR REPLACE procedure get_tickets(from_date_show IN DATE,
+                                        to_date_show IN DATE,
+                                        id_show IN INT,
+                                        from_century_show IN INT,
+                                        to_century_show IN INT,
+                                        id_conductor IN INT,
+                                        id_production_designer IN INT,
+                                        id_director IN INT,
+                                        id_genre IN INT,
+                                        id_age_category IN INT,
+                                        id_author IN INT,
+                                        id_country IN INT,
+                                        tickets_cur OUT SYS_REFCURSOR)
+    is
+begin
+    open tickets_cur for
+        select "id_ticket",
+               "name_show"                                                               as "Название",
+               (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
+                from "Employee"
+                where "id_employee" = "id_director")                                     as "Режиссер",
+               (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
+                from "Employee"
+                where "id_employee" = "id_conductor")                                    as "Диpижеp",
+               (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
+                from "Employee"
+                where "id_employee" = "id_production_designer")                          as "Художник",
+               ("name_author" || ' ' || "surname_author" || ' ' || "middle_name_author") as "Автор",
+               "name_genre"                                                              as "Жанр",
+               "century_show"                                                            as "Век спектакля",
+               "performance_date_repertoire"                                             as "Дата показа",
+               "seat_number_ticket"                                                      as "Место",
+               "cost_ticket"                                                             as "Цена"
+        from ((("Ticket" inner join "Repertoire" using ("id_performance")
+            inner join "Show" using ("id_show")) inner join "Author" using ("id_author"))
+                 inner join "Genre" using ("id_genre"))
+        where ("performance_date_repertoire" <= NVL(to_date_show, "performance_date_repertoire")
+            and "performance_date_repertoire" >= NVL(from_date_show, "performance_date_repertoire")
+            and "id_show" = NVL(id_show, "id_show")
+            and "century_show" <= NVL(to_century_show, "century_show")
+            and "century_show" >= NVL(from_century_show, "century_show")
+            and "id_conductor" = NVL(id_conductor, "id_conductor")
+            and "id_production_designer" = NVL(id_production_designer, "id_production_designer")
+            and "id_director" = NVL(id_director, "id_director")
+            and "id_genre" = NVL(id_genre, "id_genre")
+            and "id_age_category" = NVL(id_age_category, "id_age_category")
+            and "id_author" = NVL(id_author, "id_author")
+            and "id_country" = NVL(id_country, "id_country")
+            and "is_sold" = 0);
+end;
+/
+
+CREATE OR REPLACE procedure get_subscription(from_century_auth IN INT,
+                                             to_century_auth IN INT,
+                                             id_genre IN INT,
+                                             id_author IN INT,
+                                             id_country IN INT,
+                                             subscription_cur OUT SYS_REFCURSOR)
+    is
+begin
+    open subscription_cur for
+        select "id_subscription",
+               ("name_author" || ' ' || "surname_author" || ' ' || "middle_name_author") as "Автор",
+               "name_genre"                                                              as "Жанр"
+        from ("Subscription" left join "Author" using ("id_author"))
+                 left join "Genre" using ("id_genre")
+        where ("life_century_author" <= NVL(to_century_auth, "life_century_author")
+            and "life_century_author" >= NVL(from_century_auth, "life_century_author")
+            and ("id_genre" = NVL(id_genre, "id_genre") or "id_genre" is null)
+            and ("id_author" = NVL(id_author, "id_author") or "id_author" is null)
+            and "id_country" = NVL(id_country, "id_country")
+            and "is_sold" = 0);
+end;
+/
+
+CREATE OR REPLACE procedure get_tickets_in_subscription(id_subscription IN "Subscription"."id_subscription"%TYPE,
+                                                        tickets_cur OUT SYS_REFCURSOR)
+    is
+begin
+    open tickets_cur for
+        select "id_ticket",
+               "name_show"                                                               as "Название",
+               (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
+                from "Employee"
+                where "id_employee" = "id_director")                                     as "Режиссер",
+               (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
+                from "Employee"
+                where "id_employee" = "id_conductor")                                    as "Диpижеp",
+               (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
+                from "Employee"
+                where "id_employee" = "id_production_designer")                          as "Художник",
+               ("name_author" || ' ' || "surname_author" || ' ' || "middle_name_author") as "Автор",
+               "name_genre"                                                              as "Жанр",
+               "century_show"                                                            as "Век спектакля",
+               "performance_date_repertoire"                                             as "Дата показа",
+               "seat_number_ticket"                                                      as "Место",
+               "cost_ticket"                                                             as "Цена"
+        from ((("Ticket" inner join "Repertoire" using ("id_performance")
+            inner join "Show" using ("id_show")) inner join "Author" using ("id_author"))
+                 inner join "Genre" using ("id_genre"))
+        where "id_ticket" in (select "id_ticket"
+                              from "Ticket-Subscription"
+                              where "id_subscription" = id_subscription);
+end;
+/
+
+CREATE OR REPLACE procedure get_subscription_by_ticket(id_ticket IN "Ticket"."id_ticket"%TYPE,
+                                                       subscription_cur OUT SYS_REFCURSOR)
+    is
+begin
+    open subscription_cur for
+        select "id_subscription",
+               ("name_author" || ' ' || "surname_author" || ' ' || "middle_name_author") as "Автор",
+               "name_genre"                                                              as "Жанр"
+        from ("Subscription" left join "Author" using ("id_author"))
+                 left join "Genre" using ("id_genre")
+        where "id_subscription" in (select "id_subscription"
+                                    from "Ticket-Subscription"
+                                    where "id_ticket" = id_ticket);
+end;
+/
+
+CREATE OR REPLACE procedure sell_ticket(id_ticket IN "Ticket"."id_ticket"%TYPE)
+    is
+    today_date DATE;
+    cnt        INT;
+begin
+    select count(*)
+    into cnt
+    from "Ticket-Subscription"
+    where "id_ticket" = id_ticket;
+
+    if cnt != 0 then
+        raise_application_error(-20046, 'Этот билет можно купить только в абонементе!');
+    end if;
+
+    select CURRENT_DATE into today_date from dual;
+
+    UPDATE "Ticket" SET "is_sold" = 1, "date_sale" = today_date WHERE "id_ticket" = id_ticket;
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure sell_subscription(id_subscription IN "Subscription"."id_subscription"%TYPE)
+    is
+    today_date DATE;
+    cursor tickets is
+        select "id_ticket"
+        from "Ticket-Subscription"
+        where "id_subscription" = id_subscription;
+begin
+    select CURRENT_DATE into today_date from dual;
+
+    for ticket in tickets
+        loop
+            UPDATE "Ticket" SET "is_sold" = 1, "date_sale" = today_date WHERE "id_ticket" = ticket."id_ticket";
+        end loop;
+
+    UPDATE "Subscription" SET "is_sold" = 1 WHERE "id_subscription" = id_subscription;
+end;
+/
