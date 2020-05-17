@@ -1,0 +1,43 @@
+Hardware Events
+    Hardware Event Type			Hardware Event Count	Hardware Event Sample Count	Events Per Sample	Precise
+    BR_INST_RETIRED.ALL_BRANCHES	4,118,113,662			8				[Unknown]	
+    BR_MISP_RETIRED.ALL_BRANCHES	69,471,630			8				[Unknown]	
+    MEM_LOAD_RETIRED.L1_HIT		17,906,418,844			8				[Unknown]	
+    MEM_LOAD_RETIRED.L1_MISS		358,580,032			8				[Unknown]	
+    MEM_LOAD_RETIRED.L2_HIT		252,663,688			8				[Unknown]	
+    MEM_LOAD_RETIRED.L2_MISS		103,423,528			8				[Unknown]	
+    MEM_LOAD_RETIRED.L3_HIT		82,284,522			8				[Unknown]	
+    MEM_LOAD_RETIRED.L3_MISS		16,591,444			8				[Unknown]	
+
+Elapsed Time:	5.399s
+    Clockticks:	23,919,000,000
+    Instructions Retired:	36,066,000,000
+    CPI Rate:	0.663
+    MUX Reliability:	0.945
+    Retiring:	41.2%
+    Front-End Bound:	6.0%
+    Bad Speculation:	0.9%
+    Back-End Bound:	51.9%
+    Memory Bound:	16.4%
+    L1 Bound:	1.7%
+    DTLB Overhead:	4.9%
+    Loads Blocked by Store Forwarding:	0.1%
+    Lock Latency:	0.0%
+    Split Loads:	20.7%
+    4K Aliasing:	10.7%
+    FB Full:	0.0%
+    L2 Bound:	3.5%
+    L3 Bound:	3.2%
+    DRAM Bound:	5.6%
+    Store Bound:	0.0%
+    Core Bound:	35.4%
+    Divider:	0.0%
+    Port Utilization:	29.9%
+    Cycles of 0 Ports Utilized:	0.9%
+    Cycles of 1 Port Utilized:	22.3%
+    Cycles of 2 Ports Utilized:	20.3%
+    Cycles of 3+ Ports Utilized:	35.8%
+    Vector Capacity Usage (FPU):	98.7%
+    Average CPU Frequency:	4.5 GHz 
+    Total Thread Count:	3
+    Paused Time:	0s

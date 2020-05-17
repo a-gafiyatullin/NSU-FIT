@@ -1,0 +1,2 @@
+n = 110 sigma = 1.18546e-08
+Total time: 5.082 sec.
