@@ -326,6 +326,7 @@ public class ActorsInfo extends DatabaseUtils {
 
         setContentPane(mainPanel);
         pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 

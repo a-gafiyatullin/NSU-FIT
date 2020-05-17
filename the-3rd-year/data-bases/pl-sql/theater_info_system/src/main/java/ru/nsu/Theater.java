@@ -167,12 +167,17 @@ public class Theater extends JFrame {
         ticketsAdding.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                try {
+                    new TicketsAdding(connection);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
             }
         });
 
         setContentPane(mainPanel);
         pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 

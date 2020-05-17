@@ -502,17 +502,11 @@ end;
 /
 
 CREATE OR REPLACE trigger "SUBSCRIPTION-INSERT-UPDATE"
-    before insert or update on "Subscription"
+    before insert
+    on "Subscription"
     for each row
 begin
-    if :NEW."id_genre" is not null and :NEW."id_author" is not null
-        or :NEW."id_genre" is null and :NEW."id_author" is null then
-        raise_application_error(-20026, 'Абонемент может иметь либо конкретного автора, либо конкретный жанр!');
-    end if;
-    
-    if inserting then
-        select "SUBSCR_ID_SUBSCR_SEQ".nextval into :NEW."id_subscription" from dual;
-    end if;
+    select "SUBSCR_ID_SUBSCR_SEQ".nextval into :NEW."id_subscription" from dual;
 end;
 /
 

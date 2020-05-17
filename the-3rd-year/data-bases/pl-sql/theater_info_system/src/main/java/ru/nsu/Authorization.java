@@ -76,6 +76,7 @@ public class Authorization extends JFrame {
 
         setContentPane(mainPanel);
         pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 

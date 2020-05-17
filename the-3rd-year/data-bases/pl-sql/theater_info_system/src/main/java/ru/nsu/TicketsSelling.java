@@ -225,8 +225,7 @@ public class TicketsSelling extends DatabaseUtils {
         authorList.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(authorList, getAuthors, authors, "id_author",
-                        "name_author");
+                showComboBoxListFromSQL(authorList, getAuthors, authors, "id_author", "name_author");
             }
 
             @Override
@@ -479,6 +478,7 @@ public class TicketsSelling extends DatabaseUtils {
 
         setContentPane(mainPanel);
         pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 

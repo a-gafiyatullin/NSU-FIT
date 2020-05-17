@@ -308,6 +308,7 @@ public class Musicians extends DatabaseUtils {
 
         setContentPane(mainPanel);
         pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 

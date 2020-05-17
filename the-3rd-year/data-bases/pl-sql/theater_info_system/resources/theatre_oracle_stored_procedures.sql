@@ -1009,11 +1009,12 @@ begin
                "name_genre"                                                              as "Жанр"
         from ("Subscription" left join "Author" using ("id_author"))
                  left join "Genre" using ("id_genre")
-        where ("life_century_author" <= NVL(to_century_auth, "life_century_author")
-            and "life_century_author" >= NVL(from_century_auth, "life_century_author")
+        where ((("life_century_author" <= NVL(to_century_auth, "life_century_author")
+            and "life_century_author" >= NVL(from_century_auth, "life_century_author"))
+            or "life_century_author" is null)
             and ("id_genre" = NVL(id_genre, "id_genre") or "id_genre" is null)
             and ("id_author" = NVL(id_author, "id_author") or "id_author" is null)
-            and "id_country" = NVL(id_country, "id_country")
+            and ("id_country" = NVL(id_country, "id_country") or "id_country" is null)
             and "is_sold" = 0);
 end;
 /
@@ -1103,5 +1104,65 @@ begin
         end loop;
 
     UPDATE "Subscription" SET "is_sold" = 1 WHERE "id_subscription" = id_subscription;
+end;
+/
+
+CREATE OR REPLACE procedure get_performances_date_by_show(id_show IN "Repertoire"."id_show"%TYPE,
+                                                          list OUT SYS_REFCURSOR)
+    is
+begin
+    open list for
+        select "id_performance", "performance_date_repertoire"
+        from "Repertoire"
+        where "id_show" = id_show;
+end;
+/
+
+CREATE OR REPLACE procedure ticket_insert(id_performance IN "Ticket"."id_performance"%TYPE,
+                                          seat_number IN "Ticket"."seat_number_ticket"%TYPE,
+                                          cost IN "Ticket"."cost_ticket"%TYPE)
+    is
+begin
+    INSERT INTO "Ticket" VALUES (0, id_performance, seat_number, cost, 0, null);
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure ticket_delete(id_ticket "Ticket"."id_ticket"%TYPE)
+    is
+begin
+    DELETE FROM "Ticket" WHERE "id_ticket" = id_ticket;
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure ticket_to_subscription_insert(id_ticket IN "Ticket-Subscription"."id_ticket"%TYPE,
+                                                          id_subscription IN "Ticket-Subscription"."id_subscription"%TYPE)
+    is
+begin
+    INSERT INTO "Ticket-Subscription" VALUES (id_ticket, id_subscription);
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure subscription_insert(id_genre IN "Subscription"."id_genre"%TYPE,
+                                                id_author IN "Subscription"."id_author"%TYPE)
+    is
+begin
+    INSERT INTO "Subscription" VALUES (0, id_genre, id_author, 0);
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure subscription_delete(id_subscription IN "Subscription"."id_subscription"%TYPE)
+    is
+begin
+    DELETE FROM "Subscription" WHERE "id_subscription" = id_subscription;
+
+    COMMIT;
 end;
 /

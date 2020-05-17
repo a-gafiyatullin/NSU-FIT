@@ -289,6 +289,7 @@ public class Tours extends DatabaseUtils {
 
         setContentPane(mainPanel);
         pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 

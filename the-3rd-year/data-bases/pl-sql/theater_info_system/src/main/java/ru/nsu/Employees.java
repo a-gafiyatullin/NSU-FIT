@@ -387,6 +387,7 @@ public class Employees extends DatabaseUtils {
 
         setContentPane(mainPanel);
         pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
