@@ -131,7 +131,11 @@ public class Theater extends JFrame {
         statistics.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                try {
+                    new Statistics(connection);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
             }
         });
 

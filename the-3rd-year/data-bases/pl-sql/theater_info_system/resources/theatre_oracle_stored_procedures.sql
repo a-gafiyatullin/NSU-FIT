@@ -1166,3 +1166,49 @@ begin
     COMMIT;
 end;
 /
+
+CREATE OR REPLACE procedure tickets_statistic(from_date IN DATE,
+                                              to_date IN DATE,
+                                              premier IN INT,
+                                              id_show IN INT,
+                                              from_century_show IN INT,
+                                              to_century_show IN INT,
+                                              id_conductor IN INT,
+                                              id_production_designer IN INT,
+                                              id_director IN INT,
+                                              id_genre IN INT,
+                                              id_age_category IN INT,
+                                              id_author IN INT,
+                                              id_country IN INT,
+                                              ticket_count OUT INT,
+                                              money_amount OUT "Ticket"."cost_ticket"%TYPE)
+    is
+    cursor ticket_cur
+        is select "Ticket"."id_ticket", "Ticket"."cost_ticket"
+           from ((("Ticket" inner join "Repertoire" using ("id_performance"))
+               inner join "Show" using ("id_show"))
+                    inner join "Author" using ("id_author"))
+           where ("date_sale" <= NVL(to_date, "date_sale")
+               and "date_sale" >= NVL(from_date, "date_sale")
+               and "id_show" = NVL(id_show, "id_show")
+               and "century_show" <= NVL(to_century_show, "century_show")
+               and "century_show" >= NVL(from_century_show, "century_show")
+               and "id_conductor" = NVL(id_conductor, "id_conductor")
+               and "id_production_designer" = NVL(id_production_designer, "id_production_designer")
+               and "id_director" = NVL(id_director, "id_director")
+               and "id_genre" = NVL(id_genre, "id_genre")
+               and "id_age_category" = NVL(id_age_category, "id_age_category")
+               and "id_author" = NVL(id_author, "id_author")
+               and "id_country" = NVL(id_country, "id_country")
+               and ("performance_date_repertoire" = "premier_date_show" or premier = 0)
+               and "is_sold" = 1);
+begin
+    ticket_count := 0;
+    money_amount := 0;
+    for ticket in ticket_cur
+        loop
+            ticket_count := ticket_count + 1;
+            money_amount := money_amount + ticket."cost_ticket";
+        end loop;
+end;
+/
