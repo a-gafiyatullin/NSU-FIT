@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Directors extends DatabaseUtils {
     private final Map<String, Integer> directors = new HashMap<>();
@@ -31,24 +32,27 @@ public class Directors extends DatabaseUtils {
     private final CallableStatement getEmployeesInfo;
     private final CallableStatement updateEmployee;
     private final CallableStatement getShowInfo;
+
     private JPanel mainPanel;
     private JTable resultTable;
-    private JComboBox directorsComboBox;
+    private JComboBox directorComboBox;
     private JComboBox genderComboBox;
     private JComboBox jobTypeComboBox;
-    private JFormattedTextField ageFrom;
-    private JFormattedTextField ageTo;
+    private JFormattedTextField ageFromTextField;
+    private JFormattedTextField ageToTextField;
     private JButton queryButton;
     private JButton saveButton;
     private JComboBox genreComboBox;
     private JComboBox ageComboBox;
-    private JFormattedTextField periodFrom;
-    private JFormattedTextField periodTo;
+    private JFormattedTextField periodFromTextField;
+    private JFormattedTextField periodToTextField;
     private JLabel status;
     private JButton queryButton2;
     private int id_director_type;
 
     Directors(final Connection connection, String role) throws Exception {
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
         if (!role.equals("headmaster")) {
             saveButton.setVisible(false);
         }
@@ -78,7 +82,8 @@ public class Directors extends DatabaseUtils {
         getDirectors = connection.prepareCall("{call get_all_types_directors_list(?)}");
         getDirectors.registerOutParameter("list", OracleTypes.CURSOR);
 
-        getEmployeesInfo = connection.prepareCall("{call employee_info(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
+        getEmployeesInfo
+                = connection.prepareCall("{call employee_info(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
         getEmployeesInfo.registerOutParameter(18, OracleTypes.CURSOR);
 
         updateEmployee = connection.prepareCall("{call employee_update(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
@@ -86,17 +91,17 @@ public class Directors extends DatabaseUtils {
         getShowInfo = connection.prepareCall("{call director_shows(?, ?, ?, ?, ?, ?)}");
         getShowInfo.registerOutParameter(6, OracleTypes.CURSOR);
 
-        showComboBoxListFromSQL(directorsComboBox, getDirectors, directors, "id_employee", "name");
+        showComboBoxListFromSQL(directorComboBox, getDirectors, directors, "id_employee", "name");
         showComboBoxListFromSQL(genderComboBox, getGenders, genders, "id_gender", "name_gender");
         showComboBoxListFromSQL(jobTypeComboBox, getDirectorTypes, directorTypes, "id_job_type", "name_job_type");
         id_director_type = getDirectorTypes.getInt("id_director_type");
         showComboBoxListFromSQL(genreComboBox, getGenres, genres, "id_genre", "name_genre");
         showComboBoxListFromSQL(ageComboBox, getAgeCategories, ageCategories, "id_age_category", "name_age_category");
 
-        directorsComboBox.addPopupMenuListener(new PopupMenuListener() {
+        directorComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(directorsComboBox, getDirectors, directors, "id_employee", "name");
+                showComboBoxListFromSQL(directorComboBox, getDirectors, directors, "id_employee", "name");
             }
 
             @Override
@@ -181,30 +186,30 @@ public class Directors extends DatabaseUtils {
                 try {
                     resultTable.setEnabled(true);
                     // process query
-                    if (directorsComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(directorComboBox.getSelectedItem(), "-")) {
                         getEmployeesInfo.setNull(1, OracleTypes.INTEGER);
                     } else {
-                        getEmployeesInfo.setInt(1, directors.get((directorsComboBox.getSelectedItem())));
+                        getEmployeesInfo.setInt(1, directors.get((directorComboBox.getSelectedItem())));
                     }
                     getEmployeesInfo.setNull(2, OracleTypes.VARCHAR);
                     getEmployeesInfo.setNull(3, OracleTypes.VARCHAR);
                     getEmployeesInfo.setNull(4, OracleTypes.VARCHAR);
-                    if (genderComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(genderComboBox.getSelectedItem(), "-")) {
                         getEmployeesInfo.setNull(5, OracleTypes.INTEGER);
                     } else {
                         getEmployeesInfo.setInt(5, genders.get(genderComboBox.getSelectedItem()));
                     }
                     getEmployeesInfo.setNull(6, OracleTypes.VARCHAR);
                     getEmployeesInfo.setNull(7, OracleTypes.VARCHAR);
-                    if (ageFrom.getText().isEmpty()) {
+                    if (ageFromTextField.getText().isEmpty()) {
                         getEmployeesInfo.setNull(8, OracleTypes.INTEGER);
                     } else {
-                        getEmployeesInfo.setInt(8, Integer.parseInt(ageFrom.getText()));
+                        getEmployeesInfo.setInt(8, Integer.parseInt(ageFromTextField.getText()));
                     }
-                    if (ageTo.getText().isEmpty()) {
+                    if (ageToTextField.getText().isEmpty()) {
                         getEmployeesInfo.setNull(9, OracleTypes.INTEGER);
                     } else {
-                        getEmployeesInfo.setInt(9, Integer.parseInt(ageTo.getText()));
+                        getEmployeesInfo.setInt(9, Integer.parseInt(ageToTextField.getText()));
                     }
                     getEmployeesInfo.setNull(10, OracleTypes.INTEGER);
                     getEmployeesInfo.setNull(11, OracleTypes.INTEGER);
@@ -213,7 +218,7 @@ public class Directors extends DatabaseUtils {
                     getEmployeesInfo.setNull(14, OracleTypes.DOUBLE);
                     getEmployeesInfo.setNull(15, OracleTypes.DOUBLE);
                     getEmployeesInfo.setNull(16, OracleTypes.INTEGER);
-                    if (jobTypeComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(jobTypeComboBox.getSelectedItem(), "-")) {
                         getEmployeesInfo.setInt(17, id_director_type);
                     } else {
                         getEmployeesInfo.setInt(17, directorTypes.get(jobTypeComboBox.getSelectedItem()));
@@ -223,10 +228,11 @@ public class Directors extends DatabaseUtils {
                     // get results
                     ResultSet results = (ResultSet) getEmployeesInfo.getObject(18);
                     fillTableFromResultSet(resultTable, 2, employees, results);
-                    status.setText("Статус: Успех. Возвращено " + resultTable.getRowCount() + " записей.");
+                    results.close();
+                    setSuccessMessage(status, resultTable.getRowCount());
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    status.setText("Статус: запрос не выполнен.");
+                    setFailMessage(status);
                 }
             }
         });
@@ -236,14 +242,13 @@ public class Directors extends DatabaseUtils {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 try {
-                    if (resultTable.getSelectedRows().length == 0) {
+                    if (resultTable.getSelectedRow() == -1) {
                         return;
                     }
                     DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
-                    int selectedRow = resultTable.getSelectedRows()[0];
+                    int selectedRow = resultTable.getSelectedRow();
 
                     jobTypeComboBox.setSelectedItem(model.getValueAt(selectedRow, 9));
-
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
@@ -254,16 +259,16 @@ public class Directors extends DatabaseUtils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (resultTable.getSelectedRows().length == 0) {
-                        JOptionPane.showMessageDialog(mainPanel, "Выбирете запись для редактирования!",
-                                "Ошибка редактирования", JOptionPane.ERROR_MESSAGE);
+                    if (resultTable.getSelectedRow() == -1) {
+                        JOptionPane.showMessageDialog(mainPanel, "Выберите запись для редактирования!",
+                                "Ошибка редактирования!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    int selectedRow = resultTable.getSelectedRows()[0];
+                    int selectedRow = resultTable.getSelectedRow();
                     int job = directorTypes.get(jobTypeComboBox.getSelectedItem());
                     if (job == 0) {
                         JOptionPane.showMessageDialog(mainPanel, "Не все поля заполнены!",
-                                "Ошибка редактирования", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка редактирования!", JOptionPane.ERROR_MESSAGE);
                     } else {
                         updateEmployee.setNull(1, OracleTypes.VARCHAR);
                         updateEmployee.setNull(2, OracleTypes.VARCHAR);
@@ -279,13 +284,11 @@ public class Directors extends DatabaseUtils {
                         updateEmployee.execute();
 
                         updateResultTable();
-                        status.setText("Статус: запись обновлена успешно!");
                     }
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка редактирования", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка редактирования!", JOptionPane.ERROR_MESSAGE);
                     exception.printStackTrace();
-                    status.setText("Статус: ошибка обновления записи!");
                 }
             }
         });
@@ -293,31 +296,33 @@ public class Directors extends DatabaseUtils {
         queryButton2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (resultTable.getSelectedRows().length == 0) {
+                if (resultTable.getSelectedRow() == -1) {
                     JOptionPane.showMessageDialog(mainPanel, "Выберите постановщика!",
-                            "Ошибка запроса", JOptionPane.ERROR_MESSAGE);
-                    status.setText("Статус: запрос не выполнен.");
+                            "Ошибка запроса!", JOptionPane.ERROR_MESSAGE);
+                    setFailMessage(status);
                     return;
                 }
-                int selectedRow = resultTable.getSelectedRows()[0];
+                int selectedRow = resultTable.getSelectedRow();
                 resultTable.setEnabled(false);
                 try {
-                    if (periodFrom.getText().isEmpty()) {
+                    if (periodFromTextField.getText().isEmpty()) {
                         getShowInfo.setNull(1, OracleTypes.DATE);
                     } else {
-                        getShowInfo.setDate(1, new java.sql.Date(dateFormat.parse(periodFrom.getText()).getTime()));
+                        getShowInfo.setDate(1,
+                                new java.sql.Date(dateFormat.parse(periodFromTextField.getText()).getTime()));
                     }
-                    if (periodTo.getText().isEmpty()) {
+                    if (periodToTextField.getText().isEmpty()) {
                         getShowInfo.setNull(2, OracleTypes.DATE);
                     } else {
-                        getShowInfo.setDate(2, new java.sql.Date(dateFormat.parse(periodTo.getText()).getTime()));
+                        getShowInfo.setDate(2,
+                                new java.sql.Date(dateFormat.parse(periodToTextField.getText()).getTime()));
                     }
-                    if (genreComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(genreComboBox.getSelectedItem(), "-")) {
                         getShowInfo.setNull(3, OracleTypes.INTEGER);
                     } else {
                         getShowInfo.setInt(3, genres.get(genreComboBox.getSelectedItem()));
                     }
-                    if (ageComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(ageComboBox.getSelectedItem(), "-")) {
                         getShowInfo.setNull(4, OracleTypes.INTEGER);
                     } else {
                         getShowInfo.setInt(4, ageCategories.get(ageComboBox.getSelectedItem()));
@@ -327,10 +332,11 @@ public class Directors extends DatabaseUtils {
 
                     ResultSet results = (ResultSet) getShowInfo.getObject(6);
                     fillTableFromResultSet(resultTable, 2, null, results);
-                    status.setText("Статус: Успех. Возвращено " + resultTable.getRowCount() + " записей.");
+                    results.close();
+                    setSuccessMessage(status, resultTable.getRowCount());
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    status.setText("Статус: запрос не выполнен.");
+                    setFailMessage(status);
                 }
             }
         });
@@ -342,10 +348,10 @@ public class Directors extends DatabaseUtils {
     }
 
     private void createUIComponents() {
-        ageTo = new JFormattedTextField(numberFormat);
-        ageFrom = new JFormattedTextField(numberFormat);
-        periodTo = new JFormattedTextField(dateFormat);
-        periodFrom = new JFormattedTextField(dateFormat);
+        ageToTextField = new JFormattedTextField(numberFormat);
+        ageFromTextField = new JFormattedTextField(numberFormat);
+        periodToTextField = new JFormattedTextField(dateFormat);
+        periodFromTextField = new JFormattedTextField(dateFormat);
     }
 
     private void updateResultTable() {

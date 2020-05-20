@@ -11,6 +11,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Statistics extends DatabaseUtils {
     private final Map<String, Integer> shows = new HashMap<>();
@@ -30,27 +31,29 @@ public class Statistics extends DatabaseUtils {
     private final Map<String, Integer> productionDesigners = new HashMap<>();
     private final CallableStatement getProductionDesigners;
     private final CallableStatement getTicketsStatistics;
-    private JComboBox titles;
+
+    private JComboBox titleComboBox;
     private JCheckBox firstTimeInCheckBox;
-    private JComboBox conductorList;
-    private JComboBox stateList;
-    private JFormattedTextField centuryFrom;
-    private JFormattedTextField dateFrom;
-    private JFormattedTextField dateTo;
-    private JFormattedTextField centuryTo;
-    private JComboBox genreList;
-    private JComboBox ageList;
-    private JComboBox directorList;
-    private JComboBox productionDesignerList;
-    private JComboBox authorList;
+    private JComboBox conductorComboBox;
+    private JFormattedTextField centuryFromTextField;
+    private JFormattedTextField dateFromTextField;
+    private JFormattedTextField dateToTextField;
+    private JFormattedTextField centuryToTextField;
+    private JComboBox genreComboBox;
+    private JComboBox ageComboBox;
+    private JComboBox directorComboBox;
+    private JComboBox productionDesignerComboBox;
+    private JComboBox authorComboBox;
     private JButton queryButton;
-    private JComboBox countryList;
-    private JLabel sellAmount;
-    private JLabel moneyAmount;
+    private JComboBox countryComboBox;
+    private JLabel sellAmountLabel;
+    private JLabel moneyAmountLabel;
     private JPanel mainPanel;
     private JLabel status;
 
     public Statistics(final Connection connection) throws Exception {
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
         getShowTitles = connection.prepareCall("{call get_shows_list(?)}");
         getShowTitles.registerOutParameter("list", OracleTypes.CURSOR);
 
@@ -75,24 +78,27 @@ public class Statistics extends DatabaseUtils {
         getProductionDesigners = connection.prepareCall("{call get_designers_list(?)}");
         getProductionDesigners.registerOutParameter("list", OracleTypes.CURSOR);
 
-        getTicketsStatistics = connection.prepareCall("{call tickets_statistic(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
+        getTicketsStatistics
+                = connection.prepareCall("{call tickets_statistic(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
         getTicketsStatistics.registerOutParameter(14, OracleTypes.INTEGER);
         getTicketsStatistics.registerOutParameter(15, OracleTypes.DOUBLE);
 
-        showComboBoxListFromSQL(titles, getShowTitles, shows, "id_show", "name_show");
-        showComboBoxListFromSQL(genreList, getGenres, genres, "id_genre", "name_genre");
-        showComboBoxListFromSQL(ageList, getAgeCategories, ageCategories, "id_age_category", "name_age_category");
-        showComboBoxListFromSQL(authorList, getAuthors, authors, "id_author", "name_author");
-        showComboBoxListFromSQL(countryList, getCountries, countries, "id_country",
+        showComboBoxListFromSQL(titleComboBox, getShowTitles, shows, "id_show", "name_show");
+        showComboBoxListFromSQL(genreComboBox, getGenres, genres, "id_genre", "name_genre");
+        showComboBoxListFromSQL(ageComboBox, getAgeCategories, ageCategories, "id_age_category",
+                "name_age_category");
+        showComboBoxListFromSQL(authorComboBox, getAuthors, authors, "id_author", "name_author");
+        showComboBoxListFromSQL(countryComboBox, getCountries, countries, "id_country",
                 "name_country");
-        showComboBoxListFromSQL(directorList, getDirectors, directors, "id_employee", "name");
-        showComboBoxListFromSQL(conductorList, getConductors, conductors, "id_employee", "name");
-        showComboBoxListFromSQL(productionDesignerList, getProductionDesigners, productionDesigners, "id_employee", "name");
+        showComboBoxListFromSQL(directorComboBox, getDirectors, directors, "id_employee", "name");
+        showComboBoxListFromSQL(conductorComboBox, getConductors, conductors, "id_employee", "name");
+        showComboBoxListFromSQL(productionDesignerComboBox, getProductionDesigners, productionDesigners,
+                "id_employee", "name");
 
-        titles.addPopupMenuListener(new PopupMenuListener() {
+        titleComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(titles, getShowTitles, shows, "id_show", "name_show");
+                showComboBoxListFromSQL(titleComboBox, getShowTitles, shows, "id_show", "name_show");
             }
 
             @Override
@@ -104,10 +110,10 @@ public class Statistics extends DatabaseUtils {
             }
         });
 
-        conductorList.addPopupMenuListener(new PopupMenuListener() {
+        conductorComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(conductorList, getConductors, conductors, "id_employee", "name");
+                showComboBoxListFromSQL(conductorComboBox, getConductors, conductors, "id_employee", "name");
             }
 
             @Override
@@ -119,10 +125,10 @@ public class Statistics extends DatabaseUtils {
             }
         });
 
-        genreList.addPopupMenuListener(new PopupMenuListener() {
+        genreComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(genreList, getGenres, genres, "id_genre", "name_genre");
+                showComboBoxListFromSQL(genreComboBox, getGenres, genres, "id_genre", "name_genre");
             }
 
             @Override
@@ -134,10 +140,10 @@ public class Statistics extends DatabaseUtils {
             }
         });
 
-        ageList.addPopupMenuListener(new PopupMenuListener() {
+        ageComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(ageList, getAgeCategories, ageCategories, "id_age_category",
+                showComboBoxListFromSQL(ageComboBox, getAgeCategories, ageCategories, "id_age_category",
                         "name_age_category");
             }
 
@@ -150,10 +156,10 @@ public class Statistics extends DatabaseUtils {
             }
         });
 
-        directorList.addPopupMenuListener(new PopupMenuListener() {
+        directorComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(directorList, getDirectors, directors, "id_employee", "name");
+                showComboBoxListFromSQL(directorComboBox, getDirectors, directors, "id_employee", "name");
             }
 
             @Override
@@ -165,10 +171,10 @@ public class Statistics extends DatabaseUtils {
             }
         });
 
-        productionDesignerList.addPopupMenuListener(new PopupMenuListener() {
+        productionDesignerComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(productionDesignerList, getProductionDesigners, productionDesigners,
+                showComboBoxListFromSQL(productionDesignerComboBox, getProductionDesigners, productionDesigners,
                         "id_employee", "name");
             }
 
@@ -181,11 +187,10 @@ public class Statistics extends DatabaseUtils {
             }
         });
 
-        authorList.addPopupMenuListener(new PopupMenuListener() {
+        authorComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(authorList, getAuthors, authors, "id_author",
-                        "name_author");
+                showComboBoxListFromSQL(authorComboBox, getAuthors, authors, "id_author", "name_author");
             }
 
             @Override
@@ -197,10 +202,11 @@ public class Statistics extends DatabaseUtils {
             }
         });
 
-        countryList.addPopupMenuListener(new PopupMenuListener() {
+        countryComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(countryList, getCountries, countries, "id_country", "name_country");
+                showComboBoxListFromSQL(countryComboBox, getCountries, countries, "id_country",
+                        "name_country");
             }
 
             @Override
@@ -216,75 +222,78 @@ public class Statistics extends DatabaseUtils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (dateFrom.getText().isEmpty()) {
+                    if (dateFromTextField.getText().isEmpty()) {
                         getTicketsStatistics.setNull(1, OracleTypes.DATE);
                     } else {
-                        getTicketsStatistics.setDate(1, new java.sql.Date(dateFormat.parse(dateFrom.getText()).getTime()));
+                        getTicketsStatistics.setDate(1,
+                                new java.sql.Date(dateFormat.parse(dateFromTextField.getText()).getTime()));
                     }
-                    if (dateTo.getText().isEmpty()) {
+                    if (dateToTextField.getText().isEmpty()) {
                         getTicketsStatistics.setNull(2, OracleTypes.DATE);
                     } else {
-                        getTicketsStatistics.setDate(2, new java.sql.Date(dateFormat.parse(dateTo.getText()).getTime()));
+                        getTicketsStatistics.setDate(2,
+                                new java.sql.Date(dateFormat.parse(dateToTextField.getText()).getTime()));
                     }
                     getTicketsStatistics.setInt(3, firstTimeInCheckBox.isSelected() ? 1 : 0);
-                    if (titles.getSelectedItem().equals("-")) {
+                    if (Objects.equals(titleComboBox.getSelectedItem(), "-")) {
                         getTicketsStatistics.setNull(4, OracleTypes.INTEGER);
                     } else {
-                        getTicketsStatistics.setInt(4, shows.get(titles.getSelectedItem()));
+                        getTicketsStatistics.setInt(4, shows.get(titleComboBox.getSelectedItem()));
                     }
-                    if (centuryFrom.getText().isEmpty()) {
+                    if (centuryFromTextField.getText().isEmpty()) {
                         getTicketsStatistics.setNull(5, OracleTypes.INTEGER);
                     } else {
-                        getTicketsStatistics.setInt(5, Integer.parseInt(centuryFrom.getText()));
+                        getTicketsStatistics.setInt(5, Integer.parseInt(centuryFromTextField.getText()));
                     }
-                    if (centuryTo.getText().isEmpty()) {
+                    if (centuryToTextField.getText().isEmpty()) {
                         getTicketsStatistics.setNull(6, OracleTypes.INTEGER);
                     } else {
-                        getTicketsStatistics.setInt(6, Integer.parseInt(centuryTo.getText()));
+                        getTicketsStatistics.setInt(6, Integer.parseInt(centuryToTextField.getText()));
                     }
-                    if (conductorList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(conductorComboBox.getSelectedItem(), "-")) {
                         getTicketsStatistics.setNull(7, OracleTypes.INTEGER);
                     } else {
-                        getTicketsStatistics.setInt(7, conductors.get(conductorList.getSelectedItem()));
+                        getTicketsStatistics.setInt(7, conductors.get(conductorComboBox.getSelectedItem()));
                     }
-                    if (productionDesignerList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(productionDesignerComboBox.getSelectedItem(), "-")) {
                         getTicketsStatistics.setNull(8, OracleTypes.INTEGER);
                     } else {
-                        getTicketsStatistics.setInt(8, productionDesigners.get(productionDesignerList.getSelectedItem()));
+                        getTicketsStatistics.setInt(8,
+                                productionDesigners.get(productionDesignerComboBox.getSelectedItem()));
                     }
-                    if (directorList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(directorComboBox.getSelectedItem(), "-")) {
                         getTicketsStatistics.setNull(9, OracleTypes.INTEGER);
                     } else {
-                        getTicketsStatistics.setInt(9, directors.get(directorList.getSelectedItem()));
+                        getTicketsStatistics.setInt(9, directors.get(directorComboBox.getSelectedItem()));
                     }
-                    if (genreList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(genreComboBox.getSelectedItem(), "-")) {
                         getTicketsStatistics.setNull(10, OracleTypes.INTEGER);
                     } else {
-                        getTicketsStatistics.setInt(10, genres.get(genreList.getSelectedItem()));
+                        getTicketsStatistics.setInt(10, genres.get(genreComboBox.getSelectedItem()));
                     }
-                    if (ageList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(ageComboBox.getSelectedItem(), "-")) {
                         getTicketsStatistics.setNull(11, OracleTypes.INTEGER);
                     } else {
-                        getTicketsStatistics.setInt(11, ageCategories.get(ageList.getSelectedItem()));
+                        getTicketsStatistics.setInt(11, ageCategories.get(ageComboBox.getSelectedItem()));
                     }
-                    if (authorList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(authorComboBox.getSelectedItem(), "-")) {
                         getTicketsStatistics.setNull(12, OracleTypes.INTEGER);
                     } else {
-                        getTicketsStatistics.setInt(12, authors.get(authorList.getSelectedItem()));
+                        getTicketsStatistics.setInt(12, authors.get(authorComboBox.getSelectedItem()));
                     }
-                    if (countryList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(countryComboBox.getSelectedItem(), "-")) {
                         getTicketsStatistics.setNull(13, OracleTypes.INTEGER);
                     } else {
-                        getTicketsStatistics.setInt(13, countries.get(countryList.getSelectedItem()));
+                        getTicketsStatistics.setInt(13, countries.get(countryComboBox.getSelectedItem()));
                     }
                     getTicketsStatistics.execute();
-                    sellAmount.setText(Integer.toString(getTicketsStatistics.getInt(14)));
-                    moneyAmount.setText(Double.toString(getTicketsStatistics.getDouble(15)));
+                    sellAmountLabel.setText(Integer.toString(getTicketsStatistics.getInt(14)));
+                    moneyAmountLabel.setText(Double.toString(getTicketsStatistics.getDouble(15)));
 
                     status.setText("Статус: Успех.");
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    status.setText("Статус: запрос не выполнен.");
+                    setFailMessage(status);
                 }
             }
         });
@@ -296,9 +305,9 @@ public class Statistics extends DatabaseUtils {
     }
 
     private void createUIComponents() {
-        dateTo = new JFormattedTextField(dateFormat);
-        dateFrom = new JFormattedTextField(dateFormat);
-        centuryFrom = new JFormattedTextField(numberFormat);
-        centuryTo = new JFormattedTextField(numberFormat);
+        dateToTextField = new JFormattedTextField(dateFormat);
+        dateFromTextField = new JFormattedTextField(dateFormat);
+        centuryFromTextField = new JFormattedTextField(numberFormat);
+        centuryToTextField = new JFormattedTextField(numberFormat);
     }
 }

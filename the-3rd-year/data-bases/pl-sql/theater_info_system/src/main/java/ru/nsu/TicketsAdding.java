@@ -34,10 +34,11 @@ public class TicketsAdding extends DatabaseUtils {
     private final CallableStatement subscriptionDelete;
     private final Map<Integer, Integer> tickets = new HashMap<>();
     private final CallableStatement ticketInfo;
+
     private JPanel mainPanel;
     private JTable ticketsTable;
     private JTable subscriptionTable;
-    private JComboBox titles;
+    private JComboBox titleComboBox;
     private JComboBox performanceDateComboBox;
     private JFormattedTextField placeTextField;
     private JFormattedTextField costTextField;
@@ -51,6 +52,8 @@ public class TicketsAdding extends DatabaseUtils {
     private JLabel status;
 
     public TicketsAdding(final Connection connection) throws Exception {
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
         ticketsTable.getTableHeader().setReorderingAllowed(false);
         ticketsTable.setModel(new DefaultTableModel() {
 
@@ -92,16 +95,16 @@ public class TicketsAdding extends DatabaseUtils {
         subscriptionInsert = connection.prepareCall("{call subscription_insert(?, ?)}");
         subscriptionDelete = connection.prepareCall("{call subscription_delete(?)}");
 
-        showComboBoxListFromSQL(titles, getShowTitles, shows, "id_show", "name_show");
+        showComboBoxListFromSQL(titleComboBox, getShowTitles, shows, "id_show", "name_show");
         showComboBoxListFromSQL(genreComboBox, getGenres, genres, "id_genre", "name_genre");
         showComboBoxListFromSQL(authorComboBox, getAuthors, authors, "id_author", "name_author");
 
         updateTables();
-        titles.addPopupMenuListener(new PopupMenuListener() {
+        titleComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
                 performanceDateComboBox.setSelectedItem("-");
-                showComboBoxListFromSQL(titles, getShowTitles, shows, "id_show", "name_show");
+                showComboBoxListFromSQL(titleComboBox, getShowTitles, shows, "id_show", "name_show");
             }
 
             @Override
@@ -146,14 +149,14 @@ public class TicketsAdding extends DatabaseUtils {
         performanceDateComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                if (Objects.equals(titles.getSelectedItem(), "-")) {
+                if (Objects.equals(titleComboBox.getSelectedItem(), "-")) {
                     JOptionPane.showMessageDialog(mainPanel, "Укажите спектакль!",
                             "Ошибка выбора даты", JOptionPane.ERROR_MESSAGE);
                 } else {
                     try {
-                        getPerformancesDate.setInt("id_show", shows.get(titles.getSelectedItem()));
+                        getPerformancesDate.setInt("id_show", shows.get(titleComboBox.getSelectedItem()));
                         showComboBoxListFromSQL(performanceDateComboBox, getPerformancesDate, performances,
-                                "id_performance", "performance_date_repertoire");
+                                "id_performance", "Дата");
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
                     }
@@ -175,31 +178,29 @@ public class TicketsAdding extends DatabaseUtils {
                 try {
                     if (Objects.equals(performanceDateComboBox.getSelectedItem(), "-")) {
                         JOptionPane.showMessageDialog(mainPanel, "Выберите дату спектакля!",
-                                "Ошибка добавления", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     ticketAdd.setInt(1, performances.get(performanceDateComboBox.getSelectedItem()));
                     if (placeTextField.getText().isEmpty()) {
                         JOptionPane.showMessageDialog(mainPanel, "Выберите место посадки!",
-                                "Ошибка добавления", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     ticketAdd.setInt(2, Integer.parseInt(placeTextField.getText()));
                     if (costTextField.getText().isEmpty()) {
                         JOptionPane.showMessageDialog(mainPanel, "Введите стоимость!",
-                                "Ошибка добавления", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     ticketAdd.setInt(3, Integer.parseInt(costTextField.getText()));
                     ticketAdd.execute();
 
                     updateTables();
-                    status.setText("Статус: билет добавлен!");
                 } catch (Exception exception) {
                     exception.printStackTrace();
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка добавления", JOptionPane.ERROR_MESSAGE);
-                    status.setText("Статус: билет не добавлен!");
+                            "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -209,18 +210,18 @@ public class TicketsAdding extends DatabaseUtils {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (ticketsTable.getSelectedRows().length == 0) {
-                        JOptionPane.showMessageDialog(mainPanel, "Выберите билет для удаения!",
-                                "Ошибка удаления", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(mainPanel, "Выберите билет для удаления!",
+                                "Ошибка удаления!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     ticketDelete.setInt(1, tickets.get((ticketsTable.getSelectedRows()[0])));
                     ticketDelete.execute();
 
                     updateTables();
-                    status.setText("Статус: билет удален!");
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    status.setText("Статус: билет не удален!");
+                    JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
+                            "Ошибка удаления!", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -231,20 +232,20 @@ public class TicketsAdding extends DatabaseUtils {
                 try {
                     if (ticketsTable.getSelectedRows().length == 0 || subscriptionTable.getSelectedRows().length == 0) {
                         JOptionPane.showMessageDialog(mainPanel, "Выберите и билет, и абонемент!",
-                                "Ошибка связывания", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка связывания!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
 
                     ticketInsertIntoSubscription.setInt(1, tickets.get(ticketsTable.getSelectedRows()[0]));
-                    ticketInsertIntoSubscription.setInt(2, subscriptions.get(subscriptionTable.getSelectedRows()[0]));
+                    ticketInsertIntoSubscription.setInt(2,
+                            subscriptions.get(subscriptionTable.getSelectedRows()[0]));
                     ticketInsertIntoSubscription.execute();
 
                     status.setText("Статус: билет и абонемент связаны!");
                 } catch (Exception exception) {
                     exception.printStackTrace();
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка связывания", JOptionPane.ERROR_MESSAGE);
-                    status.setText("Статус: ошибка связывания билета и абонемента!");
+                            "Ошибка связывания!", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -256,7 +257,7 @@ public class TicketsAdding extends DatabaseUtils {
                     if (Objects.equals(authorComboBox.getSelectedItem(), "-")
                             == Objects.equals(genreComboBox.getSelectedItem(), "-")) {
                         JOptionPane.showMessageDialog(mainPanel, "Укажите жанр или автора!",
-                                "Ошибка добавления", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
 
@@ -270,10 +271,10 @@ public class TicketsAdding extends DatabaseUtils {
                     subscriptionInsert.execute();
 
                     updateTables();
-                    status.setText("Статус: абонемент добавлен!");
                 } catch (Exception exception) {
+                    JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
+                            "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                     exception.printStackTrace();
-                    status.setText("Статус: ошибка добавления абонемента!");
                 }
             }
         });
@@ -284,17 +285,17 @@ public class TicketsAdding extends DatabaseUtils {
                 try {
                     if (subscriptionTable.getSelectedRows().length == 0) {
                         JOptionPane.showMessageDialog(mainPanel, "Укажите абонемент!",
-                                "Ошибка расформировывания", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка расформировывания!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     subscriptionDelete.setInt(1, subscriptions.get(subscriptionTable.getSelectedRows()[0]));
                     subscriptionDelete.execute();
 
                     updateTables();
-                    status.setText("Статус: абонемент расформирован!");
                 } catch (Exception exception) {
+                    JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
+                            "Ошибка расформировывания!", JOptionPane.ERROR_MESSAGE);
                     exception.printStackTrace();
-                    status.setText("Статус: ошибка расформировывания абонемента!");
                 }
             }
         });
@@ -327,6 +328,7 @@ public class TicketsAdding extends DatabaseUtils {
 
         ResultSet results = (ResultSet) ticketInfo.getObject(13);
         fillTableFromResultSet(ticketsTable, 2, tickets, results);
+        results.close();
 
         subscriptionInfo.setNull(1, OracleTypes.INTEGER);
         subscriptionInfo.setNull(2, OracleTypes.INTEGER);
@@ -337,5 +339,6 @@ public class TicketsAdding extends DatabaseUtils {
 
         results = (ResultSet) subscriptionInfo.getObject(6);
         fillTableFromResultSet(subscriptionTable, 2, subscriptions, results);
+        results.close();
     }
 }

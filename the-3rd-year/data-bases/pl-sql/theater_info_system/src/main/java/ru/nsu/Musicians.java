@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Musicians extends DatabaseUtils {
     private final Map<String, Integer> musicians = new HashMap<>();
@@ -31,23 +32,26 @@ public class Musicians extends DatabaseUtils {
     private final CallableStatement getMusiciansInfo;
     private final CallableStatement updateMusician;
     private final CallableStatement getShowInfo;
+
     private JPanel mainPanel;
     private JTable resultTable;
     private JComboBox musicianComboBox;
     private JComboBox genderComboBox;
     private JComboBox instrumentComboBox;
-    private JFormattedTextField ageFrom;
-    private JFormattedTextField ageTo;
+    private JFormattedTextField ageFromTextField;
+    private JFormattedTextField ageToTextField;
     private JButton queryButton;
     private JButton saveButton;
     private JComboBox genreComboBox;
     private JComboBox ageComboBox;
-    private JFormattedTextField periodFrom;
-    private JFormattedTextField periodTo;
+    private JFormattedTextField periodFromTextField;
+    private JFormattedTextField periodToTextField;
     private JButton queryButton2;
     private JLabel status;
 
     public Musicians(final Connection connection, String role) throws Exception {
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
         if (!role.equals("headmaster")) {
             saveButton.setVisible(false);
         }
@@ -86,9 +90,11 @@ public class Musicians extends DatabaseUtils {
 
         showComboBoxListFromSQL(musicianComboBox, getMusicians, musicians, "id_employee", "name");
         showComboBoxListFromSQL(genderComboBox, getGenders, genders, "id_gender", "name_gender");
-        showComboBoxListFromSQL(instrumentComboBox, getInstruments, instruments, "id_instrument", "name_instrument");
+        showComboBoxListFromSQL(instrumentComboBox, getInstruments, instruments, "id_instrument",
+                "name_instrument");
         showComboBoxListFromSQL(genreComboBox, getGenres, genres, "id_genre", "name_genre");
-        showComboBoxListFromSQL(ageComboBox, getAgeCategories, ageCategories, "id_age_category", "name_age_category");
+        showComboBoxListFromSQL(ageComboBox, getAgeCategories, ageCategories, "id_age_category",
+                "name_age_category");
 
         musicianComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
@@ -173,27 +179,27 @@ public class Musicians extends DatabaseUtils {
                 try {
                     resultTable.setEnabled(true);
                     // process query
-                    if (musicianComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(musicianComboBox.getSelectedItem(), "-")) {
                         getMusiciansInfo.setNull(1, OracleTypes.INTEGER);
                     } else {
                         getMusiciansInfo.setInt(1, musicians.get((musicianComboBox.getSelectedItem())));
                     }
-                    if (genderComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(genderComboBox.getSelectedItem(), "-")) {
                         getMusiciansInfo.setNull(2, OracleTypes.INTEGER);
                     } else {
                         getMusiciansInfo.setInt(2, genders.get(genderComboBox.getSelectedItem()));
                     }
-                    if (ageFrom.getText().isEmpty()) {
+                    if (ageFromTextField.getText().isEmpty()) {
                         getMusiciansInfo.setNull(3, OracleTypes.INTEGER);
                     } else {
-                        getMusiciansInfo.setInt(3, Integer.parseInt(ageFrom.getText()));
+                        getMusiciansInfo.setInt(3, Integer.parseInt(ageFromTextField.getText()));
                     }
-                    if (ageTo.getText().isEmpty()) {
+                    if (ageToTextField.getText().isEmpty()) {
                         getMusiciansInfo.setNull(4, OracleTypes.INTEGER);
                     } else {
-                        getMusiciansInfo.setInt(4, Integer.parseInt(ageTo.getText()));
+                        getMusiciansInfo.setInt(4, Integer.parseInt(ageToTextField.getText()));
                     }
-                    if (instrumentComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(instrumentComboBox.getSelectedItem(), "-")) {
                         getMusiciansInfo.setNull(5, OracleTypes.INTEGER);
                     } else {
                         getMusiciansInfo.setInt(5, instruments.get(instrumentComboBox.getSelectedItem()));
@@ -203,10 +209,11 @@ public class Musicians extends DatabaseUtils {
                     // get results
                     ResultSet results = (ResultSet) getMusiciansInfo.getObject(6);
                     fillTableFromResultSet(resultTable, 2, musiciansInfo, results);
-                    status.setText("Статус: Успех. Возвращено " + resultTable.getRowCount() + " записей.");
+                    results.close();
+                    setSuccessMessage(status, resultTable.getRowCount());
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    status.setText("Статус: запрос не выполнен.");
+                    setFailMessage(status);
                 }
             }
         });
@@ -216,11 +223,11 @@ public class Musicians extends DatabaseUtils {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 try {
-                    if (resultTable.getSelectedRows().length == 0) {
+                    if (resultTable.getSelectedRow() == -1) {
                         return;
                     }
                     DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
-                    int selectedRow = resultTable.getSelectedRows()[0];
+                    int selectedRow = resultTable.getSelectedRow();
 
                     instrumentComboBox.setSelectedItem(model.getValueAt(selectedRow, 10));
 
@@ -234,29 +241,30 @@ public class Musicians extends DatabaseUtils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (resultTable.getSelectedRows().length == 0) {
-                        JOptionPane.showMessageDialog(mainPanel, "Выбирете запись для редактирования!",
-                                "Ошибка редактирования", JOptionPane.ERROR_MESSAGE);
+                    if (resultTable.getSelectedRow() == -1) {
+                        JOptionPane.showMessageDialog(mainPanel, "Выберите запись для редактирования!",
+                                "Ошибка редактирования!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    int selectedRow = resultTable.getSelectedRows()[0];
-                    int instrument = instruments.get(instrumentComboBox.getSelectedItem());
+                    int selectedRow = resultTable.getSelectedRow();
+                    int instrument = 0;
+                    if (!Objects.equals(instrumentComboBox.getSelectedItem(), "-")) {
+                        instrument = instruments.get(instrumentComboBox.getSelectedItem());
+                    }
                     if (instrument == 0) {
                         JOptionPane.showMessageDialog(mainPanel, "Не все поля заполнены!",
-                                "Ошибка редактирования", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка редактирования!", JOptionPane.ERROR_MESSAGE);
                     } else {
                         updateMusician.setInt(1, musiciansInfo.get(selectedRow));
                         updateMusician.setInt(2, instrument);
                         updateMusician.execute();
 
                         updateResultTable();
-                        status.setText("Статус: запись обновлена успешно!");
                     }
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка редактирования", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка редактирования!", JOptionPane.ERROR_MESSAGE);
                     exception.printStackTrace();
-                    status.setText("Статус: ошибка обновления записи!");
                 }
             }
         });
@@ -264,31 +272,33 @@ public class Musicians extends DatabaseUtils {
         queryButton2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (resultTable.getSelectedRows().length == 0) {
-                    JOptionPane.showMessageDialog(mainPanel, "Выберите постановщика!",
+                if (resultTable.getSelectedRow() == -1) {
+                    JOptionPane.showMessageDialog(mainPanel, "Выберите музыканта!",
                             "Ошибка запроса", JOptionPane.ERROR_MESSAGE);
-                    status.setText("Статус: запрос не выполнен.");
+                    setFailMessage(status);
                     return;
                 }
-                int selectedRow = resultTable.getSelectedRows()[0];
+                int selectedRow = resultTable.getSelectedRow();
                 resultTable.setEnabled(false);
                 try {
-                    if (periodFrom.getText().isEmpty()) {
+                    if (periodFromTextField.getText().isEmpty()) {
                         getShowInfo.setNull(1, OracleTypes.DATE);
                     } else {
-                        getShowInfo.setDate(1, new java.sql.Date(dateFormat.parse(periodFrom.getText()).getTime()));
+                        getShowInfo.setDate(1,
+                                new java.sql.Date(dateFormat.parse(periodFromTextField.getText()).getTime()));
                     }
-                    if (periodTo.getText().isEmpty()) {
+                    if (periodToTextField.getText().isEmpty()) {
                         getShowInfo.setNull(2, OracleTypes.DATE);
                     } else {
-                        getShowInfo.setDate(2, new java.sql.Date(dateFormat.parse(periodTo.getText()).getTime()));
+                        getShowInfo.setDate(2,
+                                new java.sql.Date(dateFormat.parse(periodToTextField.getText()).getTime()));
                     }
-                    if (genreComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(genreComboBox.getSelectedItem(), "-")) {
                         getShowInfo.setNull(3, OracleTypes.INTEGER);
                     } else {
                         getShowInfo.setInt(3, genres.get(genreComboBox.getSelectedItem()));
                     }
-                    if (ageComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(ageComboBox.getSelectedItem(), "-")) {
                         getShowInfo.setNull(4, OracleTypes.INTEGER);
                     } else {
                         getShowInfo.setInt(4, ageCategories.get(ageComboBox.getSelectedItem()));
@@ -298,10 +308,11 @@ public class Musicians extends DatabaseUtils {
 
                     ResultSet results = (ResultSet) getShowInfo.getObject(6);
                     fillTableFromResultSet(resultTable, 2, null, results);
-                    status.setText("Статус: Успех. Возвращено " + resultTable.getRowCount() + " записей.");
+                    results.close();
+                    setSuccessMessage(status, resultTable.getRowCount());
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    status.setText("Статус: запрос не выполнен.");
+                    setFailMessage(status);
                 }
             }
         });
@@ -313,10 +324,10 @@ public class Musicians extends DatabaseUtils {
     }
 
     private void createUIComponents() {
-        ageTo = new JFormattedTextField(numberFormat);
-        ageFrom = new JFormattedTextField(numberFormat);
-        periodTo = new JFormattedTextField(dateFormat);
-        periodFrom = new JFormattedTextField(dateFormat);
+        ageToTextField = new JFormattedTextField(numberFormat);
+        ageFromTextField = new JFormattedTextField(numberFormat);
+        periodToTextField = new JFormattedTextField(dateFormat);
+        periodFromTextField = new JFormattedTextField(dateFormat);
     }
 
     private void updateResultTable() {

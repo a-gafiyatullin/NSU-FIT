@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Authors extends DatabaseUtils {
     private final Map<String, Integer> genres = new HashMap<>();
@@ -27,8 +28,9 @@ public class Authors extends DatabaseUtils {
     private final CallableStatement saveAuthor;
     private final CallableStatement deleteAuthor;
     private final CallableStatement getAuthorShows;
+
     private JTable resultTable;
-    private JFormattedTextField centuryTo;
+    private JFormattedTextField centuryToTextField;
     private JButton queryButton;
     private JButton saveButton;
     private JButton deleteButton;
@@ -36,17 +38,19 @@ public class Authors extends DatabaseUtils {
     private JTextField surnameTextField;
     private JTextField middleNameTextField;
     private JComboBox countryComboBox;
-    private JFormattedTextField century;
-    private JFormattedTextField dateFrom;
-    private JFormattedTextField dateTo;
+    private JFormattedTextField centuryTextField;
+    private JFormattedTextField dateFromTextField;
+    private JFormattedTextField dateToTextField;
     private JComboBox genreComboBox;
     private JButton queryButton2;
     private JPanel mainPanel;
     private JButton addButton;
     private JLabel status;
-    private JFormattedTextField centuryFrom;
+    private JFormattedTextField centuryFromTextField;
 
     public Authors(final Connection connection, String role) throws Exception {
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
         if (!role.equals("headmaster")) {
             saveButton.setVisible(false);
             addButton.setVisible(false);
@@ -80,8 +84,7 @@ public class Authors extends DatabaseUtils {
         getAuthorShows = connection.prepareCall("{call author_shows(?, ?, ?, ?, ?)}");
         getAuthorShows.registerOutParameter(5, OracleTypes.CURSOR);
 
-        showComboBoxListFromSQL(countryComboBox, getCountries, countries, "id_country",
-                "name_country");
+        showComboBoxListFromSQL(countryComboBox, getCountries, countries, "id_country", "name_country");
         showComboBoxListFromSQL(genreComboBox, getGenres, genres, "id_genre", "name_genre");
 
         genreComboBox.addPopupMenuListener(new PopupMenuListener() {
@@ -136,17 +139,17 @@ public class Authors extends DatabaseUtils {
                     } else {
                         getAuthorsInfo.setString(3, middleNameTextField.getText());
                     }
-                    if (centuryFrom.getText().isEmpty()) {
+                    if (centuryFromTextField.getText().isEmpty()) {
                         getAuthorsInfo.setNull(4, OracleTypes.INTEGER);
                     } else {
-                        getAuthorsInfo.setInt(4, Integer.parseInt(centuryFrom.getText()));
+                        getAuthorsInfo.setInt(4, Integer.parseInt(centuryFromTextField.getText()));
                     }
-                    if (centuryTo.getText().isEmpty()) {
+                    if (centuryToTextField.getText().isEmpty()) {
                         getAuthorsInfo.setNull(5, OracleTypes.INTEGER);
                     } else {
-                        getAuthorsInfo.setInt(5, Integer.parseInt(centuryTo.getText()));
+                        getAuthorsInfo.setInt(5, Integer.parseInt(centuryToTextField.getText()));
                     }
-                    if (countryComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(countryComboBox.getSelectedItem(), "-")) {
                         getAuthorsInfo.setNull(6, OracleTypes.INTEGER);
                     } else {
                         getAuthorsInfo.setInt(6, countries.get(countryComboBox.getSelectedItem()));
@@ -156,10 +159,11 @@ public class Authors extends DatabaseUtils {
                     // get results
                     ResultSet results = (ResultSet) getAuthorsInfo.getObject(7);
                     fillTableFromResultSet(resultTable, 2, authors, results);
-                    status.setText("Статус: Успех. Возвращено " + resultTable.getRowCount() + " записей.");
+                    results.close();
+                    setSuccessMessage(status, resultTable.getRowCount());
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    status.setText("Статус: запрос не выполнен.");
+                    setFailMessage(status);
                 }
             }
         });
@@ -169,16 +173,16 @@ public class Authors extends DatabaseUtils {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 try {
-                    if (resultTable.getSelectedRows().length == 0) {
+                    if (resultTable.getSelectedRow() == -1) {
                         return;
                     }
                     DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
-                    int selectedRow = resultTable.getSelectedRows()[0];
+                    int selectedRow = resultTable.getSelectedRow();
 
                     nameTextField.setText((String) model.getValueAt(selectedRow, 0));
                     surnameTextField.setText((String) model.getValueAt(selectedRow, 1));
                     middleNameTextField.setText((String) model.getValueAt(selectedRow, 2));
-                    century.setText((String) model.getValueAt(selectedRow, 3));
+                    centuryTextField.setText((String) model.getValueAt(selectedRow, 3));
                     countryComboBox.setSelectedItem(model.getValueAt(selectedRow, 4));
 
                 } catch (Exception exception) {
@@ -203,12 +207,16 @@ public class Authors extends DatabaseUtils {
                     if (!middleNameTextField.getText().isEmpty()) {
                         middle_name = middleNameTextField.getText();
                     }
-                    int country = countries.get(countryComboBox.getSelectedItem());
-                    String century_str = century.getText();
+                    int country = 0;
+                    if (!Objects.equals(countryComboBox.getSelectedItem(), "-")) {
+                        country = countries.get(countryComboBox.getSelectedItem());
+                    }
+                    String century_str = centuryTextField.getText();
+
                     if (name == null || name.isEmpty() || country == 0 || century_str == null
                             || century_str.isEmpty()) {
                         JOptionPane.showMessageDialog(mainPanel, "Не все поля заполнены!",
-                                "Ошибка добавления", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                     } else {
                         addAuthor.setString(1, name);
                         addAuthor.setString(2, surname);
@@ -218,13 +226,11 @@ public class Authors extends DatabaseUtils {
                         addAuthor.execute();
 
                         updateResultTable();
-                        status.setText("Статус: запись добавлена успешно!");
                     }
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка добавления", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                     exception.printStackTrace();
-                    status.setText("Статус: ошибка добавления записи!");
                 }
             }
         });
@@ -233,9 +239,9 @@ public class Authors extends DatabaseUtils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (resultTable.getSelectedRows().length == 0) {
-                        JOptionPane.showMessageDialog(mainPanel, "Выбирете запись для редактирования!",
-                                "Ошибка редактирования", JOptionPane.ERROR_MESSAGE);
+                    if (resultTable.getSelectedRow() == -1) {
+                        JOptionPane.showMessageDialog(mainPanel, "Выберите запись для редактирования!",
+                                "Ошибка редактирования!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     String name = null;
@@ -251,12 +257,13 @@ public class Authors extends DatabaseUtils {
                         middle_name = middleNameTextField.getText();
                     }
                     int country = countries.get(countryComboBox.getSelectedItem());
-                    String century_str = century.getText();
-                    int selectedRow = resultTable.getSelectedRows()[0];
+                    String century_str = centuryTextField.getText();
+                    int selectedRow = resultTable.getSelectedRow();
+
                     if (name == null || name.equals("") || country == 0 || century_str == null
                             || century_str.isEmpty()) {
                         JOptionPane.showMessageDialog(mainPanel, "Не все поля заполнены!",
-                                "Ошибка редактирования", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка редактирования!", JOptionPane.ERROR_MESSAGE);
                     } else {
                         saveAuthor.setString(1, name);
                         saveAuthor.setString(2, surname);
@@ -267,13 +274,11 @@ public class Authors extends DatabaseUtils {
                         saveAuthor.execute();
 
                         updateResultTable();
-                        status.setText("Статус: запись обновлена успешно!");
                     }
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка редактирования", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка редактирования!", JOptionPane.ERROR_MESSAGE);
                     exception.printStackTrace();
-                    status.setText("Статус: ошибка обновления записи!");
                 }
             }
         });
@@ -282,23 +287,21 @@ public class Authors extends DatabaseUtils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (resultTable.getSelectedRows().length == 0) {
-                        JOptionPane.showMessageDialog(mainPanel, "Выбирете запись для удаления!",
-                                "Ошибка удаления", JOptionPane.ERROR_MESSAGE);
+                    if (resultTable.getSelectedRow() == -1) {
+                        JOptionPane.showMessageDialog(mainPanel, "Выберите запись для удаления!",
+                                "Ошибка удаления!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    int selectedRow = resultTable.getSelectedRows()[0];
+                    int selectedRow = resultTable.getSelectedRow();
 
                     deleteAuthor.setInt(1, authors.get(selectedRow));
                     deleteAuthor.execute();
 
                     updateResultTable();
-                    status.setText("Статус: запись удалена успешно!");
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка удаления", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка удаления!", JOptionPane.ERROR_MESSAGE);
                     exception.printStackTrace();
-                    status.setText("Статус: ошибка удаления записи!");
                 }
             }
         });
@@ -308,23 +311,25 @@ public class Authors extends DatabaseUtils {
             public void actionPerformed(ActionEvent e) {
                 try {
                     // process query
-                    if (dateFrom.getText().isEmpty()) {
+                    if (dateFromTextField.getText().isEmpty()) {
                         getAuthorShows.setNull(1, OracleTypes.VARCHAR);
                     } else {
-                        getAuthorShows.setDate(1, new java.sql.Date(dateFormat.parse(dateFrom.getText()).getTime()));
+                        getAuthorShows.setDate(1,
+                                new java.sql.Date(dateFormat.parse(dateFromTextField.getText()).getTime()));
                     }
-                    if (dateTo.getText().isEmpty()) {
+                    if (dateToTextField.getText().isEmpty()) {
                         getAuthorShows.setNull(2, OracleTypes.VARCHAR);
                     } else {
-                        getAuthorShows.setDate(2, new java.sql.Date(dateFormat.parse(dateTo.getText()).getTime()));
+                        getAuthorShows.setDate(2,
+                                new java.sql.Date(dateFormat.parse(dateToTextField.getText()).getTime()));
                     }
-                    if (genreComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(genreComboBox.getSelectedItem(), "-")) {
                         getAuthorShows.setNull(3, OracleTypes.INTEGER);
                     } else {
                         getAuthorShows.setInt(3, genres.get(genreComboBox.getSelectedItem()));
                     }
-                    if (resultTable.getSelectedRows().length != 0) {
-                        getAuthorShows.setInt(4, authors.get(resultTable.getSelectedRows()[0]));
+                    if (resultTable.getSelectedRow() != -1) {
+                        getAuthorShows.setInt(4, authors.get(resultTable.getSelectedRow()));
                     } else {
                         getAuthorShows.setNull(4, OracleTypes.INTEGER);
                     }
@@ -333,12 +338,12 @@ public class Authors extends DatabaseUtils {
                     // get results
                     ResultSet results = (ResultSet) getAuthorShows.getObject(5);
                     fillTableFromResultSet(resultTable, 2, null, results);
-                    status.setText("Статус: Успех. Возвращено " + resultTable.getRowCount() + " записей.");
-
+                    results.close();
+                    setSuccessMessage(status, resultTable.getRowCount());
                     resultTable.setEnabled(false);
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    status.setText("Статус: запрос не выполнен.");
+                    setFailMessage(status);
                 }
             }
         });
@@ -354,15 +359,15 @@ public class Authors extends DatabaseUtils {
         surnameTextField.setText(null);
         middleNameTextField.setText(null);
         countryComboBox.setSelectedItem("-");
-        century.setText(null);
+        centuryTextField.setText(null);
         queryButton.doClick();
     }
 
     private void createUIComponents() {
-        centuryFrom = new JFormattedTextField(numberFormat);
-        centuryTo = new JFormattedTextField(numberFormat);
-        century = new JFormattedTextField(numberFormat);
-        dateFrom = new JFormattedTextField(dateFormat);
-        dateTo = new JFormattedTextField(dateFormat);
+        centuryFromTextField = new JFormattedTextField(numberFormat);
+        centuryToTextField = new JFormattedTextField(numberFormat);
+        centuryTextField = new JFormattedTextField(numberFormat);
+        dateFromTextField = new JFormattedTextField(dateFormat);
+        dateToTextField = new JFormattedTextField(dateFormat);
     }
 }

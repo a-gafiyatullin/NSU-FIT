@@ -1,18 +1,18 @@
-CREATE OR REPLACE procedure show_info(from_date_show IN DATE,
-                                      to_date_show IN DATE,
-                                      first_time_show IN INT,
-                                      id_show IN INT,
-                                      status IN INT,
-                                      from_century_show IN INT,
-                                      to_century_show IN INT,
-                                      id_conductor IN INT,
-                                      id_production_designer IN INT,
-                                      id_director IN INT,
-                                      id_genre IN INT,
-                                      id_age_category IN INT,
-                                      id_author IN INT,
-                                      id_country IN INT,
-                                      show_cur OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure repertoire_info(from_date_show IN DATE,
+                                            to_date_show IN DATE,
+                                            first_time_show IN INT,
+                                            id_show IN "Show"."id_show"%TYPE,
+                                            status IN INT,
+                                            from_century_show IN INT,
+                                            to_century_show IN INT,
+                                            id_conductor IN "Show"."id_conductor"%TYPE,
+                                            id_production_designer IN "Show"."id_production_designer"%TYPE,
+                                            id_director IN "Show"."id_director"%TYPE,
+                                            id_genre IN "Show"."id_genre"%TYPE,
+                                            id_age_category IN "Show"."id_age_category"%TYPE,
+                                            id_author IN "Show"."id_author"%TYPE,
+                                            id_country IN "Author"."id_country"%TYPE,
+                                            show_cur OUT SYS_REFCURSOR)
     is
 begin
     open show_cur for
@@ -30,9 +30,11 @@ begin
                ("name_author" || ' ' || "surname_author" || ' ' || "middle_name_author") as "Автор",
                "name_genre"                                                              as "Жанр",
                "century_show"                                                            as "Век спектакля",
-               "premier_date_show"                                                       as "Дата премьеры"
+               "premier_date_show"                                                       as "Дата премьеры",
+               "name_age_category"                                                       as "Возраст"
         from (("Show" inner join "Author" using ("id_author"))
-                 inner join "Genre" using ("id_genre"))
+            inner join "Genre" using ("id_genre"))
+                 inner join "Age_category" using ("id_age_category")
         where "id_show" in (select "id_show"
                             from (("Repertoire" inner join "Show" using ("id_show"))
                                      inner join "Author" using ("id_author"))
@@ -55,12 +57,40 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure author_info(name_author IN VARCHAR2,
-                                        surname_author IN VARCHAR2,
-                                        middle_name_author IN VARCHAR2,
+CREATE OR REPLACE procedure show_info(id_show IN "Show"."id_show"%TYPE,
+                                      show_cur OUT SYS_REFCURSOR)
+    is
+begin
+    open show_cur for
+        select "id_show",
+               "name_show"                                                               as "Название",
+               (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
+                from "Employee"
+                where "id_employee" = "id_director")                                     as "Режиссер",
+               (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
+                from "Employee"
+                where "id_employee" = "id_conductor")                                    as "Диpижеp",
+               (select "name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee"
+                from "Employee"
+                where "id_employee" = "id_production_designer")                          as "Художник",
+               ("name_author" || ' ' || "surname_author" || ' ' || "middle_name_author") as "Автор",
+               "name_genre"                                                              as "Жанр",
+               "century_show"                                                            as "Век спектакля",
+               "premier_date_show"                                                       as "Дата премьеры",
+               "name_age_category"                                                       as "Возраст"
+        from (("Show" inner join "Author" using ("id_author"))
+            inner join "Genre" using ("id_genre"))
+                 inner join "Age_category" using ("id_age_category")
+        where "id_show" = id_show;
+end;
+/
+
+CREATE OR REPLACE procedure author_info(name_author IN "Author"."name_author"%TYPE,
+                                        surname_author IN "Author"."surname_author"%TYPE,
+                                        middle_name_author IN "Author"."middle_name_author"%TYPE,
                                         from_century_life IN INT,
                                         to_century_life IN INT,
-                                        id_country IN INT,
+                                        id_country IN "Author"."id_country"%TYPE,
                                         author_cur OUT SYS_REFCURSOR)
     is
 begin
@@ -154,31 +184,32 @@ begin
         where "id_show" in (select "id_show"
                             from (("Repertoire" inner join "Show" using ("id_show"))
                                      inner join "Author" using ("id_author"))
-                            where ("performance_date_repertoire" <= NVL(TO_DATE(to_date_show, 'yyyy/mm/dd'),
-                                                                        "performance_date_repertoire")
-                                and "performance_date_repertoire" >= NVL(TO_DATE(from_date_show, 'yyyy/mm/dd'),
-                                                                         "performance_date_repertoire")
+                            where ("performance_date_repertoire" <= NVL(to_date_show, "performance_date_repertoire")
+                                and "performance_date_repertoire" >= NVL(from_date_show, "performance_date_repertoire")
                                 and "id_genre" = NVL(id_genre, "id_genre")
                                 and "id_author" = NVL(id_author, "id_author"))
                             group by "id_show");
 end;
 /
 
-CREATE OR REPLACE procedure actor_role_in_show_info(id_show IN INT,
-                                                    list OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure actors_roles_in_show_info(id_show IN "Show"."id_show"%TYPE,
+                                                      list OUT SYS_REFCURSOR)
     is
 begin
     open list for
-        select ("name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee") as "Актер",
+        select "id_employee",
+               "id_role",
+               ("name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee") as "Актер",
                "name_role"                                                                     as "Роль",
-               "is_understudy_direction"                                                       as "Дублер?"
+               (select 'Нет' from dual where "is_understudy_direction" = 1)
+                   || (select 'Да' from dual where "is_understudy_direction" != 1)             as "Дублер"
         from ("Direction" inner join "Employee" on "id_actor" = "id_employee")
                  inner join "Role" using ("id_role")
         where "id_show" = id_show;
 end;
 /
 
-CREATE OR REPLACE procedure musicians_in_show_info(id_show IN INT,
+CREATE OR REPLACE procedure musicians_in_show_info(id_show IN "Show"."id_show"%TYPE,
                                                    list OUT SYS_REFCURSOR)
     is
 begin
@@ -347,7 +378,7 @@ begin
     SET "name_employee"            = NVL(name, "name_employee"),
         "surname_employee"         = NVL(surname, "surname_employee"),
         "middle_name_employee"     = NVL(middle_name, "middle_name_employee"),
-        "id_gender"                = id_gender,
+        "id_gender"                = NVL(id_gender, "id_gender"),
         "birthday_employee"        = NVL(birthday, "birthday_employee"),
         "hire_date_employee"       = NVL(hire_date, "hire_date_employee"),
         "children_amount_employee" = NVL(children_amount, "children_amount_employee"),
@@ -400,7 +431,7 @@ CREATE OR REPLACE procedure get_authors_list(list OUT SYS_REFCURSOR)
     is
 begin
     open list for
-        select "id_author", "name_author"
+        select "id_author", ("name_author" || ' ' || "surname_author" || ' ' || "middle_name_author") as "name_author"
         from "Author";
 end;
 /
@@ -860,18 +891,17 @@ CREATE OR REPLACE procedure get_job_types_list(list OUT SYS_REFCURSOR)
 begin
     open list for
         select "id_job_type", "name_job_type"
-        from "Job_types"
-        where "is_art_job_type" != 0;
+        from "Job_types";
 end;
 /
 
-CREATE OR REPLACE procedure tours_info(id_employee IN "Tour"."id_employee"%TYPE,
-                                       id_show IN "Tour"."id_show"%TYPE,
-                                       from_date IN "Tour"."from_date_tour"%TYPE,
-                                       to_date IN "Tour"."to_date_tour"%TYPE,
-                                       is_visiting_tour IN "Tour"."is_visiting_tour"%TYPE,
-                                       id_job_type IN "Employee"."id_job_type"%TYPE,
-                                       tour_cur OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure tour_info(id_employee IN "Tour"."id_employee"%TYPE,
+                                      id_show IN "Tour"."id_show"%TYPE,
+                                      from_date IN "Tour"."from_date_tour"%TYPE,
+                                      to_date IN "Tour"."to_date_tour"%TYPE,
+                                      is_visiting_tour IN "Tour"."is_visiting_tour"%TYPE,
+                                      id_job_type IN "Employee"."id_job_type"%TYPE,
+                                      tour_cur OUT SYS_REFCURSOR)
     is
 begin
     open tour_cur for
@@ -882,8 +912,8 @@ begin
                "name_show"                                                                     as "Спектакль",
                "from_date_tour"                                                                as "Дата начала",
                "to_date_tour"                                                                  as "Дата конца",
-               ((select 'выездные' from dual where "is_visiting_tour" != 0)
-                   || (select 'приездные' from dual where "is_visiting_tour" = 0))             as "Тип"
+               ((select 'Выездные' from dual where "is_visiting_tour" != 0)
+                   || (select 'Приездные' from dual where "is_visiting_tour" = 0))             as "Тип"
         from ((("Tour" inner join "Employee" using ("id_employee"))
             inner join "Job_types" using ("id_job_type")))
                  inner join "Show" using ("id_show")
@@ -896,11 +926,11 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure tours_insert(id_employee IN "Tour"."id_employee"%TYPE,
-                                         id_show IN "Tour"."id_show"%TYPE,
-                                         from_date IN "Tour"."from_date_tour"%TYPE,
-                                         to_date IN "Tour"."to_date_tour"%TYPE,
-                                         is_visiting_tour IN "Tour"."is_visiting_tour"%TYPE)
+CREATE OR REPLACE procedure tour_insert(id_employee IN "Tour"."id_employee"%TYPE,
+                                        id_show IN "Tour"."id_show"%TYPE,
+                                        from_date IN "Tour"."from_date_tour"%TYPE,
+                                        to_date IN "Tour"."to_date_tour"%TYPE,
+                                        is_visiting_tour IN "Tour"."is_visiting_tour"%TYPE)
     is
 begin
     INSERT INTO "Tour" VALUES (id_employee, id_show, from_date, to_date, is_visiting_tour);
@@ -909,10 +939,10 @@ begin
 end;
 /
 
-CREATE OR REPLACE procedure tours_delete(id_employee IN "Tour"."id_employee"%TYPE,
-                                         id_show IN "Tour"."id_show"%TYPE,
-                                         from_date IN "Tour"."from_date_tour"%TYPE,
-                                         to_date IN "Tour"."to_date_tour"%TYPE)
+CREATE OR REPLACE procedure tour_delete(id_employee IN "Tour"."id_employee"%TYPE,
+                                        id_show IN "Tour"."id_show"%TYPE,
+                                        from_date IN "Tour"."from_date_tour"%TYPE,
+                                        to_date IN "Tour"."to_date_tour"%TYPE)
     is
 begin
     DELETE
@@ -939,23 +969,23 @@ begin
       and "password" like password;
 exception
     when NO_DATA_FOUND then
-        raise_application_error(-20045, 'Нет такого логина или пароля!');
+        raise_application_error(-20044, 'Нет такого логина или пароля!');
 end;
 /
 
-CREATE OR REPLACE procedure get_tickets(from_date_show IN DATE,
-                                        to_date_show IN DATE,
-                                        id_show IN INT,
-                                        from_century_show IN INT,
-                                        to_century_show IN INT,
-                                        id_conductor IN INT,
-                                        id_production_designer IN INT,
-                                        id_director IN INT,
-                                        id_genre IN INT,
-                                        id_age_category IN INT,
-                                        id_author IN INT,
-                                        id_country IN INT,
-                                        tickets_cur OUT SYS_REFCURSOR)
+CREATE OR REPLACE procedure get_ticket(from_date_show IN DATE,
+                                       to_date_show IN DATE,
+                                       id_show IN "Show"."id_show"%TYPE,
+                                       from_century_show IN INT,
+                                       to_century_show IN INT,
+                                       id_conductor IN "Show"."id_conductor"%TYPE,
+                                       id_production_designer IN "Show"."id_production_designer"%TYPE,
+                                       id_director IN "Show"."id_director"%TYPE,
+                                       id_genre IN "Show"."id_genre"%TYPE,
+                                       id_age_category IN "Show"."id_age_category"%TYPE,
+                                       id_author IN "Show"."id_author"%TYPE,
+                                       id_country IN "Author"."id_country"%TYPE,
+                                       tickets_cur OUT SYS_REFCURSOR)
     is
 begin
     open tickets_cur for
@@ -997,9 +1027,9 @@ end;
 
 CREATE OR REPLACE procedure get_subscription(from_century_auth IN INT,
                                              to_century_auth IN INT,
-                                             id_genre IN INT,
-                                             id_author IN INT,
-                                             id_country IN INT,
+                                             id_genre IN "Show"."id_genre"%TYPE,
+                                             id_author IN "Show"."id_author"%TYPE,
+                                             id_country IN "Author"."id_country"%TYPE,
                                              subscription_cur OUT SYS_REFCURSOR)
     is
 begin
@@ -1077,7 +1107,7 @@ begin
     where "id_ticket" = id_ticket;
 
     if cnt != 0 then
-        raise_application_error(-20046, 'Этот билет можно купить только в абонементе!');
+        raise_application_error(-20045, 'Этот билет можно купить только в абонементе!');
     end if;
 
     select CURRENT_DATE into today_date from dual;
@@ -1112,7 +1142,7 @@ CREATE OR REPLACE procedure get_performances_date_by_show(id_show IN "Repertoire
     is
 begin
     open list for
-        select "id_performance", "performance_date_repertoire"
+        select "id_performance", "performance_date_repertoire" as "Дата"
         from "Repertoire"
         where "id_show" = id_show;
 end;
@@ -1170,16 +1200,16 @@ end;
 CREATE OR REPLACE procedure tickets_statistic(from_date IN DATE,
                                               to_date IN DATE,
                                               premier IN INT,
-                                              id_show IN INT,
+                                              id_show IN "Show"."id_show"%TYPE,
                                               from_century_show IN INT,
                                               to_century_show IN INT,
-                                              id_conductor IN INT,
-                                              id_production_designer IN INT,
-                                              id_director IN INT,
-                                              id_genre IN INT,
-                                              id_age_category IN INT,
-                                              id_author IN INT,
-                                              id_country IN INT,
+                                              id_conductor IN "Show"."id_conductor"%TYPE,
+                                              id_production_designer IN "Show"."id_production_designer"%TYPE,
+                                              id_director IN "Show"."id_director"%TYPE,
+                                              id_genre IN "Show"."id_age_category"%TYPE,
+                                              id_age_category IN "Show"."id_age_category"%TYPE,
+                                              id_author IN "Show"."id_author"%TYPE,
+                                              id_country IN "Author"."id_country"%TYPE,
                                               ticket_count OUT INT,
                                               money_amount OUT "Ticket"."cost_ticket"%TYPE)
     is
@@ -1212,3 +1242,293 @@ begin
         end loop;
 end;
 /
+
+CREATE OR REPLACE procedure show_delete(id_show IN "Show"."id_show"%TYPE)
+    is
+begin
+    DELETE FROM "Show" WHERE "id_show" = id_show;
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure show_insert(name IN "Show"."name_show"%TYPE,
+                                        century_show IN "Show"."century_show"%TYPE,
+                                        id_conductor IN "Show"."id_conductor"%TYPE,
+                                        id_production_designer IN "Show"."id_production_designer"%TYPE,
+                                        id_director IN "Show"."id_director"%TYPE,
+                                        id_genre IN "Show"."id_genre"%TYPE,
+                                        id_age_category IN "Show"."id_age_category"%TYPE,
+                                        id_author IN "Show"."id_author"%TYPE,
+                                        premier_date IN "Show"."premier_date_show"%TYPE)
+    is
+begin
+    INSERT INTO "Show"
+    VALUES (0, name, id_director, id_production_designer, id_conductor,
+            id_author, id_genre, id_age_category, century_show, premier_date);
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure show_update(id_show IN "Show"."id_show"%TYPE,
+                                        name IN "Show"."name_show"%TYPE,
+                                        century_show IN "Show"."century_show"%TYPE,
+                                        id_conductor IN "Show"."id_conductor"%TYPE,
+                                        id_production_designer IN "Show"."id_production_designer"%TYPE,
+                                        id_director IN "Show"."id_director"%TYPE,
+                                        id_genre IN "Show"."id_genre"%TYPE,
+                                        id_age_category IN "Show"."id_age_category"%TYPE,
+                                        id_author IN "Show"."id_author"%TYPE,
+                                        premier_date IN "Show"."premier_date_show"%TYPE)
+    is
+begin
+    UPDATE "Show"
+    SET "name_show"              = name,
+        "id_director"            = id_director,
+        "id_production_designer" = id_production_designer,
+        "id_conductor"           = id_conductor,
+        "id_author"              = id_author,
+        "id_genre"               = id_genre,
+        "id_age_category"        = id_age_category,
+        "century_show"           = century_show,
+        "premier_date_show"      = premier_date
+    WHERE "id_show" = id_show;
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE function is_musician_in_show(id_show IN "Show"."id_show"%TYPE,
+                                               id_musician IN "Musician-Show"."id_musician"%TYPE)
+    return VARCHAR2
+    is
+    cnt INT;
+begin
+    select count(*)
+    into cnt
+    from "Musician-Show"
+    where "id_musician" = id_musician
+      and "id_show" = id_show;
+
+    if cnt = 0 then
+        return 'Нет';
+    end if;
+
+    return 'Да';
+end;
+/
+
+CREATE OR REPLACE procedure get_all_musicians_for_show(id_show IN "Show"."id_show"%TYPE,
+                                                       id_instrument IN "Musical_instruments"."id_instrument"%TYPE,
+                                                       musicians_cur OUT SYS_REFCURSOR)
+    is
+begin
+    open musicians_cur for
+        select "id_employee",
+               ("name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee") as "Музыкант",
+               is_musician_in_show(id_show, "id_employee")                                     as "В этом спектакле",
+               "name_instrument"                                                               as "Инструмент"
+        from "Employee"
+                 inner join "Musician-Instrument" on "Employee"."id_employee" = "Musician-Instrument"."id_musician"
+                 inner join "Musical_instruments" using ("id_instrument")
+        where "id_instrument" = NVL(id_instrument, "id_instrument");
+end;
+/
+
+CREATE OR REPLACE procedure set_musician_for_show(id_show IN "Show"."id_show"%TYPE,
+                                                  id_employee IN "Musician-Show"."id_musician"%TYPE)
+    is
+begin
+    INSERT INTO "Musician-Show" VALUES (id_employee, id_show);
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure delete_musician_from_show(id_show IN "Show"."id_show"%TYPE,
+                                                      id_employee IN "Musician-Show"."id_musician"%TYPE)
+    is
+begin
+    DELETE FROM "Musician-Show" WHERE "id_musician" = id_employee and "id_show" = id_show;
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure get_roles_for_show(id_show IN "Show"."id_show"%TYPE,
+                                               list OUT SYS_REFCURSOR)
+    is
+begin
+    open list for
+        select "id_role", "name_role", "is_main_role"
+        from "Role"
+        where "id_show" = id_show;
+end;
+/
+
+CREATE OR REPLACE procedure get_role_characteristics(id_role IN "Role-Characteristic"."id_role"%TYPE,
+                                                     characteristics_cur OUT SYS_REFCURSOR)
+    is
+begin
+    open characteristics_cur for
+        select "id_characteristic", "type_characteristic" as "Тип", "value_role_characteristic" as "Значение"
+        from "Role-Characteristic"
+                 inner join "Characteristic" using ("id_characteristic")
+        where "id_role" = id_role;
+end;
+/
+
+CREATE OR REPLACE procedure role_info(id_role IN "Role-Characteristic"."id_role"%TYPE,
+                                      is_main_role OUT "Role"."is_main_role"%TYPE)
+    is
+begin
+    select "is_main_role"
+    into is_main_role
+    from "Role"
+    where "id_role" = id_role;
+end;
+/
+
+CREATE OR REPLACE procedure role_delete(id_role IN "Role"."id_role"%TYPE)
+    is
+begin
+    DELETE FROM "Role" WHERE "id_role" = id_role;
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure role_insert(name IN "Role"."name_role"%TYPE,
+                                        id_show IN "Role"."id_show"%TYPE,
+                                        is_main_role IN "Role"."is_main_role"%TYPE)
+    is
+begin
+    INSERT INTO "Role" VALUES (0, id_show, name, is_main_role);
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure role_update(id_role IN "Role"."id_role"%TYPE,
+                                        name IN "Role"."name_role"%TYPE,
+                                        is_main_role IN "Role"."is_main_role"%TYPE)
+    is
+begin
+    UPDATE "Role"
+    SET "name_role"    = name,
+        "is_main_role" = is_main_role
+    WHERE "id_role" = id_role;
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure role_characteristic_insert(id_role IN "Role-Characteristic"."id_role"%TYPE,
+                                                       id_characteristics IN "Role-Characteristic"."id_characteristic"%TYPE,
+                                                       value IN "Role-Characteristic"."value_role_characteristic"%TYPE)
+    is
+begin
+    INSERT INTO "Role-Characteristic" VALUES (id_characteristics, id_role, value);
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure role_characteristic_delete(id_role IN "Role-Characteristic"."id_role"%TYPE,
+                                                       id_characteristics IN "Role-Characteristic"."id_characteristic"%TYPE)
+    is
+begin
+    DELETE FROM "Role-Characteristic" WHERE "id_characteristic" = id_characteristics and "id_role" = id_role;
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE function is_actor_fit_into_the_role(id_role IN "Role-Characteristic"."id_role"%TYPE,
+                                                      id_actor IN "Direction"."id_actor"%TYPE)
+    return int
+    is
+    cursor role_characteristic is
+        select "id_characteristic"
+        from "Role-Characteristic"
+        where "id_role" = id_role;
+    cursor actor_characteristic is
+        select "id_characteristic"
+        from "Actor-Characteristic"
+        where "id_actor" = id_actor;
+    found boolean;
+begin
+    for role_ch in role_characteristic
+        loop
+            found := false;
+            for actor_ch in actor_characteristic
+                loop
+                    if role_ch."id_characteristic" = actor_ch."id_characteristic" then
+                        found := true;
+                        exit;
+                    end if;
+                end loop;
+            if not found then
+                return 0;
+            end if;
+        end loop;
+    return 1;
+end;
+/
+
+CREATE OR REPLACE procedure get_actors_for_role(id_role IN "Role-Characteristic"."id_role"%TYPE,
+                                                list OUT SYS_REFCURSOR)
+    is
+begin
+    open list for
+        select "id_employee",
+               ("name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee") as "Актер"
+        from "Employee"
+                 inner join "Job_types" using ("id_job_type")
+        where "name_job_type" like 'актер'
+          and is_actor_fit_into_the_role(id_role, "id_employee") = 1;
+end;
+/
+
+CREATE OR REPLACE procedure set_actor_to_role(id_role IN "Role-Characteristic"."id_role"%TYPE,
+                                              id_actor IN "Direction"."id_actor"%TYPE,
+                                              is_understudy IN "Direction"."is_understudy_direction"%TYPE)
+    is
+begin
+    INSERT INTO "Direction" VALUES (id_actor, id_role, is_understudy);
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure delete_actor_from_role(id_role IN "Role-Characteristic"."id_role"%TYPE,
+                                                   id_actor IN "Direction"."id_actor"%TYPE)
+    is
+begin
+    DELETE FROM "Direction" WHERE "id_actor" = id_actor and "id_role" = id_role;
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure performance_insert(id_show IN "Show"."id_show"%TYPE,
+                                               date_performance IN "Repertoire"."performance_date_repertoire"%TYPE)
+    is
+begin
+    INSERT INTO "Repertoire" VALUES (0, id_show, date_performance);
+
+    COMMIT;
+end;
+/
+
+CREATE OR REPLACE procedure performance_delete(id_performance IN "Repertoire"."id_performance"%TYPE)
+    is
+begin
+    DELETE FROM "Repertoire" WHERE "id_performance" = id_performance;
+
+    COMMIT;
+end;
+/
+
+

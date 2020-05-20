@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ShowsInfo extends DatabaseUtils {
     private final Map<String, Integer> shows = new HashMap<>();
@@ -33,32 +34,35 @@ public class ShowsInfo extends DatabaseUtils {
     private final CallableStatement getConductors;
     private final Map<String, Integer> productionDesigners = new HashMap<>();
     private final CallableStatement getProductionDesigners;
-    private final Map<Integer, Integer> showsInfo = new HashMap<>();
-    private final CallableStatement getShowInfo;
+    private final Map<Integer, Integer> repertoireInfo = new HashMap<>();
+    private final CallableStatement getRepertoireInfo;
     private final CallableStatement getShowActorInfo;
     private final CallableStatement getShowMusicianInfo;
+
     private JTable showTable;
-    private JFormattedTextField dateTo;
-    private JFormattedTextField dateFrom;
-    private JComboBox titles;
+    private JFormattedTextField dateToTextField;
+    private JFormattedTextField dateFromTextField;
+    private JComboBox titleComboBox;
     private JCheckBox firstTimeInCheckBox;
-    private JFormattedTextField centuryFrom;
-    private JFormattedTextField centuryTo;
-    private JComboBox conductorList;
+    private JFormattedTextField centuryFromTextField;
+    private JFormattedTextField centuryToTextField;
+    private JComboBox conductorComboBox;
     private JComboBox stateList;
-    private JComboBox ageList;
-    private JComboBox directorList;
-    private JComboBox countryList;
-    private JComboBox productionDesignerList;
-    private JComboBox authorList;
+    private JComboBox ageComboBox;
+    private JComboBox directorComboBox;
+    private JComboBox countryComboBox;
+    private JComboBox productionDesignerComboBox;
+    private JComboBox authorComboBox;
     private JButton queryButton;
-    private JComboBox genreList;
+    private JComboBox genreComboBox;
     private JPanel mainPanel;
     private JTable actorTable;
     private JTable musicianTable;
     private JLabel status;
 
     public ShowsInfo(final Connection connection) throws Exception {
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
         musicianTable.getTableHeader().setReorderingAllowed(false);
         musicianTable.setModel(new DefaultTableModel() {
 
@@ -108,29 +112,30 @@ public class ShowsInfo extends DatabaseUtils {
         getProductionDesigners = connection.prepareCall("{call get_designers_list(?)}");
         getProductionDesigners.registerOutParameter("list", OracleTypes.CURSOR);
 
-        getShowInfo = connection.prepareCall("{call show_info(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
-        getShowInfo.registerOutParameter(15, OracleTypes.CURSOR);
+        getRepertoireInfo = connection.prepareCall("{call repertoire_info(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
+        getRepertoireInfo.registerOutParameter(15, OracleTypes.CURSOR);
 
-        getShowActorInfo = connection.prepareCall("{call actor_role_in_show_info(?, ?)}");
+        getShowActorInfo = connection.prepareCall("{call actors_roles_in_show_info(?, ?)}");
         getShowActorInfo.registerOutParameter(2, OracleTypes.CURSOR);
 
         getShowMusicianInfo = connection.prepareCall("{call musicians_in_show_info(?, ?)}");
         getShowMusicianInfo.registerOutParameter(2, OracleTypes.CURSOR);
 
-        showComboBoxListFromSQL(titles, getShowTitles, shows, "id_show", "name_show");
-        showComboBoxListFromSQL(genreList, getGenres, genres, "id_genre", "name_genre");
-        showComboBoxListFromSQL(ageList, getAgeCategories, ageCategories, "id_age_category", "name_age_category");
-        showComboBoxListFromSQL(authorList, getAuthors, authors, "id_author", "name_author");
-        showComboBoxListFromSQL(countryList, getCountries, countries, "id_country",
-                "name_country");
-        showComboBoxListFromSQL(directorList, getDirectors, directors, "id_employee", "name");
-        showComboBoxListFromSQL(conductorList, getConductors, conductors, "id_employee", "name");
-        showComboBoxListFromSQL(productionDesignerList, getProductionDesigners, productionDesigners, "id_employee", "name");
+        showComboBoxListFromSQL(titleComboBox, getShowTitles, shows, "id_show", "name_show");
+        showComboBoxListFromSQL(genreComboBox, getGenres, genres, "id_genre", "name_genre");
+        showComboBoxListFromSQL(ageComboBox, getAgeCategories, ageCategories, "id_age_category",
+                "name_age_category");
+        showComboBoxListFromSQL(authorComboBox, getAuthors, authors, "id_author", "name_author");
+        showComboBoxListFromSQL(countryComboBox, getCountries, countries, "id_country", "name_country");
+        showComboBoxListFromSQL(directorComboBox, getDirectors, directors, "id_employee", "name");
+        showComboBoxListFromSQL(conductorComboBox, getConductors, conductors, "id_employee", "name");
+        showComboBoxListFromSQL(productionDesignerComboBox, getProductionDesigners, productionDesigners,
+                "id_employee", "name");
 
-        titles.addPopupMenuListener(new PopupMenuListener() {
+        titleComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(titles, getShowTitles, shows, "id_show", "name_show");
+                showComboBoxListFromSQL(titleComboBox, getShowTitles, shows, "id_show", "name_show");
             }
 
             @Override
@@ -142,10 +147,11 @@ public class ShowsInfo extends DatabaseUtils {
             }
         });
 
-        conductorList.addPopupMenuListener(new PopupMenuListener() {
+        conductorComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(conductorList, getConductors, conductors, "id_employee", "name");
+                showComboBoxListFromSQL(conductorComboBox, getConductors, conductors, "id_employee",
+                        "name");
             }
 
             @Override
@@ -157,10 +163,10 @@ public class ShowsInfo extends DatabaseUtils {
             }
         });
 
-        genreList.addPopupMenuListener(new PopupMenuListener() {
+        genreComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(genreList, getGenres, genres, "id_genre", "name_genre");
+                showComboBoxListFromSQL(genreComboBox, getGenres, genres, "id_genre", "name_genre");
             }
 
             @Override
@@ -172,10 +178,10 @@ public class ShowsInfo extends DatabaseUtils {
             }
         });
 
-        ageList.addPopupMenuListener(new PopupMenuListener() {
+        ageComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(ageList, getAgeCategories, ageCategories, "id_age_category",
+                showComboBoxListFromSQL(ageComboBox, getAgeCategories, ageCategories, "id_age_category",
                         "name_age_category");
             }
 
@@ -188,10 +194,10 @@ public class ShowsInfo extends DatabaseUtils {
             }
         });
 
-        directorList.addPopupMenuListener(new PopupMenuListener() {
+        directorComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(directorList, getDirectors, directors, "id_employee", "name");
+                showComboBoxListFromSQL(directorComboBox, getDirectors, directors, "id_employee", "name");
             }
 
             @Override
@@ -203,10 +209,10 @@ public class ShowsInfo extends DatabaseUtils {
             }
         });
 
-        productionDesignerList.addPopupMenuListener(new PopupMenuListener() {
+        productionDesignerComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(productionDesignerList, getProductionDesigners, productionDesigners,
+                showComboBoxListFromSQL(productionDesignerComboBox, getProductionDesigners, productionDesigners,
                         "id_employee", "name");
             }
 
@@ -219,11 +225,10 @@ public class ShowsInfo extends DatabaseUtils {
             }
         });
 
-        authorList.addPopupMenuListener(new PopupMenuListener() {
+        authorComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(authorList, getAuthors, authors, "id_author",
-                        "name_author");
+                showComboBoxListFromSQL(authorComboBox, getAuthors, authors, "id_author", "name_author");
             }
 
             @Override
@@ -235,10 +240,11 @@ public class ShowsInfo extends DatabaseUtils {
             }
         });
 
-        countryList.addPopupMenuListener(new PopupMenuListener() {
+        countryComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(countryList, getCountries, countries, "id_country", "name_country");
+                showComboBoxListFromSQL(countryComboBox, getCountries, countries, "id_country",
+                        "name_country");
             }
 
             @Override
@@ -255,76 +261,79 @@ public class ShowsInfo extends DatabaseUtils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (dateFrom.getText().isEmpty()) {
-                        getShowInfo.setNull(1, OracleTypes.DATE);
+                    if (dateFromTextField.getText().isEmpty()) {
+                        getRepertoireInfo.setNull(1, OracleTypes.DATE);
                     } else {
-                        getShowInfo.setDate(1, new java.sql.Date(dateFormat.parse(dateFrom.getText()).getTime()));
+                        getRepertoireInfo.setDate(1,
+                                new java.sql.Date(dateFormat.parse(dateFromTextField.getText()).getTime()));
                     }
-                    if (dateTo.getText().isEmpty()) {
-                        getShowInfo.setNull(2, OracleTypes.DATE);
+                    if (dateToTextField.getText().isEmpty()) {
+                        getRepertoireInfo.setNull(2, OracleTypes.DATE);
                     } else {
-                        getShowInfo.setDate(2, new java.sql.Date(dateFormat.parse(dateTo.getText()).getTime()));
+                        getRepertoireInfo.setDate(2,
+                                new java.sql.Date(dateFormat.parse(dateToTextField.getText()).getTime()));
                     }
-                    getShowInfo.setInt(3, firstTimeInCheckBox.isSelected() ? 1 : 0);
-                    if (titles.getSelectedItem().equals("-")) {
-                        getShowInfo.setNull(4, OracleTypes.INTEGER);
+                    getRepertoireInfo.setInt(3, firstTimeInCheckBox.isSelected() ? 1 : 0);
+                    if (Objects.equals(titleComboBox.getSelectedItem(), "-")) {
+                        getRepertoireInfo.setNull(4, OracleTypes.INTEGER);
                     } else {
-                        getShowInfo.setInt(4, shows.get(titles.getSelectedItem()));
+                        getRepertoireInfo.setInt(4, shows.get(titleComboBox.getSelectedItem()));
                     }
-                    getShowInfo.setInt(5, stateList.getSelectedIndex());
-                    if (centuryFrom.getText().isEmpty()) {
-                        getShowInfo.setNull(6, OracleTypes.INTEGER);
+                    getRepertoireInfo.setInt(5, stateList.getSelectedIndex());
+                    if (centuryFromTextField.getText().isEmpty()) {
+                        getRepertoireInfo.setNull(6, OracleTypes.INTEGER);
                     } else {
-                        getShowInfo.setInt(6, Integer.parseInt(centuryFrom.getText()));
+                        getRepertoireInfo.setInt(6, Integer.parseInt(centuryFromTextField.getText()));
                     }
-                    if (centuryTo.getText().isEmpty()) {
-                        getShowInfo.setNull(7, OracleTypes.INTEGER);
+                    if (centuryToTextField.getText().isEmpty()) {
+                        getRepertoireInfo.setNull(7, OracleTypes.INTEGER);
                     } else {
-                        getShowInfo.setInt(7, Integer.parseInt(centuryTo.getText()));
+                        getRepertoireInfo.setInt(7, Integer.parseInt(centuryToTextField.getText()));
                     }
-                    if (conductorList.getSelectedItem().equals("-")) {
-                        getShowInfo.setNull(8, OracleTypes.INTEGER);
+                    if (Objects.equals(conductorComboBox.getSelectedItem(), "-")) {
+                        getRepertoireInfo.setNull(8, OracleTypes.INTEGER);
                     } else {
-                        getShowInfo.setInt(8, conductors.get(conductorList.getSelectedItem()));
+                        getRepertoireInfo.setInt(8, conductors.get(conductorComboBox.getSelectedItem()));
                     }
-                    if (productionDesignerList.getSelectedItem().equals("-")) {
-                        getShowInfo.setNull(9, OracleTypes.INTEGER);
+                    if (Objects.equals(productionDesignerComboBox.getSelectedItem(), "-")) {
+                        getRepertoireInfo.setNull(9, OracleTypes.INTEGER);
                     } else {
-                        getShowInfo.setInt(9, productionDesigners.get(productionDesignerList.getSelectedItem()));
+                        getRepertoireInfo.setInt(9, productionDesigners.get(productionDesignerComboBox.getSelectedItem()));
                     }
-                    if (directorList.getSelectedItem().equals("-")) {
-                        getShowInfo.setNull(10, OracleTypes.INTEGER);
+                    if (Objects.equals(directorComboBox.getSelectedItem(), "-")) {
+                        getRepertoireInfo.setNull(10, OracleTypes.INTEGER);
                     } else {
-                        getShowInfo.setInt(10, directors.get(directorList.getSelectedItem()));
+                        getRepertoireInfo.setInt(10, directors.get(directorComboBox.getSelectedItem()));
                     }
-                    if (genreList.getSelectedItem().equals("-")) {
-                        getShowInfo.setNull(11, OracleTypes.INTEGER);
+                    if (Objects.equals(genreComboBox.getSelectedItem(), "-")) {
+                        getRepertoireInfo.setNull(11, OracleTypes.INTEGER);
                     } else {
-                        getShowInfo.setInt(11, genres.get(genreList.getSelectedItem()));
+                        getRepertoireInfo.setInt(11, genres.get(genreComboBox.getSelectedItem()));
                     }
-                    if (ageList.getSelectedItem().equals("-")) {
-                        getShowInfo.setNull(12, OracleTypes.INTEGER);
+                    if (Objects.equals(ageComboBox.getSelectedItem(), "-")) {
+                        getRepertoireInfo.setNull(12, OracleTypes.INTEGER);
                     } else {
-                        getShowInfo.setInt(12, ageCategories.get(ageList.getSelectedItem()));
+                        getRepertoireInfo.setInt(12, ageCategories.get(ageComboBox.getSelectedItem()));
                     }
-                    if (authorList.getSelectedItem().equals("-")) {
-                        getShowInfo.setNull(13, OracleTypes.INTEGER);
+                    if (Objects.equals(authorComboBox.getSelectedItem(), "-")) {
+                        getRepertoireInfo.setNull(13, OracleTypes.INTEGER);
                     } else {
-                        getShowInfo.setInt(13, authors.get(authorList.getSelectedItem()));
+                        getRepertoireInfo.setInt(13, authors.get(authorComboBox.getSelectedItem()));
                     }
-                    if (countryList.getSelectedItem().equals("-")) {
-                        getShowInfo.setNull(14, OracleTypes.INTEGER);
+                    if (Objects.equals(countryComboBox.getSelectedItem(), "-")) {
+                        getRepertoireInfo.setNull(14, OracleTypes.INTEGER);
                     } else {
-                        getShowInfo.setInt(14, countries.get(countryList.getSelectedItem()));
+                        getRepertoireInfo.setInt(14, countries.get(countryComboBox.getSelectedItem()));
                     }
-                    getShowInfo.execute();
+                    getRepertoireInfo.execute();
 
-                    ResultSet results = (ResultSet) getShowInfo.getObject(15);
-                    fillTableFromResultSet(showTable, 2, showsInfo, results);
-                    status.setText("Статус: Успех. Возвращено " + showTable.getRowCount() + " записей.");
+                    ResultSet results = (ResultSet) getRepertoireInfo.getObject(15);
+                    fillTableFromResultSet(showTable, 2, repertoireInfo, results);
+                    results.close();
+                    setSuccessMessage(status, showTable.getRowCount());
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    status.setText("Статус: запрос не выполнен.");
+                    setFailMessage(status);
                 }
             }
         });
@@ -334,20 +343,22 @@ public class ShowsInfo extends DatabaseUtils {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 try {
-                    if (showTable.getSelectedRows().length == 0) {
+                    if (showTable.getSelectedRow() == -1) {
                         return;
                     }
-                    getShowActorInfo.setInt(1, showsInfo.get(showTable.getSelectedRows()[0]));
+                    getShowActorInfo.setInt(1, repertoireInfo.get(showTable.getSelectedRow()));
                     getShowActorInfo.execute();
 
                     ResultSet results = (ResultSet) getShowActorInfo.getObject(2);
                     fillTableFromResultSet(actorTable, 1, null, results);
+                    results.close();
 
-                    getShowMusicianInfo.setInt(1, showsInfo.get(showTable.getSelectedRows()[0]));
+                    getShowMusicianInfo.setInt(1, repertoireInfo.get(showTable.getSelectedRow()));
                     getShowMusicianInfo.execute();
 
                     results = (ResultSet) getShowMusicianInfo.getObject(2);
-                    fillTableFromResultSet(musicianTable, 1, null, results);
+                    fillTableFromResultSet(musicianTable, 3, null, results);
+                    results.close();
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
@@ -361,9 +372,9 @@ public class ShowsInfo extends DatabaseUtils {
     }
 
     private void createUIComponents() {
-        dateTo = new JFormattedTextField(dateFormat);
-        dateFrom = new JFormattedTextField(dateFormat);
-        centuryFrom = new JFormattedTextField(numberFormat);
-        centuryTo = new JFormattedTextField(numberFormat);
+        dateToTextField = new JFormattedTextField(dateFormat);
+        dateFromTextField = new JFormattedTextField(dateFormat);
+        centuryFromTextField = new JFormattedTextField(numberFormat);
+        centuryToTextField = new JFormattedTextField(numberFormat);
     }
 }

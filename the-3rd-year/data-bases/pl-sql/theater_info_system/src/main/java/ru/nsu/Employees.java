@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Employees extends DatabaseUtils {
     private final Map<String, Integer> genders = new HashMap<>();
@@ -28,6 +29,7 @@ public class Employees extends DatabaseUtils {
     private final CallableStatement addEmployee;
     private final CallableStatement updateEmployee;
     private final CallableStatement deleteEmployee;
+
     private JTable resultTable;
     private JTextField nameTextField;
     private JTextField surnameTextField;
@@ -57,6 +59,8 @@ public class Employees extends DatabaseUtils {
     private JLabel status;
 
     public Employees(final Connection connection) throws Exception {
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
         resultTable.getTableHeader().setReorderingAllowed(false);
         resultTable.setModel(new DefaultTableModel() {
 
@@ -75,7 +79,8 @@ public class Employees extends DatabaseUtils {
         getJobs = connection.prepareCall("{call get_job_types_list(?)}");
         getJobs.registerOutParameter("list", OracleTypes.CURSOR);
 
-        getEmployeesInfo = connection.prepareCall("{call employee_info(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
+        getEmployeesInfo
+                = connection.prepareCall("{call employee_info(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
         getEmployeesInfo.registerOutParameter(18, OracleTypes.CURSOR);
 
         addEmployee = connection.prepareCall("{call employee_insert(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
@@ -85,9 +90,9 @@ public class Employees extends DatabaseUtils {
         deleteEmployee = connection.prepareCall("{call employee_delete(?)}");
 
         showComboBoxListFromSQL(genderComboBox, getGenders, genders, "id_gender", "name_gender");
-        showComboBoxListFromSQL(educationComboBox, getEducation, educations, "id_education", "name_education");
-        showComboBoxListFromSQL(jobTypeComboBox, getJobs, jobs, "id_job_type",
-                "name_job_type");
+        showComboBoxListFromSQL(educationComboBox, getEducation, educations, "id_education",
+                "name_education");
+        showComboBoxListFromSQL(jobTypeComboBox, getJobs, jobs, "id_job_type", "name_job_type");
 
         genderComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
@@ -156,7 +161,7 @@ public class Employees extends DatabaseUtils {
                     } else {
                         getEmployeesInfo.setString(4, middleNameTextField.getText());
                     }
-                    if (genderComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(genderComboBox.getSelectedItem(), "-")) {
                         getEmployeesInfo.setNull(5, OracleTypes.INTEGER);
                     } else {
                         getEmployeesInfo.setInt(5, genders.get(genderComboBox.getSelectedItem()));
@@ -213,12 +218,12 @@ public class Employees extends DatabaseUtils {
                     } else {
                         getEmployeesInfo.setDouble(15, Double.parseDouble(salaryToTextField.getText()));
                     }
-                    if (educationComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(educationComboBox.getSelectedItem(), "-")) {
                         getEmployeesInfo.setNull(16, OracleTypes.INTEGER);
                     } else {
                         getEmployeesInfo.setInt(16, educations.get(educationComboBox.getSelectedItem()));
                     }
-                    if (jobTypeComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(jobTypeComboBox.getSelectedItem(), "-")) {
                         getEmployeesInfo.setNull(17, OracleTypes.INTEGER);
                     } else {
                         getEmployeesInfo.setInt(17, jobs.get(jobTypeComboBox.getSelectedItem()));
@@ -228,10 +233,11 @@ public class Employees extends DatabaseUtils {
                     // get results
                     ResultSet results = (ResultSet) getEmployeesInfo.getObject(18);
                     fillTableFromResultSet(resultTable, 2, employees, results);
-                    status.setText("Статус: Успех. Возвращено " + resultTable.getRowCount() + " записей.");
+                    results.close();
+                    setSuccessMessage(status, resultTable.getRowCount());
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    status.setText("Статус: запрос не выполнен.");
+                    setFailMessage(status);
                 }
             }
         });
@@ -241,11 +247,11 @@ public class Employees extends DatabaseUtils {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 try {
-                    if (resultTable.getSelectedRows().length == 0) {
+                    if (resultTable.getSelectedRow() == -1) {
                         return;
                     }
                     DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
-                    int selectedRow = resultTable.getSelectedRows()[0];
+                    int selectedRow = resultTable.getSelectedRow();
 
                     nameTextField.setText((String) model.getValueAt(selectedRow, 0));
                     surnameTextField.setText((String) model.getValueAt(selectedRow, 1));
@@ -282,7 +288,7 @@ public class Employees extends DatabaseUtils {
                             || children_amount.isEmpty() || salary.isEmpty()
                             || education == 0 || job == 0) {
                         JOptionPane.showMessageDialog(mainPanel, "Не все поля заполнены!",
-                                "Ошибка добавления", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                     } else {
 
                         addEmployee.setString(1, name);
@@ -298,13 +304,11 @@ public class Employees extends DatabaseUtils {
                         addEmployee.execute();
 
                         updateResultTable();
-                        status.setText("Статус: запись добавлена успешно!");
                     }
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка добавления", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                     exception.printStackTrace();
-                    status.setText("Статус: ошибка добавления записи!");
                 }
             }
         });
@@ -313,12 +317,12 @@ public class Employees extends DatabaseUtils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (resultTable.getSelectedRows().length == 0) {
-                        JOptionPane.showMessageDialog(mainPanel, "Выбирете запись для редактирования!",
-                                "Ошибка редактирования", JOptionPane.ERROR_MESSAGE);
+                    if (resultTable.getSelectedRow() == -1) {
+                        JOptionPane.showMessageDialog(mainPanel, "Выберите запись для редактирования!",
+                                "Ошибка редактирования!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    int selectedRow = resultTable.getSelectedRows()[0];
+                    int selectedRow = resultTable.getSelectedRow();
                     String name = nameTextField.getText();
                     String surname = surnameTextField.getText();
                     String middle_name = middleNameTextField.getText();
@@ -329,11 +333,12 @@ public class Employees extends DatabaseUtils {
                     String salary = salaryTextField.getText();
                     int education = educations.get(educationComboBox.getSelectedItem());
                     int job = jobs.get(jobTypeComboBox.getSelectedItem());
+
                     if (name.isEmpty() || gender == 0 || birthday.isEmpty() || hire_date.isEmpty()
                             || children_amount.isEmpty() || salary.isEmpty()
                             || education == 0 || job == 0) {
                         JOptionPane.showMessageDialog(mainPanel, "Не все поля заполнены!",
-                                "Ошибка редактирования", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка редактирования!", JOptionPane.ERROR_MESSAGE);
                     } else {
                         updateEmployee.setString(1, name);
                         updateEmployee.setString(2, surname);
@@ -349,13 +354,11 @@ public class Employees extends DatabaseUtils {
                         updateEmployee.execute();
 
                         updateResultTable();
-                        status.setText("Статус: запись обновлена успешно!");
                     }
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка редактирования", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка редактирования!", JOptionPane.ERROR_MESSAGE);
                     exception.printStackTrace();
-                    status.setText("Статус: ошибка обновления записи!");
                 }
             }
         });
@@ -364,23 +367,21 @@ public class Employees extends DatabaseUtils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (resultTable.getSelectedRows().length == 0) {
+                    if (resultTable.getSelectedRow() == -1) {
                         JOptionPane.showMessageDialog(mainPanel, "Выбирете запись для удаления!",
-                                "Ошибка удаления", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка удаления!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    int selectedRow = resultTable.getSelectedRows()[0];
+                    int selectedRow = resultTable.getSelectedRow();
 
                     deleteEmployee.setInt(1, employees.get(selectedRow));
                     deleteEmployee.execute();
 
                     updateResultTable();
-                    status.setText("Статус: запись удалена успешно!");
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка удаления", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка удаления!", JOptionPane.ERROR_MESSAGE);
                     exception.printStackTrace();
-                    status.setText("Статус: ошибка удаления записи!");
                 }
             }
         });

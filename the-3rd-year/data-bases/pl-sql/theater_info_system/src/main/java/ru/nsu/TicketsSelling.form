@@ -74,7 +74,7 @@
                   <text value="Название:"/>
                 </properties>
               </component>
-              <component id="ff124" class="javax.swing.JComboBox" binding="titles">
+              <component id="ff124" class="javax.swing.JComboBox" binding="titleComboBox">
                 <constraints>
                   <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -124,7 +124,7 @@
                   <text value="Дирижер-постановщик:"/>
                 </properties>
               </component>
-              <component id="f4ec8" class="javax.swing.JComboBox" binding="conductorList">
+              <component id="f4ec8" class="javax.swing.JComboBox" binding="conductorComboBox">
                 <constraints>
                   <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -134,7 +134,7 @@
                   </model>
                 </properties>
               </component>
-              <component id="a2063" class="javax.swing.JFormattedTextField" binding="centuryFrom" custom-create="true">
+              <component id="a2063" class="javax.swing.JFormattedTextField" binding="centuryFromTextField" custom-create="true">
                 <constraints>
                   <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -142,7 +142,7 @@
                 </constraints>
                 <properties/>
               </component>
-              <component id="42da7" class="javax.swing.JFormattedTextField" binding="dateFrom" custom-create="true">
+              <component id="42da7" class="javax.swing.JFormattedTextField" binding="dateFromTextField" custom-create="true">
                 <constraints>
                   <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -150,7 +150,7 @@
                 </constraints>
                 <properties/>
               </component>
-              <component id="8f379" class="javax.swing.JFormattedTextField" binding="dateTo" custom-create="true">
+              <component id="8f379" class="javax.swing.JFormattedTextField" binding="dateToTextField" custom-create="true">
                 <constraints>
                   <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -158,7 +158,7 @@
                 </constraints>
                 <properties/>
               </component>
-              <component id="2eabf" class="javax.swing.JFormattedTextField" binding="centuryTo" custom-create="true">
+              <component id="2eabf" class="javax.swing.JFormattedTextField" binding="centuryToTextField" custom-create="true">
                 <constraints>
                   <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -184,7 +184,7 @@
                   <text value="Жанр:"/>
                 </properties>
               </component>
-              <component id="43e70" class="javax.swing.JComboBox" binding="genreList">
+              <component id="43e70" class="javax.swing.JComboBox" binding="genreComboBox">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -202,7 +202,7 @@
                   <text value="Возраст:"/>
                 </properties>
               </component>
-              <component id="865ae" class="javax.swing.JComboBox" binding="ageList">
+              <component id="865ae" class="javax.swing.JComboBox" binding="ageComboBox">
                 <constraints>
                   <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -220,7 +220,7 @@
                   <text value="Режиссер-постановщик:"/>
                 </properties>
               </component>
-              <component id="ef6ed" class="javax.swing.JComboBox" binding="directorList">
+              <component id="ef6ed" class="javax.swing.JComboBox" binding="directorComboBox">
                 <constraints>
                   <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -238,7 +238,7 @@
                   <text value="Художник-постановщик:"/>
                 </properties>
               </component>
-              <component id="c089a" class="javax.swing.JComboBox" binding="productionDesignerList">
+              <component id="c089a" class="javax.swing.JComboBox" binding="productionDesignerComboBox">
                 <constraints>
                   <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -256,7 +256,7 @@
                   <text value="Автор:"/>
                 </properties>
               </component>
-              <component id="85ca9" class="javax.swing.JComboBox" binding="authorList">
+              <component id="85ca9" class="javax.swing.JComboBox" binding="authorComboBox">
                 <constraints>
                   <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -274,7 +274,7 @@
                   <text value="Страна автора:"/>
                 </properties>
               </component>
-              <component id="ffaea" class="javax.swing.JComboBox" binding="countryList">
+              <component id="ffaea" class="javax.swing.JComboBox" binding="countryComboBox">
                 <constraints>
                   <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>

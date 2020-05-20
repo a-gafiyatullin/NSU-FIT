@@ -25,7 +25,7 @@ begin
 end;
 /
 
-CREATE OR REPLACE trigger "BI_COMPETITION_ID_COMPETITON"
+CREATE OR REPLACE trigger "BI_COMPETITION_ID_COMPETITION"
     before insert
     on "Competition"
     for each row
@@ -120,7 +120,7 @@ CREATE OR REPLACE trigger "ACTOR-RANK-INSERT-UPDATE"
     on "Actor-Rank"
     for each row
 declare
-    birthday DATE;
+    birthday "Employee"."birthday_employee"%TYPE;
 begin
     select "birthday_employee"
     into birthday
@@ -137,41 +137,46 @@ CREATE OR REPLACE trigger "DIRECTION-INSERT"
     before insert on "Direction"
     for each row
 declare
-    actors_count INT;
-    role_row "Role"%ROWTYPE;
-    actor_roles INT;
-    main_actors_count INT;
-    today_date DATE;
+    actors_cnt      INT;
+    role_row        "Role"%ROWTYPE;
+    actor_roles     INT;
+    main_actors_cnt INT;
+    today_date      DATE;
     performance_cnt INT;
 begin
     select CURRENT_DATE into today_date from dual;
-    
-    select * into role_row
+
+    select *
+    into role_row
     from "Role"
     where "id_role" = :NEW."id_role";
-    
-    select count(*) into performance_cnt
+
+    select count(*)
+    into performance_cnt
     from "Repertoire"
     where "id_show" = role_row."id_show"
-        and "performance_date_repertoire" > today_date;
-        
+      and "performance_date_repertoire" > today_date;
+
     if performance_cnt != 0 then
         raise_application_error(-20001, 'Нельзя утверждать новые роли, пока не пройдут показы спектакля!');
     end if;
-    
-    select count(*) into actors_count
+
+    select count(*)
+    into actors_cnt
     from "Direction"
     where "id_role" = :NEW."id_role";
-  
-    if role_row."is_main_role" = 0 and actors_count = 1 then
+
+    if role_row."is_main_role" = 0 and actors_cnt = 1 then
         raise_application_error(-20002, 'Попытка назначения второго актера на не главную роль!');
-    elsif role_row."is_main_role" = 1 and actors_count = 2 then
+    elsif role_row."is_main_role" = 1 and actors_cnt = 2 then
         raise_application_error(-20003, 'Попытка назначения третьего актера на главную роль!');
-    elsif role_row."is_main_role" = 1 and actors_count = 1 then
-        select count(*) into main_actors_count
+    elsif role_row."is_main_role" = 1 and actors_cnt = 1 then
+        select count(*)
+        into main_actors_cnt
         from "Direction"
-        where "id_role" = :NEW."id_role" and "is_understudy_direction" = :NEW."is_understudy_direction";
-        if main_actors_count = 1 then
+        where "id_role" = :NEW."id_role"
+          and "is_understudy_direction" = :NEW."is_understudy_direction";
+        if main_actors_cnt = 1 then
             raise_application_error(-20004, 'Попытка назначения второго основного актера или дублера на главную роль!');
         end if;
     end if;
@@ -190,21 +195,23 @@ CREATE OR REPLACE trigger "DIRECTION-DELETE"
     before delete on "Direction"
     for each row
 declare
-    id_show INT;
+    id_show         "Show"."id_show"%TYPE;
     performance_cnt INT;
-    today_date DATE;
+    today_date      DATE;
 begin
     select CURRENT_DATE into today_date from dual;
 
-    select "id_show" into id_show
+    select "id_show"
+    into id_show
     from "Role"
     where "id_role" = :OLD."id_role";
-  
-    select count(*) into performance_cnt
+
+    select count(*)
+    into performance_cnt
     from "Repertoire"
     where "id_show" = id_show
-        and "performance_date_repertoire" > today_date;
-    
+      and "performance_date_repertoire" > today_date;
+
     if performance_cnt != 0 then
         raise_application_error(-20006, 'Нельзя удалять утвержденные роли, пока не пройдут показы спектакля!');
     end if;
@@ -216,10 +223,10 @@ CREATE OR REPLACE trigger "TOUR-INSERT"
     for each row
 declare
     today_date        DATE;
-    employee_job_type VARCHAR2(255);
-    counter_director  INT;
-    counter_musician  INT;
-    counter_actor     INT;
+    employee_job_type "Job_types"."name_job_type"%TYPE;
+    cnt_director      INT;
+    cnt_musician      INT;
+    cnt_actor         INT;
     cursor tour_cur
         is
         select *
@@ -241,35 +248,40 @@ begin
     if :NEW."to_date_tour" < :NEW."from_date_tour" or :NEW."from_date_tour" < today_date then
         raise_application_error(-20008, 'Дата начала гастролей позже даты конца или раньше сегодняшнего дня!');
     end if;
-    
-    select count(*) into counter_director
+
+    select count(*)
+    into cnt_director
     from "Show"
     where ("id_director" = :NEW."id_employee"
-            or "id_production_designer" = :NEW."id_employee"
-            or "id_conductor" = :NEW."id_employee")
-            and "id_show" = :NEW."id_show";
-    
-    select count(*) into counter_musician
+        or "id_production_designer" = :NEW."id_employee"
+        or "id_conductor" = :NEW."id_employee")
+      and "id_show" = :NEW."id_show";
+
+    select count(*)
+    into cnt_musician
     from "Musician-Show"
     where "id_musician" = :NEW."id_employee"
-            and "id_show" = :NEW."id_show";
-    
-    select count(*) into counter_actor
-    from ("Direction" inner join "Role" using("id_role"))
+      and "id_show" = :NEW."id_show";
+
+    select count(*)
+    into cnt_actor
+    from ("Direction"
+             inner join "Role" using ("id_role"))
     where "id_actor" = :NEW."id_employee"
-            and "id_show" = :NEW."id_show";
-        
-    if counter_actor + counter_director + counter_musician = 0 then
+      and "id_show" = :NEW."id_show";
+
+    if cnt_musician + cnt_actor + cnt_director = 0 then
         raise_application_error(-20009, 'Этот человек не участвует в этом спектакле!');
-    end if;    
-    
+    end if;
+
     for tour_rec in tour_cur
-    loop
-        if tour_rec."from_date_tour" <= :NEW."from_date_tour" and tour_rec."to_date_tour" >= :NEW."from_date_tour"
-            or tour_rec."from_date_tour" <= :NEW."to_date_tour" and tour_rec."to_date_tour" >= :NEW."to_date_tour" then
+        loop
+            if tour_rec."from_date_tour" <= :NEW."from_date_tour" and tour_rec."to_date_tour" >= :NEW."from_date_tour"
+                or
+               tour_rec."from_date_tour" <= :NEW."to_date_tour" and tour_rec."to_date_tour" >= :NEW."to_date_tour" then
                 raise_application_error(-20010, 'У этого сотрудника есть пересекающиеся гастроли!');
-        end if;
-    end loop;
+            end if;
+        end loop;
 end;
 /
 
@@ -277,11 +289,11 @@ CREATE OR REPLACE trigger "SHOW-INSERT-UPDATE"
     before insert or update on "Show"
     for each row
 declare
-    author_century INT;
-    today_date DATE;
+    author_century  "Author"."life_century_author"%TYPE;
+    today_date      DATE;
     performance_cnt INT;
     cursor repertoire_cur
-    is
+        is
         select *
         from "Repertoire"
         where "id_show" = :NEW."id_show";
@@ -390,42 +402,45 @@ CREATE OR REPLACE trigger "REPERTOIRE-INSERT"
     before insert on "Repertoire"
     for each row
 declare
-    premier_date DATE;
-    actors_count INT;
+    premier_date    "Show"."premier_date_show"%TYPE;
+    actors_cnt      INT;
     cursor show_roles is
         select "id_role", "is_main_role"
         from "Role"
         where "id_show" = :NEW."id_show";
-    performance_amount INT;
-                              
+    performance_cnt INT;
 begin
-    select "premier_date_show" into premier_date
+    select "premier_date_show"
+    into premier_date
     from "Show"
     where "id_show" = :NEW."id_show";
-  
+
     if :NEW."performance_date_repertoire" < premier_date then
         raise_application_error(-20019, 'Дата показа не может быть раньше даты премьеры!');
     end if;
-  
+
     for role_record in show_roles
-    loop
-        select count(*) into actors_count
-        from "Direction"
-        where "id_role" = role_record."id_role";
-    
-        if role_record."is_main_role" = 0 and actors_count < 1 or role_record."is_main_role" = 1 and actors_count < 2 then
-            raise_application_error(-20020, 'Актерский состав для данного спектакля сформирован не полностью!');
-        end if;
-    end loop;
-    
-    select count(*) into performance_amount
+        loop
+            select count(*)
+            into actors_cnt
+            from "Direction"
+            where "id_role" = role_record."id_role";
+
+            if role_record."is_main_role" = 0 and actors_cnt < 1 or
+               role_record."is_main_role" = 1 and actors_cnt < 2 then
+                raise_application_error(-20020, 'Актерский состав для данного спектакля сформирован не полностью!');
+            end if;
+        end loop;
+
+    select count(*)
+    into performance_cnt
     from "Repertoire"
     where "performance_date_repertoire" = :NEW."performance_date_repertoire";
-    
-    if performance_amount != 0 then
+
+    if performance_cnt != 0 then
         raise_application_error(-20021, 'На это время уже назначен спектакль!');
     end if;
-    
+
     select "REPERTOIRE_ID_PERFORMANCE_SEQ".nextval into :NEW."id_performance" from dual;
 end;
 /
@@ -434,13 +449,14 @@ CREATE OR REPLACE trigger "REPERTOIRE-DELETE"
     before delete on "Repertoire"
     for each row
 declare
-    tickets_amount INT;                      
+    tickets_cnt INT;
 begin
-    select count(*) into tickets_amount
+    select count(*)
+    into tickets_cnt
     from "Ticket"
     where "id_performance" = :OLD."id_performance";
-    
-    if tickets_amount != 0 then
+
+    if tickets_cnt != 0 then
         raise_application_error(-20022, 'На это выступление уже выпущены билеты!');
     end if;
 end;
@@ -450,15 +466,17 @@ CREATE OR REPLACE trigger "TICKET-INSERT"
     before insert on "Ticket"
     for each row
 declare
-    tickets_count INT;
+    tickets_cnt INT;
 begin
-    select count(*) into tickets_count
-    from "Ticket" 
-    where "id_performance" = :NEW."id_performance" and "seat_number_ticket" = :NEW."seat_number_ticket";
-    if tickets_count = 1 then
+    select count(*)
+    into tickets_cnt
+    from "Ticket"
+    where "id_performance" = :NEW."id_performance"
+      and "seat_number_ticket" = :NEW."seat_number_ticket";
+    if tickets_cnt = 1 then
         raise_application_error(-20023, 'Билет на это место для этого показа уже существует!');
     end if;
-    
+
     select "TICKET_ID_TICKET_SEQ".nextval into :NEW."id_ticket" from dual;
 end;
 /
@@ -466,31 +484,36 @@ end;
 CREATE OR REPLACE trigger "TICKET-SUBSCRIPTION-INSERT"
     before insert on "Ticket-Subscription"
     for each row
-declare 
-    tickets_count INT;
-    id_show INT;
-    id_show_author INT;
-    id_show_genre INT;
-    id_subscription_author INT;
-    id_subscription_genre INT;
+declare
+    tickets_cnt            INT;
+    id_show                "Show"."id_show"%TYPE;
+    id_show_author         "Author"."id_author"%TYPE;
+    id_show_genre          "Genre"."id_genre"%TYPE;
+    id_subscription_author "Author"."id_author"%TYPE;
+    id_subscription_genre  "Genre"."id_genre"%TYPE;
 begin
-    select count(*) into tickets_count
+    select count(*)
+    into tickets_cnt
     from "Ticket-Subscription"
     where "id_ticket" = :NEW."id_ticket";
-    
-    if tickets_count = 1 then
+
+    if tickets_cnt = 1 then
         raise_application_error(-20024, 'Этот билет уже добавлен в абонемент!');
     end if;
-    
-    select "id_show" into id_show
-    from ("Ticket" inner join "Repertoire" using("id_performance"))
+
+    select "id_show"
+    into id_show
+    from ("Ticket"
+             inner join "Repertoire" using ("id_performance"))
     where "id_ticket" = :NEW."id_ticket";
-    
-    select "id_author", "id_genre" into id_show_author, id_show_genre
+
+    select "id_author", "id_genre"
+    into id_show_author, id_show_genre
     from "Show"
     where "id_show" = id_show;
-    
-    select "id_author", "id_genre" into id_subscription_author, id_subscription_genre
+
+    select "id_author", "id_genre"
+    into id_subscription_author, id_subscription_genre
     from "Subscription"
     where "id_subscription" = :NEW."id_subscription";
     
@@ -516,18 +539,16 @@ CREATE OR REPLACE trigger "EMPLOYEE-INSERT-UPDATE"
 declare
     today_date DATE;
 begin
-    if updating or inserting then
-        if :NEW."hire_date_employee" < :NEW."birthday_employee" then
-            raise_application_error(-20027, 'Дата рождения сотрудника позже даты найма!');
-        end if;
-        
-        select CURRENT_DATE into today_date from dual;
-        
-        if :NEW."birthday_employee" > today_date then
-            raise_application_error(-20028, 'Дата рождения сотрудника позже сегоднящнего дня!');
-        end if;
+    if :NEW."hire_date_employee" < :NEW."birthday_employee" then
+        raise_application_error(-20026, 'Дата рождения сотрудника позже даты найма!');
     end if;
-    
+
+    select CURRENT_DATE into today_date from dual;
+
+    if :NEW."birthday_employee" > today_date then
+        raise_application_error(-20027, 'Дата рождения сотрудника позже сегоднящнего дня!');
+    end if;
+
     if inserting then
         select "EMPLOYEE_ID_EMPLOYEE_SEQ".nextval into :NEW."id_employee" from dual;
     end if;
@@ -538,26 +559,29 @@ CREATE OR REPLACE trigger "EMPLOYEE-DELETE"
     before delete on "Employee"
     for each row
 declare
-    counter_director INT;
-    counter_musician INT;
-    counter_actor INT;
+    cnt_director INT;
+    cnt_musician INT;
+    cnt_actor    INT;
 begin
-    select count(*) into counter_director
+    select count(*)
+    into cnt_director
     from "Show"
     where ("id_director" = :OLD."id_employee"
         or "id_production_designer" = :OLD."id_employee"
         or "id_conductor" = :OLD."id_employee");
-            
-    select count(*) into counter_musician
+
+    select count(*)
+    into cnt_musician
     from "Musician-Show"
     where "id_musician" = :OLD."id_employee";
-    
-    select count(*) into counter_actor
+
+    select count(*)
+    into cnt_actor
     from "Direction"
     where "id_actor" = :OLD."id_employee";
-        
-    if counter_actor + counter_director + counter_musician != 0 then
-        raise_application_error(-20029, 'Этот человек занят в спектаклях!');
+
+    if cnt_actor + cnt_director + cnt_musician != 0 then
+        raise_application_error(-20028, 'Этот человек занят в спектаклях!');
     end if;
 end;
 /
@@ -573,7 +597,7 @@ begin
     where "id_characteristic" = :OLD."id_characteristic";
     
     if cnt != 0 then
-        raise_application_error(-20030, 'Данная запись используется!');
+        raise_application_error(-20029, 'Данная запись используется!');
     end if;
     
     select count(*) into cnt
@@ -581,7 +605,7 @@ begin
     where "id_characteristic" = :OLD."id_characteristic";
     
     if cnt != 0 then
-        raise_application_error(-20031, 'Данная запись используется!');
+        raise_application_error(-20030, 'Данная запись используется!');
     end if;
 end;
 /
@@ -597,7 +621,7 @@ begin
     where "id_gender" = :OLD."id_gender";
     
     if cnt != 0 then
-        raise_application_error(-20032, 'Данная запись используется!');
+        raise_application_error(-20031, 'Данная запись используется!');
     end if;
 end;
 /
@@ -613,7 +637,7 @@ begin
     where "id_instrument" = :OLD."id_instrument";
     
     if cnt != 0 then
-        raise_application_error(-20033, 'Данная запись используется!');
+        raise_application_error(-20032, 'Данная запись используется!');
     end if;
 end;
 /
@@ -629,7 +653,7 @@ begin
     where "id_education" = :OLD."id_education";
     
     if cnt != 0 then
-        raise_application_error(-20034, 'Данная запись используется!');
+        raise_application_error(-20033, 'Данная запись используется!');
     end if;
 end;
 /
@@ -645,7 +669,7 @@ begin
     where "id_job_type" = :OLD."id_job_type";
     
     if cnt != 0 then
-        raise_application_error(-20035, 'Данная запись используется!');
+        raise_application_error(-20034, 'Данная запись используется!');
     end if;
 end;
 /
@@ -661,7 +685,7 @@ begin
     where "id_age_category" = :OLD."id_age_category";
     
     if cnt != 0 then
-        raise_application_error(-20036, 'Данная запись используется!');
+        raise_application_error(-20035, 'Данная запись используется!');
     end if;
 end;
 /
@@ -677,7 +701,7 @@ begin
     where "id_genre" = :OLD."id_genre";
     
     if cnt != 0 then
-        raise_application_error(-20037, 'Данная запись используется!');
+        raise_application_error(-20036, 'Данная запись используется!');
     end if;
 end;
 /
@@ -693,7 +717,7 @@ begin
     where "id_country" = :OLD."id_country";
     
     if cnt != 0 then
-        raise_application_error(-20038, 'Данная запись используется!');
+        raise_application_error(-20037, 'Данная запись используется!');
     end if;
 end;
 /
@@ -709,7 +733,7 @@ begin
     where "id_rank" = :OLD."id_rank";
     
     if cnt != 0 then
-        raise_application_error(-20039, 'Данная запись используется!');
+        raise_application_error(-20038, 'Данная запись используется!');
     end if;
 end;
 /
@@ -725,7 +749,7 @@ begin
     where "id_competition" = :OLD."id_competition";
     
     if cnt != 0 then
-        raise_application_error(-20040, 'Данная запись используется!');
+        raise_application_error(-20039, 'Данная запись используется!');
     end if;
 end;
 /
@@ -741,7 +765,7 @@ begin
     where "id_role" = :OLD."id_role";
     
     if cnt != 0 then
-        raise_application_error(-20041, 'Данная запись используется!');
+        raise_application_error(-20040, 'Данная запись используется!');
     end if;
 end;
 /
@@ -752,7 +776,7 @@ CREATE OR REPLACE trigger "ROLE-CHARACTER-INS-UPD-DEL"
     for each row
 declare
     cnt     INT;
-    id_role INT;
+    id_role "Role-Characteristic"."id_role"%TYPE;
 begin
     if inserting or updating then
         id_role := :NEW."id_role";
@@ -765,7 +789,7 @@ begin
     where "id_role" = id_role;
 
     if cnt != 0 then
-        raise_application_error(-20042, 'Данная запись используется!');
+        raise_application_error(-20041, 'Данная запись используется!');
     end if;
 end;
 /
@@ -781,7 +805,7 @@ begin
     where "id_author" = :OLD."id_author";
     
     if cnt != 0 then
-        raise_application_error(-20043, 'Данная запись используется!');
+        raise_application_error(-20042, 'Данная запись используется!');
     end if;
 end;
 /
@@ -799,7 +823,7 @@ begin
     for show_rec in show_cur
     loop
         if show_rec."century_show" < :NEW."life_century_author" then
-            raise_application_error(-20044, 'Век жизни автора не может быть позже времени постановки его спектаклей!');
+            raise_application_error(-20043, 'Век жизни автора не может быть позже времени постановки его спектаклей!');
         end if;
     end loop;
 end;

@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ActorsInfo extends DatabaseUtils {
     private final Map<String, Integer> actors = new HashMap<>();
@@ -30,8 +31,9 @@ public class ActorsInfo extends DatabaseUtils {
     private final CallableStatement getGenres;
     private final CallableStatement getActorRank;
     private final CallableStatement getActorRole;
+
     private JTable resultTable;
-    private JComboBox actorsComboBox;
+    private JComboBox actorComboBox;
     private JComboBox genderComboBox;
     private JFormattedTextField ageFromTextField;
     private JFormattedTextField ageToTextField;
@@ -48,6 +50,8 @@ public class ActorsInfo extends DatabaseUtils {
     private JLabel status;
 
     public ActorsInfo(final Connection connection) throws Exception {
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
         resultTable.getTableHeader().setReorderingAllowed(false);
         resultTable.setEnabled(false);
 
@@ -78,7 +82,7 @@ public class ActorsInfo extends DatabaseUtils {
         getActorRole = connection.prepareCall("{call actor_roles_info(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
         getActorRole.registerOutParameter(10, OracleTypes.CURSOR);
 
-        showComboBoxListFromSQL(actorsComboBox, getActors, actors, "id_employee", "name");
+        showComboBoxListFromSQL(actorComboBox, getActors, actors, "id_employee", "name");
         showComboBoxListFromSQL(genderComboBox, getGenders, genders, "id_gender", "name_gender");
         showComboBoxListFromSQL(rankComboBox, getRanks, ranks, "id_rank", "name_rank");
         showComboBoxListFromSQL(competitionComboBox, getCompetitions, competitions, "id_competition",
@@ -88,10 +92,10 @@ public class ActorsInfo extends DatabaseUtils {
                 "name_age_category");
         showComboBoxListFromSQL(directorComboBox, getDirectors, directors, "id_employee", "name");
 
-        actorsComboBox.addPopupMenuListener(new PopupMenuListener() {
+        actorComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(actorsComboBox, getActors, actors, "id_employee", "name");
+                showComboBoxListFromSQL(actorComboBox, getActors, actors, "id_employee", "name");
             }
 
             @Override
@@ -204,12 +208,12 @@ public class ActorsInfo extends DatabaseUtils {
             public void actionPerformed(ActionEvent e) {
                 try {
                     // process query
-                    if (actorsComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(actorComboBox.getSelectedItem(), "-")) {
                         getActorRank.setNull(1, OracleTypes.INTEGER);
                     } else {
-                        getActorRank.setInt(1, actors.get(actorsComboBox.getSelectedItem()));
+                        getActorRank.setInt(1, actors.get(actorComboBox.getSelectedItem()));
                     }
-                    if (genderComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(genderComboBox.getSelectedItem(), "-")) {
                         getActorRank.setNull(2, OracleTypes.INTEGER);
                     } else {
                         getActorRank.setInt(2, genders.get(genderComboBox.getSelectedItem()));
@@ -236,12 +240,12 @@ public class ActorsInfo extends DatabaseUtils {
                         getActorRank.setDate(6,
                                 new java.sql.Date(dateFormat.parse(periodToTextField.getText()).getTime()));
                     }
-                    if (rankComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(rankComboBox.getSelectedItem(), "-")) {
                         getActorRank.setNull(7, OracleTypes.INTEGER);
                     } else {
                         getActorRank.setInt(7, ranks.get(rankComboBox.getSelectedItem()));
                     }
-                    if (competitionComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(competitionComboBox.getSelectedItem(), "-")) {
                         getActorRank.setNull(8, OracleTypes.INTEGER);
                     } else {
                         getActorRank.setInt(8, competitions.get(competitionComboBox.getSelectedItem()));
@@ -251,10 +255,11 @@ public class ActorsInfo extends DatabaseUtils {
                     // get results
                     ResultSet results = (ResultSet) getActorRank.getObject(9);
                     fillTableFromResultSet(resultTable, 1, null, results);
-                    status.setText("Статус: Успех. Возвращено " + resultTable.getRowCount() + " записей.");
+                    results.close();
+                    setSuccessMessage(status, resultTable.getRowCount());
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    status.setText("Статус: запрос не выполнен.");
+                    setFailMessage(status);
                 }
             }
         });
@@ -264,12 +269,12 @@ public class ActorsInfo extends DatabaseUtils {
             public void actionPerformed(ActionEvent e) {
                 try {
                     // process query
-                    if (actorsComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(actorComboBox.getSelectedItem(), "-")) {
                         getActorRole.setNull(1, OracleTypes.INTEGER);
                     } else {
-                        getActorRole.setInt(1, actors.get(actorsComboBox.getSelectedItem()));
+                        getActorRole.setInt(1, actors.get(actorComboBox.getSelectedItem()));
                     }
-                    if (genderComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(genderComboBox.getSelectedItem(), "-")) {
                         getActorRole.setNull(2, OracleTypes.INTEGER);
                     } else {
                         getActorRole.setInt(2, genders.get(genderComboBox.getSelectedItem()));
@@ -296,17 +301,17 @@ public class ActorsInfo extends DatabaseUtils {
                         getActorRole.setDate(6,
                                 new java.sql.Date(dateFormat.parse(periodToTextField.getText()).getTime()));
                     }
-                    if (genreComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(genreComboBox.getSelectedItem(), "-")) {
                         getActorRole.setNull(7, OracleTypes.INTEGER);
                     } else {
                         getActorRole.setInt(7, genres.get(genreComboBox.getSelectedItem()));
                     }
-                    if (ageCategoryComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(ageCategoryComboBox.getSelectedItem(), "-")) {
                         getActorRole.setNull(8, OracleTypes.INTEGER);
                     } else {
                         getActorRole.setInt(8, ageCategories.get(ageCategoryComboBox.getSelectedItem()));
                     }
-                    if (directorComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(directorComboBox.getSelectedItem(), "-")) {
                         getActorRole.setNull(9, OracleTypes.INTEGER);
                     } else {
                         getActorRole.setInt(9, directors.get(directorComboBox.getSelectedItem()));
@@ -316,10 +321,11 @@ public class ActorsInfo extends DatabaseUtils {
                     // get results
                     ResultSet results = (ResultSet) getActorRole.getObject(10);
                     fillTableFromResultSet(resultTable, 1, null, results);
-                    status.setText("Статус: Успех. Возвращено " + resultTable.getRowCount() + " записей.");
+                    results.close();
+                    setSuccessMessage(status, resultTable.getRowCount());
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    status.setText("Статус: запрос не выполнен.");
+                    setFailMessage(status);
                 }
             }
         });

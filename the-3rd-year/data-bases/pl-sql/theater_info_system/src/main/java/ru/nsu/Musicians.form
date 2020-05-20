@@ -71,7 +71,7 @@
           <text value="Возраст: от:"/>
         </properties>
       </component>
-      <component id="71844" class="javax.swing.JFormattedTextField" binding="ageFrom" custom-create="true">
+      <component id="71844" class="javax.swing.JFormattedTextField" binding="ageFromTextField" custom-create="true">
         <constraints>
           <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
@@ -87,7 +87,7 @@
           <text value="до:"/>
         </properties>
       </component>
-      <component id="5baf8" class="javax.swing.JFormattedTextField" binding="ageTo" custom-create="true">
+      <component id="5baf8" class="javax.swing.JFormattedTextField" binding="ageToTextField" custom-create="true">
         <constraints>
           <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
@@ -168,7 +168,7 @@
               <text value="Период: от:"/>
             </properties>
           </component>
-          <component id="5c1a2" class="javax.swing.JFormattedTextField" binding="periodFrom" custom-create="true">
+          <component id="5c1a2" class="javax.swing.JFormattedTextField" binding="periodFromTextField" custom-create="true">
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -184,7 +184,7 @@
               <text value="до:"/>
             </properties>
           </component>
-          <component id="77fa9" class="javax.swing.JFormattedTextField" binding="periodTo" custom-create="true">
+          <component id="77fa9" class="javax.swing.JFormattedTextField" binding="periodToTextField" custom-create="true">
             <constraints>
               <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>

@@ -34,12 +34,12 @@ public class Authorization extends JFrame {
                 try {
                     if (loginTextField.getText().isEmpty()) {
                         JOptionPane.showMessageDialog(mainPanel, "Введите имя пользователя!",
-                                "Ошибка входа", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка входа!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     if (passwordTextField.getPassword().length == 0) {
                         JOptionPane.showMessageDialog(mainPanel, "Введите пароль!",
-                                "Ошибка входа", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка входа!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     loginQuery.setString(1, loginTextField.getText());
@@ -53,7 +53,7 @@ public class Authorization extends JFrame {
                 } catch (Exception exception) {
                     exception.printStackTrace();
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка входа", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка входа!", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -69,7 +69,7 @@ public class Authorization extends JFrame {
                 } catch (Exception exception) {
                     exception.printStackTrace();
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка входа", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка входа!", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

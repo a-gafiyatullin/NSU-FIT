@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class TicketsSelling extends DatabaseUtils {
     private final Map<String, Integer> shows = new HashMap<>();
@@ -41,21 +42,22 @@ public class TicketsSelling extends DatabaseUtils {
     private final CallableStatement subscriptionInfo;
     private final CallableStatement getTicketsInSubscription;
     private final CallableStatement sellSubscription;
+
     private JPanel mainPanel;
     private JTable subscriptionTable;
-    private JComboBox titles;
-    private JComboBox conductorList;
-    private JFormattedTextField centuryFrom;
-    private JFormattedTextField dateFrom;
-    private JFormattedTextField dateTo;
-    private JFormattedTextField centuryTo;
-    private JComboBox genreList;
-    private JComboBox ageList;
-    private JComboBox directorList;
-    private JComboBox productionDesignerList;
-    private JComboBox authorList;
+    private JComboBox titleComboBox;
+    private JComboBox conductorComboBox;
+    private JFormattedTextField centuryFromTextField;
+    private JFormattedTextField dateFromTextField;
+    private JFormattedTextField dateToTextField;
+    private JFormattedTextField centuryToTextField;
+    private JComboBox genreComboBox;
+    private JComboBox ageComboBox;
+    private JComboBox directorComboBox;
+    private JComboBox productionDesignerComboBox;
+    private JComboBox authorComboBox;
     private JButton ticketQuery;
-    private JComboBox countryList;
+    private JComboBox countryComboBox;
     private JTable ticketsTable;
     private JButton ticketSelling;
     private JButton subscriptionSelling;
@@ -64,6 +66,8 @@ public class TicketsSelling extends DatabaseUtils {
     private JLabel status;
 
     public TicketsSelling(final Connection connection) throws Exception {
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
         ticketsTable.getTableHeader().setReorderingAllowed(false);
         ticketsTable.setModel(new DefaultTableModel() {
 
@@ -120,20 +124,22 @@ public class TicketsSelling extends DatabaseUtils {
         sellTicket = connection.prepareCall("{call sell_ticket(?)}");
         sellSubscription = connection.prepareCall("{call sell_subscription(?)}");
 
-        showComboBoxListFromSQL(titles, getShowTitles, shows, "id_show", "name_show");
-        showComboBoxListFromSQL(genreList, getGenres, genres, "id_genre", "name_genre");
-        showComboBoxListFromSQL(ageList, getAgeCategories, ageCategories, "id_age_category", "name_age_category");
-        showComboBoxListFromSQL(authorList, getAuthors, authors, "id_author", "name_author");
-        showComboBoxListFromSQL(countryList, getCountries, countries, "id_country",
+        showComboBoxListFromSQL(titleComboBox, getShowTitles, shows, "id_show", "name_show");
+        showComboBoxListFromSQL(genreComboBox, getGenres, genres, "id_genre", "name_genre");
+        showComboBoxListFromSQL(ageComboBox, getAgeCategories, ageCategories, "id_age_category",
+                "name_age_category");
+        showComboBoxListFromSQL(authorComboBox, getAuthors, authors, "id_author", "name_author");
+        showComboBoxListFromSQL(countryComboBox, getCountries, countries, "id_country",
                 "name_country");
-        showComboBoxListFromSQL(directorList, getDirectors, directors, "id_employee", "name");
-        showComboBoxListFromSQL(conductorList, getConductors, conductors, "id_employee", "name");
-        showComboBoxListFromSQL(productionDesignerList, getProductionDesigners, productionDesigners, "id_employee", "name");
+        showComboBoxListFromSQL(directorComboBox, getDirectors, directors, "id_employee", "name");
+        showComboBoxListFromSQL(conductorComboBox, getConductors, conductors, "id_employee", "name");
+        showComboBoxListFromSQL(productionDesignerComboBox, getProductionDesigners, productionDesigners,
+                "id_employee", "name");
 
-        titles.addPopupMenuListener(new PopupMenuListener() {
+        titleComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(titles, getShowTitles, shows, "id_show", "name_show");
+                showComboBoxListFromSQL(titleComboBox, getShowTitles, shows, "id_show", "name_show");
             }
 
             @Override
@@ -145,10 +151,10 @@ public class TicketsSelling extends DatabaseUtils {
             }
         });
 
-        conductorList.addPopupMenuListener(new PopupMenuListener() {
+        conductorComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(conductorList, getConductors, conductors, "id_employee", "name");
+                showComboBoxListFromSQL(conductorComboBox, getConductors, conductors, "id_employee", "name");
             }
 
             @Override
@@ -160,10 +166,10 @@ public class TicketsSelling extends DatabaseUtils {
             }
         });
 
-        genreList.addPopupMenuListener(new PopupMenuListener() {
+        genreComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(genreList, getGenres, genres, "id_genre", "name_genre");
+                showComboBoxListFromSQL(genreComboBox, getGenres, genres, "id_genre", "name_genre");
             }
 
             @Override
@@ -175,10 +181,10 @@ public class TicketsSelling extends DatabaseUtils {
             }
         });
 
-        ageList.addPopupMenuListener(new PopupMenuListener() {
+        ageComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(ageList, getAgeCategories, ageCategories, "id_age_category",
+                showComboBoxListFromSQL(ageComboBox, getAgeCategories, ageCategories, "id_age_category",
                         "name_age_category");
             }
 
@@ -191,10 +197,10 @@ public class TicketsSelling extends DatabaseUtils {
             }
         });
 
-        directorList.addPopupMenuListener(new PopupMenuListener() {
+        directorComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(directorList, getDirectors, directors, "id_employee", "name");
+                showComboBoxListFromSQL(directorComboBox, getDirectors, directors, "id_employee", "name");
             }
 
             @Override
@@ -206,10 +212,10 @@ public class TicketsSelling extends DatabaseUtils {
             }
         });
 
-        productionDesignerList.addPopupMenuListener(new PopupMenuListener() {
+        productionDesignerComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(productionDesignerList, getProductionDesigners, productionDesigners,
+                showComboBoxListFromSQL(productionDesignerComboBox, getProductionDesigners, productionDesigners,
                         "id_employee", "name");
             }
 
@@ -222,10 +228,10 @@ public class TicketsSelling extends DatabaseUtils {
             }
         });
 
-        authorList.addPopupMenuListener(new PopupMenuListener() {
+        authorComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(authorList, getAuthors, authors, "id_author", "name_author");
+                showComboBoxListFromSQL(authorComboBox, getAuthors, authors, "id_author", "name_author");
             }
 
             @Override
@@ -237,10 +243,10 @@ public class TicketsSelling extends DatabaseUtils {
             }
         });
 
-        countryList.addPopupMenuListener(new PopupMenuListener() {
+        countryComboBox.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                showComboBoxListFromSQL(countryList, getCountries, countries, "id_country", "name_country");
+                showComboBoxListFromSQL(countryComboBox, getCountries, countries, "id_country", "name_country");
             }
 
             @Override
@@ -256,74 +262,78 @@ public class TicketsSelling extends DatabaseUtils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (dateFrom.getText().isEmpty()) {
+                    if (dateFromTextField.getText().isEmpty()) {
                         ticketInfo.setNull(1, OracleTypes.DATE);
                     } else {
-                        ticketInfo.setDate(1, new java.sql.Date(dateFormat.parse(dateFrom.getText()).getTime()));
+                        ticketInfo.setDate(1,
+                                new java.sql.Date(dateFormat.parse(dateFromTextField.getText()).getTime()));
                     }
-                    if (dateTo.getText().isEmpty()) {
+                    if (dateToTextField.getText().isEmpty()) {
                         ticketInfo.setNull(2, OracleTypes.DATE);
                     } else {
-                        ticketInfo.setDate(2, new java.sql.Date(dateFormat.parse(dateTo.getText()).getTime()));
+                        ticketInfo.setDate(2,
+                                new java.sql.Date(dateFormat.parse(dateToTextField.getText()).getTime()));
                     }
-                    if (titles.getSelectedItem().equals("-")) {
+                    if (Objects.equals(titleComboBox.getSelectedItem(), "-")) {
                         ticketInfo.setNull(3, OracleTypes.INTEGER);
                     } else {
-                        ticketInfo.setInt(3, shows.get(titles.getSelectedItem()));
+                        ticketInfo.setInt(3, shows.get(titleComboBox.getSelectedItem()));
                     }
-                    if (centuryFrom.getText().isEmpty()) {
+                    if (centuryFromTextField.getText().isEmpty()) {
                         ticketInfo.setNull(4, OracleTypes.INTEGER);
                     } else {
-                        ticketInfo.setInt(4, Integer.parseInt(centuryFrom.getText()));
+                        ticketInfo.setInt(4, Integer.parseInt(centuryFromTextField.getText()));
                     }
-                    if (centuryTo.getText().isEmpty()) {
+                    if (centuryToTextField.getText().isEmpty()) {
                         ticketInfo.setNull(5, OracleTypes.INTEGER);
                     } else {
-                        ticketInfo.setInt(5, Integer.parseInt(centuryTo.getText()));
+                        ticketInfo.setInt(5, Integer.parseInt(centuryToTextField.getText()));
                     }
-                    if (conductorList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(conductorComboBox.getSelectedItem(), "-")) {
                         ticketInfo.setNull(6, OracleTypes.INTEGER);
                     } else {
-                        ticketInfo.setInt(6, conductors.get(conductorList.getSelectedItem()));
+                        ticketInfo.setInt(6, conductors.get(conductorComboBox.getSelectedItem()));
                     }
-                    if (productionDesignerList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(productionDesignerComboBox.getSelectedItem(), "-")) {
                         ticketInfo.setNull(7, OracleTypes.INTEGER);
                     } else {
-                        ticketInfo.setInt(7, productionDesigners.get(productionDesignerList.getSelectedItem()));
+                        ticketInfo.setInt(7,
+                                productionDesigners.get(productionDesignerComboBox.getSelectedItem()));
                     }
-                    if (directorList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(directorComboBox.getSelectedItem(), "-")) {
                         ticketInfo.setNull(8, OracleTypes.INTEGER);
                     } else {
-                        ticketInfo.setInt(8, directors.get(directorList.getSelectedItem()));
+                        ticketInfo.setInt(8, directors.get(directorComboBox.getSelectedItem()));
                     }
-                    if (genreList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(genreComboBox.getSelectedItem(), "-")) {
                         ticketInfo.setNull(9, OracleTypes.INTEGER);
                     } else {
-                        ticketInfo.setInt(9, genres.get(genreList.getSelectedItem()));
+                        ticketInfo.setInt(9, genres.get(genreComboBox.getSelectedItem()));
                     }
-                    if (ageList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(ageComboBox.getSelectedItem(), "-")) {
                         ticketInfo.setNull(10, OracleTypes.INTEGER);
                     } else {
-                        ticketInfo.setInt(10, ageCategories.get(ageList.getSelectedItem()));
+                        ticketInfo.setInt(10, ageCategories.get(ageComboBox.getSelectedItem()));
                     }
-                    if (authorList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(authorComboBox.getSelectedItem(), "-")) {
                         ticketInfo.setNull(11, OracleTypes.INTEGER);
                     } else {
-                        ticketInfo.setInt(11, authors.get(authorList.getSelectedItem()));
+                        ticketInfo.setInt(11, authors.get(authorComboBox.getSelectedItem()));
                     }
-                    if (countryList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(countryComboBox.getSelectedItem(), "-")) {
                         ticketInfo.setNull(12, OracleTypes.INTEGER);
                     } else {
-                        ticketInfo.setInt(12, countries.get(countryList.getSelectedItem()));
+                        ticketInfo.setInt(12, countries.get(countryComboBox.getSelectedItem()));
                     }
                     ticketInfo.execute();
 
                     ResultSet results = (ResultSet) ticketInfo.getObject(13);
                     fillTableFromResultSet(ticketsTable, 2, tickets, results);
-                    status.setText("Статус: Успех. Возвращено " + ticketsTable.getRowCount() + " записей.");
+                    results.close();
+                    setSuccessMessage(status, ticketsTable.getRowCount());
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    status.setText("Статус: запрос не выполнен.");
+                    setFailMessage(status);
                 }
             }
         });
@@ -334,18 +344,18 @@ public class TicketsSelling extends DatabaseUtils {
                 try {
                     if (ticketsTable.getSelectedRows().length == 0) {
                         JOptionPane.showMessageDialog(mainPanel, "Укажите билет!",
-                                "Ошибка продажи", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка продажи!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     sellTicket.setInt(1, tickets.get(ticketsTable.getSelectedRows()[0]));
                     sellTicket.execute();
 
                     DefaultTableModel model = (DefaultTableModel) ticketsTable.getModel();
-                    model.removeRow(ticketsTable.getSelectedRows()[0]);
+                    model.removeRow(ticketsTable.getSelectedRow());
                 } catch (Exception exception) {
                     exception.printStackTrace();
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка продажи", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка продажи!", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -356,7 +366,7 @@ public class TicketsSelling extends DatabaseUtils {
                 try {
                     if (subscriptionTable.getSelectedRows().length == 0) {
                         JOptionPane.showMessageDialog(mainPanel, "Укажите абонемент!",
-                                "Ошибка продажи", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка продажи!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     sellSubscription.setInt(1, subscriptions.get(subscriptionTable.getSelectedRows()[0]));
@@ -367,6 +377,8 @@ public class TicketsSelling extends DatabaseUtils {
                     model = (DefaultTableModel) ticketsTable.getModel();
                     model.setRowCount(0);
                 } catch (Exception exception) {
+                    JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
+                            "Ошибка продажи!", JOptionPane.ERROR_MESSAGE);
                     exception.printStackTrace();
                 }
             }
@@ -378,12 +390,12 @@ public class TicketsSelling extends DatabaseUtils {
                 try {
                     subscriptionInfo.setNull(1, OracleTypes.INTEGER);
                     subscriptionInfo.setNull(2, OracleTypes.INTEGER);
-                    if (genreList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(genreComboBox.getSelectedItem(), "-")) {
                         JOptionPane.showMessageDialog(mainPanel, "Укажите жанр!",
-                                "Ошибка запроса", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка запроса!", JOptionPane.ERROR_MESSAGE);
                         return;
                     } else {
-                        subscriptionInfo.setInt(3, genres.get(genreList.getSelectedItem()));
+                        subscriptionInfo.setInt(3, genres.get(genreComboBox.getSelectedItem()));
                     }
                     subscriptionInfo.setNull(4, OracleTypes.INTEGER);
                     subscriptionInfo.setNull(5, OracleTypes.INTEGER);
@@ -391,10 +403,11 @@ public class TicketsSelling extends DatabaseUtils {
 
                     ResultSet results = (ResultSet) subscriptionInfo.getObject(6);
                     fillTableFromResultSet(subscriptionTable, 2, subscriptions, results);
-                    status.setText("Статус: Успех. Возвращено " + subscriptionTable.getRowCount() + " записей.");
+                    results.close();
+                    setSuccessMessage(status, subscriptionTable.getRowCount());
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    status.setText("Статус: запрос не выполнен.");
+                    setFailMessage(status);
                 }
             }
         });
@@ -403,37 +416,39 @@ public class TicketsSelling extends DatabaseUtils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (centuryFrom.getText().isEmpty()) {
+                    if (centuryFromTextField.getText().isEmpty()) {
                         subscriptionInfo.setNull(4, OracleTypes.INTEGER);
                     } else {
-                        subscriptionInfo.setInt(4, Integer.parseInt(centuryFrom.getText()));
+                        subscriptionInfo.setInt(4, Integer.parseInt(centuryFromTextField.getText()));
                     }
-                    if (centuryTo.getText().isEmpty()) {
+                    if (centuryToTextField.getText().isEmpty()) {
                         subscriptionInfo.setNull(5, OracleTypes.INTEGER);
                     } else {
-                        subscriptionInfo.setInt(5, Integer.parseInt(centuryTo.getText()));
+                        subscriptionInfo.setInt(5, Integer.parseInt(centuryToTextField.getText()));
                     }
                     ticketInfo.setNull(9, OracleTypes.INTEGER);
-                    if (authorList.getSelectedItem().equals("-") && countryList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(authorComboBox.getSelectedItem(), "-") &&
+                            countryComboBox.getSelectedItem().equals("-")) {
                         JOptionPane.showMessageDialog(mainPanel, "Укажите автора или страну!",
-                                "Ошибка запроса", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка запроса!", JOptionPane.ERROR_MESSAGE);
                         return;
                     } else {
-                        subscriptionInfo.setInt(11, authors.get(authorList.getSelectedItem()));
+                        subscriptionInfo.setInt(11, authors.get(authorComboBox.getSelectedItem()));
                     }
-                    if (countryList.getSelectedItem().equals("-")) {
+                    if (Objects.equals(countryComboBox.getSelectedItem(), "-")) {
                         subscriptionInfo.setNull(12, OracleTypes.INTEGER);
                     } else {
-                        subscriptionInfo.setInt(12, countries.get(countryList.getSelectedItem()));
+                        subscriptionInfo.setInt(12, countries.get(countryComboBox.getSelectedItem()));
                     }
                     subscriptionInfo.execute();
 
                     ResultSet results = (ResultSet) subscriptionInfo.getObject(13);
                     fillTableFromResultSet(subscriptionTable, 2, subscriptions, results);
-                    status.setText("Статус: Успех. Возвращено " + subscriptionTable.getRowCount() + " записей.");
+                    results.close();
+                    setSuccessMessage(status, subscriptionTable.getRowCount());
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    status.setText("Статус: запрос не выполнен.");
+                    setFailMessage(status);
                 }
             }
         });
@@ -451,6 +466,7 @@ public class TicketsSelling extends DatabaseUtils {
 
                     ResultSet results = (ResultSet) getTicketsInSubscription.getObject(2);
                     fillTableFromResultSet(ticketsTable, 2, tickets, results);
+                    results.close();
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
@@ -470,6 +486,7 @@ public class TicketsSelling extends DatabaseUtils {
 
                     ResultSet results = (ResultSet) getSubscriptionByTicketInfo.getObject(2);
                     fillTableFromResultSet(subscriptionTable, 2, subscriptions, results);
+                    results.close();
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
@@ -483,9 +500,9 @@ public class TicketsSelling extends DatabaseUtils {
     }
 
     private void createUIComponents() {
-        dateTo = new JFormattedTextField(dateFormat);
-        dateFrom = new JFormattedTextField(dateFormat);
-        centuryFrom = new JFormattedTextField(numberFormat);
-        centuryTo = new JFormattedTextField(numberFormat);
+        dateToTextField = new JFormattedTextField(dateFormat);
+        dateFromTextField = new JFormattedTextField(dateFormat);
+        centuryFromTextField = new JFormattedTextField(numberFormat);
+        centuryToTextField = new JFormattedTextField(numberFormat);
     }
 }

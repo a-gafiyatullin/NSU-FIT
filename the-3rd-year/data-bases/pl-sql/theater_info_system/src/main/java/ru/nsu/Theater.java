@@ -14,7 +14,7 @@ public class Theater extends JFrame {
     private JButton tours;
     private JButton employees;
     private JButton musicians;
-    private JButton actorsEditinig;
+    private JButton actorsEditing;
     private JButton showsEditing;
     private JButton ticketsAdding;
     private JButton ticketsSelling;
@@ -28,14 +28,14 @@ public class Theater extends JFrame {
                 ticketsSelling.setVisible(false);
                 statistics.setVisible(false);
                 employees.setVisible(false);
-                actorsEditinig.setVisible(false);
+                actorsEditing.setVisible(false);
                 showsEditing.setVisible(false);
                 ticketsAdding.setVisible(false);
                 break;
             case "admin":
                 ticketsSelling.setVisible(false);
                 employees.setVisible(false);
-                actorsEditinig.setVisible(false);
+                actorsEditing.setVisible(false);
                 showsEditing.setVisible(false);
                 ticketsAdding.setVisible(false);
                 break;
@@ -45,7 +45,7 @@ public class Theater extends JFrame {
             case "cashier":
                 statistics.setVisible(false);
                 employees.setVisible(false);
-                actorsEditinig.setVisible(false);
+                actorsEditing.setVisible(false);
                 showsEditing.setVisible(false);
                 ticketsAdding.setVisible(false);
                 break;
@@ -150,7 +150,7 @@ public class Theater extends JFrame {
             }
         });
 
-        actorsEditinig.addActionListener(new ActionListener() {
+        actorsEditing.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -164,7 +164,11 @@ public class Theater extends JFrame {
         showsEditing.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                try {
+                    new ShowEditing(connection);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
             }
         });
 

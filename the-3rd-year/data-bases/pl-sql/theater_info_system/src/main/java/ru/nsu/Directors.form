@@ -70,7 +70,7 @@
               <text value="Период: от:"/>
             </properties>
           </component>
-          <component id="9457c" class="javax.swing.JFormattedTextField" binding="periodFrom" custom-create="true">
+          <component id="9457c" class="javax.swing.JFormattedTextField" binding="periodFromTextField" custom-create="true">
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -86,7 +86,7 @@
               <text value="до:"/>
             </properties>
           </component>
-          <component id="ed14" class="javax.swing.JFormattedTextField" binding="periodTo" custom-create="true">
+          <component id="ed14" class="javax.swing.JFormattedTextField" binding="periodToTextField" custom-create="true">
             <constraints>
               <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -112,7 +112,7 @@
           <text value="ФИО:"/>
         </properties>
       </component>
-      <component id="7c1aa" class="javax.swing.JComboBox" binding="directorsComboBox">
+      <component id="7c1aa" class="javax.swing.JComboBox" binding="directorComboBox">
         <constraints>
           <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
@@ -154,7 +154,7 @@
           <text value="Возраст: от:"/>
         </properties>
       </component>
-      <component id="e2811" class="javax.swing.JFormattedTextField" binding="ageFrom" custom-create="true">
+      <component id="e2811" class="javax.swing.JFormattedTextField" binding="ageFromTextField" custom-create="true">
         <constraints>
           <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
@@ -170,7 +170,7 @@
           <text value="до:"/>
         </properties>
       </component>
-      <component id="8f852" class="javax.swing.JFormattedTextField" binding="ageTo" custom-create="true">
+      <component id="8f852" class="javax.swing.JFormattedTextField" binding="ageToTextField" custom-create="true">
         <constraints>
           <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>

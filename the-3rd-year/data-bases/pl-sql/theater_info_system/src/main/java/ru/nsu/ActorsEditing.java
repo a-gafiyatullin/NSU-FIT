@@ -14,6 +14,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ActorsEditing extends DatabaseUtils {
     private final Map<String, Integer> actors = new HashMap<>();
@@ -32,6 +33,7 @@ public class ActorsEditing extends DatabaseUtils {
     private final CallableStatement deleteActorRank;
     private final CallableStatement deleteActorCharacteristics;
     private final CallableStatement insertActorRank;
+
     private JPanel mainPanel;
     private JComboBox actorComboBox;
     private JButton editButton;
@@ -46,9 +48,10 @@ public class ActorsEditing extends DatabaseUtils {
     private JButton characteristicAddButton;
     private JButton characteristicDeleteButton;
     private JTable characteristicTable;
-    private JLabel statusField;
 
     public ActorsEditing(final Connection connection) throws Exception {
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
         characteristicTable.getTableHeader().setReorderingAllowed(false);
         rankTable.getTableHeader().setReorderingAllowed(false);
         characteristicTable.setModel(new DefaultTableModel() {
@@ -166,30 +169,32 @@ public class ActorsEditing extends DatabaseUtils {
             public void actionPerformed(ActionEvent e) {
                 try {
                     int id_actor = 0;
-                    if (!actorComboBox.getSelectedItem().equals("-")) {
+                    if (!Objects.equals(actorComboBox.getSelectedItem(), "-")) {
                         id_actor = actors.get(actorComboBox.getSelectedItem());
                     }
 
                     if (id_actor == 0) {
                         JOptionPane.showMessageDialog(mainPanel, "Выберите актера!",
-                                "Ошибка редактирования", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка редактирования!", JOptionPane.ERROR_MESSAGE);
                     } else {
                         getActorRank.setInt(1, id_actor);
                         getActorRank.execute();
 
                         ResultSet results = (ResultSet) getActorRank.getObject(2);
                         fillTableFromResultSet(rankTable, 2, actorRank, results);
+                        results.close();
 
                         getActorCharacteristics.setInt(1, id_actor);
                         getActorCharacteristics.execute();
 
                         results = (ResultSet) getActorCharacteristics.getObject(2);
                         fillTableFromResultSet(characteristicTable, 2, actorCharacteristics, results);
+                        results.close();
                     }
                 } catch (Exception exception) {
                     exception.printStackTrace();
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка редактирования", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка редактирования!", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -199,20 +204,20 @@ public class ActorsEditing extends DatabaseUtils {
             public void actionPerformed(ActionEvent e) {
                 try {
                     int id_actor = 0;
-                    if (!actorComboBox.getSelectedItem().equals("-")) {
+                    if (!Objects.equals(actorComboBox.getSelectedItem(), "-")) {
                         id_actor = actors.get(actorComboBox.getSelectedItem());
                     }
 
                     if (id_actor == 0) {
                         JOptionPane.showMessageDialog(mainPanel, "Выберите актера!",
-                                "Ошибка добавления", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                     } else {
                         int id_rank = 0;
-                        if (!rankComboBox.getSelectedItem().equals("-")) {
+                        if (!Objects.equals(rankComboBox.getSelectedItem(), "-")) {
                             id_rank = ranks.get(rankComboBox.getSelectedItem());
                         }
                         int id_competition = 0;
-                        if (!competitionComboBox.getSelectedItem().equals("-")) {
+                        if (!Objects.equals(competitionComboBox.getSelectedItem(), "-")) {
                             id_competition = competitions.get(competitionComboBox.getSelectedItem());
                         }
                         Date date = null;
@@ -220,7 +225,7 @@ public class ActorsEditing extends DatabaseUtils {
                             date = new java.sql.Date(dateFormat.parse(dateTextField.getText()).getTime());
                         if (id_rank * id_competition == 0) {
                             JOptionPane.showMessageDialog(mainPanel, "Не все поля заполнены!",
-                                    "Ошибка добавления", JOptionPane.ERROR_MESSAGE);
+                                    "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                         } else {
                             insertActorRank.setInt(1, id_actor);
                             insertActorRank.setInt(2, id_rank);
@@ -229,14 +234,12 @@ public class ActorsEditing extends DatabaseUtils {
                             insertActorRank.execute();
 
                             editButton.doClick();
-                            statusField.setText("Статус: Успешно.");
                         }
                     }
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    statusField.setText("Статус: Ошибка!");
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка добавления", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -246,35 +249,33 @@ public class ActorsEditing extends DatabaseUtils {
             public void actionPerformed(ActionEvent e) {
                 try {
                     int id_actor = 0;
-                    if (!actorComboBox.getSelectedItem().equals("-")) {
+                    if (!Objects.equals(actorComboBox.getSelectedItem(), "-")) {
                         id_actor = actors.get(actorComboBox.getSelectedItem());
                     }
 
                     if (id_actor == 0) {
                         JOptionPane.showMessageDialog(mainPanel, "Выберите актера!",
-                                "Ошибка удаления", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка удаления!", JOptionPane.ERROR_MESSAGE);
                     } else {
                         int id_rank = 0;
-                        if (rankTable.getSelectedRows().length != 0) {
-                            id_rank = actorRank.get(rankTable.getSelectedRows()[0]);
+                        if (rankTable.getSelectedRow() != -1) {
+                            id_rank = actorRank.get(rankTable.getSelectedRow());
                         }
                         if (id_rank == 0) {
-                            JOptionPane.showMessageDialog(mainPanel, "Выберете звание!",
-                                    "Ошибка удаления", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(mainPanel, "Выберите звание!",
+                                    "Ошибка удаления!", JOptionPane.ERROR_MESSAGE);
                         } else {
                             deleteActorRank.setInt(1, id_actor);
                             deleteActorRank.setInt(2, id_rank);
                             deleteActorRank.execute();
 
                             editButton.doClick();
-                            statusField.setText("Статус: Успешно.");
                         }
                     }
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    statusField.setText("Статус: Ошибка!");
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка удаления", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка удаления!", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -284,16 +285,16 @@ public class ActorsEditing extends DatabaseUtils {
             public void actionPerformed(ActionEvent e) {
                 try {
                     int id_actor = 0;
-                    if (!actorComboBox.getSelectedItem().equals("-")) {
+                    if (!Objects.equals(actorComboBox.getSelectedItem(), "-")) {
                         id_actor = actors.get(actorComboBox.getSelectedItem());
                     }
 
                     if (id_actor == 0) {
                         JOptionPane.showMessageDialog(mainPanel, "Выберите актера!",
-                                "Ошибка добавления", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                     } else {
                         int id_characteristic = 0;
-                        if (!characteristicComboBox.getSelectedItem().equals("-")) {
+                        if (!Objects.equals(characteristicComboBox.getSelectedItem(), "-")) {
                             id_characteristic = characteristics.get(characteristicComboBox.getSelectedItem());
                         }
                         double value = 0;
@@ -310,14 +311,12 @@ public class ActorsEditing extends DatabaseUtils {
                             insertActorCharacteristics.execute();
 
                             editButton.doClick();
-                            statusField.setText("Статус: Успешно.");
                         }
                     }
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    statusField.setText("Статус: Ошибка.");
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка добавления", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -327,35 +326,33 @@ public class ActorsEditing extends DatabaseUtils {
             public void actionPerformed(ActionEvent e) {
                 try {
                     int id_actor = 0;
-                    if (!actorComboBox.getSelectedItem().equals("-")) {
+                    if (!Objects.equals(actorComboBox.getSelectedItem(), "-")) {
                         id_actor = actors.get(actorComboBox.getSelectedItem());
                     }
 
                     if (id_actor == 0) {
                         JOptionPane.showMessageDialog(mainPanel, "Выберите актера!",
-                                "Ошибка удаления", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка удаления!", JOptionPane.ERROR_MESSAGE);
                     } else {
                         int id_characteristic = 0;
-                        if (characteristicTable.getSelectedRows().length != 0) {
-                            id_characteristic = actorCharacteristics.get(characteristicTable.getSelectedRows()[0]);
+                        if (characteristicTable.getSelectedRow() != -1) {
+                            id_characteristic = actorCharacteristics.get(characteristicTable.getSelectedRow());
                         }
                         if (id_characteristic == 0) {
                             JOptionPane.showMessageDialog(mainPanel, "Выберите характеристику!",
-                                    "Ошибка удаления", JOptionPane.ERROR_MESSAGE);
+                                    "Ошибка удаления!", JOptionPane.ERROR_MESSAGE);
                         } else {
                             deleteActorCharacteristics.setInt(1, id_actor);
                             deleteActorCharacteristics.setInt(2, id_characteristic);
                             deleteActorCharacteristics.execute();
 
                             editButton.doClick();
-                            statusField.setText("Статус: Успешно.");
                         }
                     }
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    statusField.setText("Статус: Ошибка.");
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка удаления", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка удаления!", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

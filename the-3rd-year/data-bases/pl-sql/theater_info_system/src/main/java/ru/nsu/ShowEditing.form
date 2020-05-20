@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="4" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="21" y="20" width="1016" height="615"/>
+      <xy x="21" y="20" width="1238" height="641"/>
     </constraints>
     <properties>
       <enabled value="true"/>
@@ -26,7 +26,7 @@
               <text value="Век:"/>
             </properties>
           </component>
-          <component id="c7587" class="javax.swing.JFormattedTextField" binding="titleCenturyTextField">
+          <component id="c7587" class="javax.swing.JFormattedTextField" binding="titleCenturyTextField" custom-create="true">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -42,7 +42,7 @@
               <text value="Режиссер-постановщик:"/>
             </properties>
           </component>
-          <component id="69f61" class="javax.swing.JComboBox" binding="directorsComboBox">
+          <component id="69f61" class="javax.swing.JComboBox" binding="directorComboBox">
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -60,7 +60,7 @@
               <text value="Художник-постановщик:"/>
             </properties>
           </component>
-          <component id="54f01" class="javax.swing.JComboBox" binding="productionDesignersComboBox">
+          <component id="54f01" class="javax.swing.JComboBox" binding="productionDesignerComboBox">
             <constraints>
               <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -78,7 +78,7 @@
               <text value="Автор:"/>
             </properties>
           </component>
-          <component id="586e0" class="javax.swing.JComboBox" binding="authorsComboBox">
+          <component id="586e0" class="javax.swing.JComboBox" binding="authorComboBox">
             <constraints>
               <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -112,7 +112,7 @@
               <text value="Возраст:"/>
             </properties>
           </component>
-          <component id="3b3a5" class="javax.swing.JComboBox" binding="agesComboBox">
+          <component id="3b3a5" class="javax.swing.JComboBox" binding="ageComboBox">
             <constraints>
               <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -130,7 +130,7 @@
               <text value="Жанр:"/>
             </properties>
           </component>
-          <component id="4eed7" class="javax.swing.JComboBox" binding="genresComboBox">
+          <component id="4eed7" class="javax.swing.JComboBox" binding="genreComboBox">
             <constraints>
               <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -164,7 +164,7 @@
               <text value="Дата премьеры:"/>
             </properties>
           </component>
-          <component id="68b54" class="javax.swing.JFormattedTextField" binding="premierDateTextField">
+          <component id="68b54" class="javax.swing.JFormattedTextField" binding="premierDateTextField" custom-create="true">
             <constraints>
               <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -180,7 +180,7 @@
               <text value="Дирижер-постановщик:"/>
             </properties>
           </component>
-          <component id="6a95" class="javax.swing.JComboBox" binding="conductorsComboBox">
+          <component id="6a95" class="javax.swing.JComboBox" binding="conductorComboBox">
             <constraints>
               <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -208,7 +208,7 @@
               <text value="Cпектакль:"/>
             </properties>
           </component>
-          <component id="90d67" class="javax.swing.JComboBox" binding="titlesComboBox">
+          <component id="90d67" class="javax.swing.JComboBox" binding="titleComboBox">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -270,11 +270,15 @@
               </component>
             </children>
           </scrollpane>
-          <component id="58957" class="javax.swing.JComboBox" binding="characteristics">
+          <component id="58957" class="javax.swing.JComboBox" binding="characteristicsComboBox">
             <constraints>
               <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties/>
+            <properties>
+              <model>
+                <item value="-"/>
+              </model>
+            </properties>
           </component>
           <component id="8d2f6" class="javax.swing.JLabel">
             <constraints>
@@ -284,7 +288,7 @@
               <text value="Числовое значение(если требуется):"/>
             </properties>
           </component>
-          <component id="e73f3" class="javax.swing.JFormattedTextField" binding="characteristicValue">
+          <component id="e73f3" class="javax.swing.JFormattedTextField" binding="characteristicValue" custom-create="true">
             <constraints>
               <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -302,13 +306,17 @@
               <text value="Роль:"/>
             </properties>
           </component>
-          <component id="58110" class="javax.swing.JComboBox" binding="rolesComboBox">
+          <component id="58110" class="javax.swing.JComboBox" binding="roleComboBox">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="71" height="25"/>
               </grid>
             </constraints>
-            <properties/>
+            <properties>
+              <model>
+                <item value="-"/>
+              </model>
+            </properties>
           </component>
           <component id="4ee45" class="javax.swing.JButton" binding="editRoleButton">
             <constraints>
@@ -384,7 +392,7 @@
           </component>
         </children>
       </grid>
-      <grid id="83b42" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="83b42" layout-manager="GridLayoutManager" row-count="3" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -392,20 +400,6 @@
         <properties/>
         <border type="none" title="Подбор актеров на роли:"/>
         <children>
-          <component id="75658" class="javax.swing.JLabel">
-            <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Роль:"/>
-            </properties>
-          </component>
-          <component id="daa8e" class="javax.swing.JComboBox" binding="rolesForActorsComboBox">
-            <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties/>
-          </component>
           <component id="9e" class="javax.swing.JLabel">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -414,38 +408,73 @@
               <text value="Актеры:"/>
             </properties>
           </component>
-          <component id="fc725" class="javax.swing.JComboBox" binding="actorsComboBox">
+          <component id="fc725" class="javax.swing.JComboBox" binding="actorComboBox">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties/>
+            <properties>
+              <model>
+                <item value="-"/>
+              </model>
+            </properties>
+          </component>
+          <component id="75658" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Роль:"/>
+            </properties>
+          </component>
+          <component id="daa8e" class="javax.swing.JComboBox" binding="rolesForActorsComboBox">
+            <constraints>
+              <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <model>
+                <item value="-"/>
+              </model>
+            </properties>
           </component>
           <component id="d5e89" class="javax.swing.JButton" binding="addAsUnderstudyActorButton">
             <constraints>
-              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Назначить дублером"/>
             </properties>
           </component>
+          <scrollpane id="9f713">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="4" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="ab63f" class="javax.swing.JTable" binding="actorsTable">
+                <constraints/>
+                <properties/>
+              </component>
+            </children>
+          </scrollpane>
           <component id="cdd7d" class="javax.swing.JButton" binding="addAsMainActorButton">
             <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Назначить основным"/>
             </properties>
           </component>
+          <component id="4dfd5" class="javax.swing.JButton" binding="deleteActorFromRoleButton">
+            <constraints>
+              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Снять с роли"/>
+            </properties>
+          </component>
         </children>
       </grid>
-      <component id="43ffc" class="javax.swing.JLabel" binding="status">
-        <constraints>
-          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Статус:"/>
-        </properties>
-      </component>
       <grid id="c4f03" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
@@ -454,14 +483,14 @@
         <properties/>
         <border type="none" title="Даты показа:"/>
         <children>
-          <scrollpane id="bca58" binding="performancesTable">
+          <scrollpane id="bca58">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties/>
             <border type="none"/>
             <children>
-              <component id="324e4" class="javax.swing.JTable" binding="table3" default-binding="true">
+              <component id="324e4" class="javax.swing.JTable" binding="performancesTable">
                 <constraints/>
                 <properties/>
               </component>
@@ -475,7 +504,7 @@
               <text value="Дата:"/>
             </properties>
           </component>
-          <component id="ce732" class="javax.swing.JFormattedTextField" binding="dateTextField">
+          <component id="ce732" class="javax.swing.JFormattedTextField" binding="dateTextField" custom-create="true">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -501,7 +530,7 @@
           </component>
         </children>
       </grid>
-      <grid id="c62a6" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="c62a6" layout-manager="GridLayoutManager" row-count="3" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -525,7 +554,7 @@
           </component>
           <scrollpane id="470ae">
             <constraints>
-              <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="0" row-span="1" col-span="3" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties/>
             <border type="none"/>
@@ -536,24 +565,40 @@
               </component>
             </children>
           </scrollpane>
-          <component id="865d8" class="javax.swing.JButton" binding="addMusicianToTitleButton">
+          <component id="4f837" class="javax.swing.JButton" binding="getMusiciansButton">
             <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Назначить"/>
+              <text value="Найти"/>
             </properties>
           </component>
           <component id="4c61a" class="javax.swing.JButton" binding="deleteMusicianFromTitleButton">
             <constraints>
-              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Удалить"/>
             </properties>
           </component>
+          <component id="865d8" class="javax.swing.JButton" binding="addMusicianToTitleButton">
+            <constraints>
+              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Назначить"/>
+            </properties>
+          </component>
         </children>
       </grid>
+      <component id="84a85" class="javax.swing.JLabel" binding="status">
+        <constraints>
+          <grid row="3" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Статус:"/>
+        </properties>
+      </component>
     </children>
   </grid>
 </form>

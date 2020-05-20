@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Tours extends DatabaseUtils {
     private final CallableStatement getEmployees;
@@ -26,20 +27,23 @@ public class Tours extends DatabaseUtils {
     private final CallableStatement getTours;
     private final CallableStatement deleteTour;
     private final CallableStatement insertTour;
+
     private JPanel mainPanel;
     private JTable resultTable;
     private JComboBox employeeComboBox;
     private JComboBox showComboBox;
     private JComboBox jobTypeComboBox;
     private JComboBox tourTypeComboBox;
-    private JFormattedTextField periodFrom;
-    private JFormattedTextField periodTo;
+    private JFormattedTextField periodFromTextField;
+    private JFormattedTextField periodToTextField;
     private JLabel status;
     private JButton addButton;
     private JButton queryButton;
     private JButton deleteButton;
 
     public Tours(final Connection connection, String role) throws Exception {
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
         if (!role.equals("headmaster")) {
             addButton.setVisible(false);
             deleteButton.setVisible(false);
@@ -63,10 +67,10 @@ public class Tours extends DatabaseUtils {
         getJobTypes = connection.prepareCall("{call get_job_types_list(?)}");
         getJobTypes.registerOutParameter("list", OracleTypes.CURSOR);
 
-        getTours = connection.prepareCall("{call tours_info(?, ?, ?, ?, ?, ?, ?)}");
+        getTours = connection.prepareCall("{call tour_info(?, ?, ?, ?, ?, ?, ?)}");
         getTours.registerOutParameter(7, OracleTypes.CURSOR);
-        deleteTour = connection.prepareCall("{call tours_delete(?, ?, ?, ?)}");
-        insertTour = connection.prepareCall("{call tours_insert(?, ?, ?, ?, ?)}");
+        deleteTour = connection.prepareCall("{call tour_delete(?, ?, ?, ?)}");
+        insertTour = connection.prepareCall("{call tour_insert(?, ?, ?, ?, ?)}");
 
         showComboBoxListFromSQL(employeeComboBox, getEmployees, employees, "id_employee", "name");
         showComboBoxListFromSQL(showComboBox, getShowTitles, shows, "id_show", "name_show");
@@ -122,32 +126,34 @@ public class Tours extends DatabaseUtils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (employeeComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(employeeComboBox.getSelectedItem(), "-")) {
                         getTours.setNull(1, OracleTypes.INTEGER);
                     } else {
                         getTours.setInt(1, employees.get(employeeComboBox.getSelectedItem()));
                     }
-                    if (showComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(showComboBox.getSelectedItem(), "-")) {
                         getTours.setNull(2, OracleTypes.INTEGER);
                     } else {
                         getTours.setInt(2, shows.get(showComboBox.getSelectedItem()));
                     }
-                    if (periodFrom.getText().isEmpty()) {
+                    if (periodFromTextField.getText().isEmpty()) {
                         getTours.setNull(3, OracleTypes.DATE);
                     } else {
-                        getTours.setDate(3, new java.sql.Date(dateFormat.parse(periodFrom.getText()).getTime()));
+                        getTours.setDate(3,
+                                new java.sql.Date(dateFormat.parse(periodFromTextField.getText()).getTime()));
                     }
-                    if (periodTo.getText().isEmpty()) {
+                    if (periodToTextField.getText().isEmpty()) {
                         getTours.setNull(4, OracleTypes.DATE);
                     } else {
-                        getTours.setDate(4, new java.sql.Date(dateFormat.parse(periodTo.getText()).getTime()));
+                        getTours.setDate(4,
+                                new java.sql.Date(dateFormat.parse(periodToTextField.getText()).getTime()));
                     }
-                    if (tourTypeComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(tourTypeComboBox.getSelectedItem(), "-")) {
                         getTours.setNull(5, OracleTypes.INTEGER);
                     } else {
                         getTours.setInt(5, (tourTypeComboBox.getSelectedItem().equals("выездные") ? 1 : 0));
                     }
-                    if (jobTypeComboBox.getSelectedItem().equals("-")) {
+                    if (Objects.equals(jobTypeComboBox.getSelectedItem(), "-")) {
                         getTours.setNull(6, OracleTypes.INTEGER);
                     } else {
                         getTours.setInt(6, jobs.get(jobTypeComboBox.getSelectedItem()));
@@ -176,10 +182,11 @@ public class Tours extends DatabaseUtils {
                         model.addRow(row.clone());
                         j++;
                     }
-                    status.setText("Статус: Успех. Возвращено " + resultTable.getRowCount() + " записей.");
+                    results.close();
+                    setSuccessMessage(status, resultTable.getRowCount());
                 } catch (Exception exception) {
                     exception.printStackTrace();
-                    status.setText("Статус: запрос не выполнен.");
+                    setFailMessage(status);
                 }
             }
         });
@@ -198,8 +205,8 @@ public class Tours extends DatabaseUtils {
                     employeeComboBox.setSelectedItem(model.getValueAt(selectedRow, 0));
                     jobTypeComboBox.setSelectedItem(model.getValueAt(selectedRow, 1));
                     showComboBox.setSelectedItem(model.getValueAt(selectedRow, 2));
-                    periodFrom.setText((String) model.getValueAt(selectedRow, 3));
-                    periodTo.setText((String) model.getValueAt(selectedRow, 4));
+                    periodFromTextField.setText((String) model.getValueAt(selectedRow, 3));
+                    periodToTextField.setText((String) model.getValueAt(selectedRow, 4));
                     tourTypeComboBox.setSelectedItem(model.getValueAt(selectedRow, 5));
                 } catch (Exception exception) {
                     exception.printStackTrace();
@@ -212,30 +219,30 @@ public class Tours extends DatabaseUtils {
             public void actionPerformed(ActionEvent e) {
                 try {
                     int id_employee = 0;
-                    if (!employeeComboBox.getSelectedItem().equals("-")) {
+                    if (!Objects.equals(employeeComboBox.getSelectedItem(), "-")) {
                         id_employee = employees.get(employeeComboBox.getSelectedItem());
                     }
                     int id_show = 0;
-                    if (!showComboBox.getSelectedItem().equals("-")) {
+                    if (!Objects.equals(showComboBox.getSelectedItem(), "-")) {
                         id_show = shows.get(showComboBox.getSelectedItem());
                     }
                     Date dateFrom = null;
-                    if (!periodFrom.getText().isEmpty()) {
+                    if (!periodFromTextField.getText().isEmpty()) {
                         getTours.setNull(3, OracleTypes.DATE);
-                        dateFrom = new java.sql.Date(dateFormat.parse(periodFrom.getText()).getTime());
+                        dateFrom = new java.sql.Date(dateFormat.parse(periodFromTextField.getText()).getTime());
                     }
                     Date dateTo = null;
-                    if (!periodTo.getText().isEmpty()) {
-                        dateTo = new java.sql.Date(dateFormat.parse(periodTo.getText()).getTime());
+                    if (!periodToTextField.getText().isEmpty()) {
+                        dateTo = new java.sql.Date(dateFormat.parse(periodToTextField.getText()).getTime());
                     }
                     int type = -1;
-                    if (!tourTypeComboBox.getSelectedItem().equals("-")) {
+                    if (!Objects.equals(tourTypeComboBox.getSelectedItem(), "-")) {
                         type = (tourTypeComboBox.getSelectedItem().equals("выездные") ? 1 : 0);
                     }
 
                     if (id_employee * id_show == 0 || dateFrom == null || dateTo == null || type == -1) {
                         JOptionPane.showMessageDialog(mainPanel, "Не все поля заполнены!",
-                                "Ошибка добавления", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                     } else {
 
                         insertTour.setInt(1, id_employee);
@@ -246,13 +253,11 @@ public class Tours extends DatabaseUtils {
                         insertTour.execute();
 
                         updateResultTable();
-                        status.setText("Статус: запись добавлена успешно!");
                     }
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка добавления", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка добавления!", JOptionPane.ERROR_MESSAGE);
                     exception.printStackTrace();
-                    status.setText("Статус: ошибка добавления записи!");
                 }
             }
         });
@@ -263,7 +268,7 @@ public class Tours extends DatabaseUtils {
                 try {
                     if (resultTable.getSelectedRows().length == 0) {
                         JOptionPane.showMessageDialog(mainPanel, "Выбирете запись для удаления!",
-                                "Ошибка удаления", JOptionPane.ERROR_MESSAGE);
+                                "Ошибка удаления!", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     int selectedRow = resultTable.getSelectedRows()[0];
@@ -271,18 +276,18 @@ public class Tours extends DatabaseUtils {
                     deleteTour.setInt(1, tours.get(selectedRow).getKey());
                     deleteTour.setInt(2, tours.get(selectedRow).getValue());
                     deleteTour.setDate(3,
-                            new java.sql.Date(dateFormat.parse((String) resultTable.getValueAt(selectedRow, 3)).getTime()));
+                            new java.sql.Date(dateFormat.parse((String)
+                                    resultTable.getValueAt(selectedRow, 3)).getTime()));
                     deleteTour.setDate(4,
-                            new java.sql.Date(dateFormat.parse((String) resultTable.getValueAt(selectedRow, 4)).getTime()));
+                            new java.sql.Date(dateFormat.parse((String)
+                                    resultTable.getValueAt(selectedRow, 4)).getTime()));
                     deleteTour.execute();
 
                     updateResultTable();
-                    status.setText("Статус: запись удалена успешно!");
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(mainPanel, exception.getMessage().split("\n", 2)[0],
-                            "Ошибка удаления", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка удаления!", JOptionPane.ERROR_MESSAGE);
                     exception.printStackTrace();
-                    status.setText("Статус: ошибка удаления записи!");
                 }
             }
         });
@@ -294,16 +299,16 @@ public class Tours extends DatabaseUtils {
     }
 
     private void createUIComponents() {
-        periodTo = new JFormattedTextField(dateFormat);
-        periodFrom = new JFormattedTextField(dateFormat);
+        periodToTextField = new JFormattedTextField(dateFormat);
+        periodFromTextField = new JFormattedTextField(dateFormat);
     }
 
     private void updateResultTable() {
         employeeComboBox.setSelectedItem("-");
         jobTypeComboBox.setSelectedItem("-");
         showComboBox.setSelectedItem("-");
-        periodFrom.setText(null);
-        periodTo.setText(null);
+        periodFromTextField.setText(null);
+        periodToTextField.setText(null);
         tourTypeComboBox.setSelectedItem("-");
 
         queryButton.doClick();

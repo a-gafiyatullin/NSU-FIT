@@ -33,6 +33,7 @@ public abstract class DatabaseUtils extends JFrame {
                 entries.put(title, resultSet.getInt(id_str));
                 comboBox.addItem(title);
             }
+            resultSet.close();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -67,5 +68,13 @@ public abstract class DatabaseUtils extends JFrame {
             model.addRow(row.clone());
             j++;
         }
+    }
+
+    public static void setSuccessMessage(JLabel label, int rowCount) {
+        label.setText("Статус: Успех. Возвращено " + rowCount + " записей.");
+    }
+
+    public static void setFailMessage(JLabel label) {
+        label.setText("Статус: запрос не выполнен!");
     }
 }
