@@ -1,0 +1,72 @@
+1 threads:
+n = 110 sigma = 1.18546e-08
+Total time: 5.41 sec.
+Generating plot...
+
+2 threads:
+n = 110 sigma = 1.18546e-08
+Total time: 2.855 sec.
+Generating plot...
+
+3 threads:
+n = 110 sigma = 1.18546e-08
+Total time: 2.058 sec.
+Generating plot...
+
+4 threads:
+n = 110 sigma = 1.18546e-08
+Total time: 1.727 sec.
+Generating plot...
+
+5 threads:
+n = 110 sigma = 1.18546e-08
+Total time: 1.573 sec.
+Generating plot...
+
+6 threads:
+n = 110 sigma = 1.18546e-08
+Total time: 1.58 sec.
+Generating plot...
+
+7 threads:
+n = 110 sigma = 1.18546e-08
+Total time: 1.656 sec.
+Generating plot...
+
+8 threads:
+n = 110 sigma = 1.18546e-08
+Total time: 1.736 sec.
+Generating plot...
+
+
+Hardware Event Type			Hardware Event Count	Hardware Event Sample Count	Events Per Sample	Precise
+    BR_INST_RETIRED.ALL_BRANCHES	3,468,964,614				8			[Unknown]	
+    BR_MISP_RETIRED.ALL_BRANCHES	34,512,798				8			[Unknown]	
+    MEM_LOAD_RETIRED.L1_HIT		17,803,155,882				8			[Unknown]	
+    MEM_LOAD_RETIRED.L1_MISS		423,035,838				8			[Unknown]	
+    MEM_LOAD_RETIRED.L2_HIT		292,462,636				8			[Unknown]	
+    MEM_LOAD_RETIRED.L2_MISS		123,204,666				8			[Unknown]	
+    MEM_LOAD_RETIRED.L3_HIT		86,183,268				8			[Unknown]	
+    MEM_LOAD_RETIRED.L3_MISS		25,325,896				8			[Unknown]	
+
+Elapsed Time:	1.604s
+    Clockticks:	50,904,000,000
+    Instructions Retired:	39,126,000,000
+    CPI Rate:	1.301
+    MUX Reliability:	1.000
+    Retiring:	24.3%
+    Front-End Bound:	3.6%
+    Bad Speculation:	1.0%
+    Back-End Bound:	71.1%
+    Memory Bound:	50.5%
+    L1 Bound:	1.8%
+    L2 Bound:	20.7%
+    L3 Bound:	4.5%
+    DRAM Bound:	18.2%
+    Memory Bandwidth:	60.5%
+    Memory Latency:	21.8%
+    Store Bound:	0.0%
+    Core Bound:	20.6%
+    Average CPU Frequency:	4.5 GHz 
+    Total Thread Count:	10
+    Paused Time:	0s

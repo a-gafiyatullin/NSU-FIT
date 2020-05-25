@@ -1,0 +1,39 @@
+1 threads:
+n = 110 sigma = 1.18546e-08
+Total time: 5.425 sec.
+Generating plot...
+
+2 threads:
+n = 110 sigma = 1.18546e-08
+Total time: 2.87 sec.
+Generating plot...
+
+3 threads:
+n = 110 sigma = 1.18546e-08
+Total time: 2.082 sec.
+Generating plot...
+
+4 threads:
+n = 110 sigma = 1.18546e-08
+Total time: 1.721 sec.
+Generating plot...
+
+5 threads:
+n = 110 sigma = 1.18546e-08
+Total time: 1.568 sec.
+Generating plot...
+
+6 threads:
+n = 110 sigma = 1.18546e-08
+Total time: 1.579 sec.
+Generating plot...
+
+7 threads:
+n = 110 sigma = 1.18546e-08
+Total time: 1.569 sec.
+Generating plot...
+
+8 threads:
+n = 110 sigma = 1.18546e-08
+Total time: 1.682 sec.
+Generating plot...
