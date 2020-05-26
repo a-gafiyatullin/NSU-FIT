@@ -11,21 +11,18 @@
 *input*
 *output*
 
-# Ignore IDE files
+# Ignore IDE and build systems files
 *.idea*
 *.iml
 *-build-*
 .project
 .cproject
-
-# Ignore rubbish from flow9 files
+target/
+/Debug/
+/Release/
+x64
 *javagen*
 
 # Ignore backup files
 .~*
 
-# Ignore build system files
-target/
-/Debug/
-/Release/
-x64
