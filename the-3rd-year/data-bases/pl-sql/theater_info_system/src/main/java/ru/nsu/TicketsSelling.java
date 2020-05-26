@@ -109,7 +109,7 @@ public class TicketsSelling extends DatabaseUtils {
         getProductionDesigners = connection.prepareCall("{call get_designers_list(?)}");
         getProductionDesigners.registerOutParameter("list", OracleTypes.CURSOR);
 
-        ticketInfo = connection.prepareCall("{call get_tickets(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
+        ticketInfo = connection.prepareCall("{call get_ticket(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
         ticketInfo.registerOutParameter(13, OracleTypes.CURSOR);
 
         subscriptionInfo = connection.prepareCall("{call get_subscription(?, ?, ?, ?, ?, ?)}");

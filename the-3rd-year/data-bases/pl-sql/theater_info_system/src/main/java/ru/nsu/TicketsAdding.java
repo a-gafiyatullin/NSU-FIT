@@ -87,7 +87,7 @@ public class TicketsAdding extends DatabaseUtils {
         ticketDelete = connection.prepareCall("{call ticket_delete(?)}");
         ticketInsertIntoSubscription = connection.prepareCall("{call ticket_to_subscription_insert(?, ?)}");
 
-        ticketInfo = connection.prepareCall("{call get_tickets(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
+        ticketInfo = connection.prepareCall("{call get_ticket(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
         ticketInfo.registerOutParameter(13, OracleTypes.CURSOR);
 
         subscriptionInfo = connection.prepareCall("{call get_subscription(?, ?, ?, ?, ?, ?)}");
