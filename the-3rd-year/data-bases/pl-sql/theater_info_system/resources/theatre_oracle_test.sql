@@ -5,7 +5,7 @@ VALUES (0, 'admin'); /* должно выполниться */
 INSERT INTO "User_Role"
 VALUES (0, 'cashier'); /* должно выполниться */
 INSERT INTO "Users"
-VALUES ('xp10rd', '1234', 1); /* должно выполниться */
+VALUES ('master', '1234', 1); /* должно выполниться */
 INSERT INTO "Users"
 VALUES ('admin', '1234', 2); /* должно выполниться */
 INSERT INTO "Users"

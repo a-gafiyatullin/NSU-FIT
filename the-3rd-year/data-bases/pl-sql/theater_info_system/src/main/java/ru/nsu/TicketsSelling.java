@@ -417,32 +417,32 @@ public class TicketsSelling extends DatabaseUtils {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (centuryFromTextField.getText().isEmpty()) {
-                        subscriptionInfo.setNull(4, OracleTypes.INTEGER);
+                        subscriptionInfo.setNull(1, OracleTypes.INTEGER);
                     } else {
-                        subscriptionInfo.setInt(4, Integer.parseInt(centuryFromTextField.getText()));
+                        subscriptionInfo.setInt(1, Integer.parseInt(centuryFromTextField.getText()));
                     }
                     if (centuryToTextField.getText().isEmpty()) {
-                        subscriptionInfo.setNull(5, OracleTypes.INTEGER);
+                        subscriptionInfo.setNull(2, OracleTypes.INTEGER);
                     } else {
-                        subscriptionInfo.setInt(5, Integer.parseInt(centuryToTextField.getText()));
+                        subscriptionInfo.setInt(2, Integer.parseInt(centuryToTextField.getText()));
                     }
-                    ticketInfo.setNull(9, OracleTypes.INTEGER);
+                    subscriptionInfo.setNull(3, OracleTypes.INTEGER);
                     if (Objects.equals(authorComboBox.getSelectedItem(), "-") &&
                             countryComboBox.getSelectedItem().equals("-")) {
                         JOptionPane.showMessageDialog(mainPanel, "Укажите автора или страну!",
                                 "Ошибка запроса!", JOptionPane.ERROR_MESSAGE);
                         return;
                     } else {
-                        subscriptionInfo.setInt(11, authors.get(authorComboBox.getSelectedItem()));
+                        subscriptionInfo.setInt(4, authors.get(authorComboBox.getSelectedItem()));
                     }
                     if (Objects.equals(countryComboBox.getSelectedItem(), "-")) {
-                        subscriptionInfo.setNull(12, OracleTypes.INTEGER);
+                        subscriptionInfo.setNull(5, OracleTypes.INTEGER);
                     } else {
-                        subscriptionInfo.setInt(12, countries.get(countryComboBox.getSelectedItem()));
+                        subscriptionInfo.setInt(5, countries.get(countryComboBox.getSelectedItem()));
                     }
                     subscriptionInfo.execute();
 
-                    ResultSet results = (ResultSet) subscriptionInfo.getObject(13);
+                    ResultSet results = (ResultSet) subscriptionInfo.getObject(6);
                     fillTableFromResultSet(subscriptionTable, 2, subscriptions, results);
                     results.close();
                     setSuccessMessage(status, subscriptionTable.getRowCount());

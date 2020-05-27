@@ -350,14 +350,14 @@ public class ShowsInfo extends DatabaseUtils {
                     getShowActorInfo.execute();
 
                     ResultSet results = (ResultSet) getShowActorInfo.getObject(2);
-                    fillTableFromResultSet(actorTable, 1, null, results);
+                    fillTableFromResultSet(actorTable, 3, null, results);
                     results.close();
 
                     getShowMusicianInfo.setInt(1, repertoireInfo.get(showTable.getSelectedRow()));
                     getShowMusicianInfo.execute();
 
                     results = (ResultSet) getShowMusicianInfo.getObject(2);
-                    fillTableFromResultSet(musicianTable, 3, null, results);
+                    fillTableFromResultSet(musicianTable, 1, null, results);
                     results.close();
                 } catch (Exception exception) {
                     exception.printStackTrace();

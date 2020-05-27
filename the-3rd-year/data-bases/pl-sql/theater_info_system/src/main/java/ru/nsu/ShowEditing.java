@@ -926,7 +926,7 @@ public class ShowEditing extends DatabaseUtils {
                         id_role = roles.get(roleComboBox.getSelectedItem());
                         deleteRoleCharacteristic.setInt(1, id_role);
                     }
-                    if (characteristicsTable.getSelectedRow() == 0) {
+                    if (characteristicsTable.getSelectedRow() == -1) {
                         JOptionPane.showMessageDialog(mainPanel, "Выберите характеристику!",
                                 "Ошибка удаления характеристики роли!", JOptionPane.ERROR_MESSAGE);
                         return;
@@ -1062,7 +1062,7 @@ public class ShowEditing extends DatabaseUtils {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (performancesTable.getSelectedRow() == 0) {
+                    if (performancesTable.getSelectedRow() == -1) {
                         JOptionPane.showMessageDialog(mainPanel, "Выберите выступление!",
                                 "Ошибка удаления выступления!", JOptionPane.ERROR_MESSAGE);
                     } else {
