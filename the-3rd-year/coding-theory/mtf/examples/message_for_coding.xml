@@ -1,0 +1,15 @@
+<mtf>
+    <message>
+    The main idea is that each symbol in the data is replaced by its index in the stack of "recently used symbols".
+    For example, long sequences of identical symbols are replaced by as many zeroes, whereas when a symbol that has not been used in a long time appears,
+    it is replaced with a large number. Thus at the end the data is transformed into a sequence of integers; if the data exhibits a lot of local correlations,
+    then these integers tend to be small. This algorithm was published in a paper by Ryabko.The original name of this code is "book stack".
+    Let us give a precise description. Assume for simplicity that the symbols in the data are bytes.
+    Each byte value is encoded by its index in a list of bytes, which changes over the course of the algorithm.
+    The list is initially in order by byte value (0, 1, 2, 3, ..., 255). Therefore, the first byte is always encoded by its own value. However, after encoding a byte,
+    that value is moved to the front of the list before continuing to the next byte.
+    </message>
+
+    <alphabet>abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ  
+    "".(0123456789),;</alphabet>
+</mtf>
