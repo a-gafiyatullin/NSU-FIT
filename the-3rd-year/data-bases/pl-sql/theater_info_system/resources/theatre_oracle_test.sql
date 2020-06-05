@@ -167,7 +167,7 @@ INSERT INTO "Employee"
 VALUES (0, 'Алексей', '', '', 1, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
         0, 30000, 4, 1); /* должно выполниться */
 INSERT INTO "Employee"
-VALUES (0, 'NoName', '', '', 1, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
+VALUES (0, 'Павел', '', '', 1, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
         0, 30000, 4, 1); /* должно выполниться */
 INSERT INTO "Employee"
 VALUES (0, 'Владимир', '', '', 2, TO_DATE('1999/01/01', 'yyyy/mm/dd'), TO_DATE('2020/01/01', 'yyyy/mm/dd'),
@@ -345,8 +345,8 @@ UPDATE "Show" SET "premier_date_show" = TO_DATE('2030/01/01', 'yyyy/mm/dd') WHER
 UPDATE "Show" SET "premier_date_show" = TO_DATE('2005/01/01', 'yyyy/mm/dd') WHERE "id_show" = 2;     /* не должно выполниться */
 DELETE FROM "Show" WHERE "id_show" = 2;                                                              /* не должно выполниться */
 /*----------------------------------------------------------------------------------------------------------------------------*/
-INSERT INTO "Show" VALUES(0, 'NoName', 2, 3, 4, 1, 1, 2, 19, TO_DATE('2022/01/01', 'yyyy/mm/dd'));      /* должно выполниться */
-INSERT INTO "Role" VALUES(0, 3, 'NoName', 1);                                                           /* должно выполниться */
+INSERT INTO "Show" VALUES(0, 'ТестШоу1', 2, 3, 4, 1, 1, 2, 19, TO_DATE('2022/01/01', 'yyyy/mm/dd'));      /* должно выполниться */
+INSERT INTO "Role" VALUES(0, 3, 'ТестРоль1', 1);                                                           /* должно выполниться */
 INSERT INTO "Direction" VALUES(8, 6, 1);                                                                /* должно выполниться */
 INSERT INTO "Direction" VALUES(9, 6, 0);                                                                /* должно выполниться */
 /* тест Direction 2-----------------------------------------------------------------------------------------------------------*/
@@ -354,7 +354,7 @@ DELETE FROM "Direction" WHERE "id_actor" = 9 and "id_role" = 6;                 
 INSERT INTO "Direction" VALUES(9, 6, 0);                                                                /* должно выполниться */
 INSERT INTO "Repertoire" VALUES(0, 3, TO_DATE('2024/01/01', 'yyyy/mm/dd'));                             /* должно выполниться */
 UPDATE "Show" SET "century_show" = 21 WHERE "id_show" = 3;                                           /* не должно выполниться */
-INSERT INTO "Role" VALUES(0, 3, 'NoName2', 1);                                                          /* должно выполниться */
+INSERT INTO "Role" VALUES(0, 3, 'ТестРоль2', 1);                                                          /* должно выполниться */
 INSERT INTO "Direction" VALUES(1, 7, 1);                                                             /* не должно выполниться */
 DELETE FROM "Direction" WHERE "id_actor" = 9 and "id_role" = 6;                                      /* не должно выполниться */
 /* тест Tour -----------------------------------------------------------------------------------------------------------------*/

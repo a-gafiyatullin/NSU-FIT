@@ -201,8 +201,8 @@ begin
                "id_role",
                ("name_employee" || ' ' || "surname_employee" || ' ' || "middle_name_employee") as "Актер",
                "name_role"                                                                     as "Роль",
-               (select 'Нет' from dual where "is_understudy_direction" = 1)
-                   || (select 'Да' from dual where "is_understudy_direction" != 1)             as "Дублер"
+               (select 'Нет' from dual where "is_understudy_direction" = 0)
+                   || (select 'Да' from dual where "is_understudy_direction" != 0)             as "Дублер"
         from ("Direction" inner join "Employee" on "id_actor" = "id_employee")
                  inner join "Role" using ("id_role")
         where "id_show" = id_show;
