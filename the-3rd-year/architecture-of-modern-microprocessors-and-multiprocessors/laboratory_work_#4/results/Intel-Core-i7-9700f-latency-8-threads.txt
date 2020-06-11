@@ -1,0 +1,37 @@
+READ:
+Hardware Events
+    Hardware Event Type			Hardware Event Count	Hardware Event Sample Count	Events Per Sample	Precise
+    BR_INST_RETIRED.ALL_BRANCHES	78,710,870,392			8			[Unknown]	
+    BR_MISP_RETIRED.ALL_BRANCHES	346,014,884			8			[Unknown]	
+    MEM_LOAD_RETIRED.L1_HIT		41,727,226,742			8			[Unknown]	
+    MEM_LOAD_RETIRED.L1_MISS		4,504,975,952			8			[Unknown]	
+    MEM_LOAD_RETIRED.L2_HIT		1,382,751,884			8			[Unknown]	
+    MEM_LOAD_RETIRED.L2_MISS		3,098,279,902			8			[Unknown]	
+    MEM_LOAD_RETIRED.L3_HIT		226,426,874			8			[Unknown]	
+    MEM_LOAD_RETIRED.L3_MISS		2,265,460,184			8			[Unknown]	
+
+WRITE:
+Hardware Events
+    Hardware Event Type			Hardware Event Count	Hardware Event Sample Count	Events Per Sample	Precise
+    BR_INST_RETIRED.ALL_BRANCHES	63,099,343,574			8			[Unknown]	
+    BR_MISP_RETIRED.ALL_BRANCHES	377,618,094			8			[Unknown]	
+    MEM_LOAD_RETIRED.L1_HIT		42,004,084,898			8			[Unknown]	
+    MEM_LOAD_RETIRED.L1_MISS		1,204,727,892			8			[Unknown]	
+    MEM_LOAD_RETIRED.L2_HIT		419,563,344			8			[Unknown]	
+    MEM_LOAD_RETIRED.L2_MISS		801,121,176			8			[Unknown]	
+    MEM_LOAD_RETIRED.L3_HIT		176,370,586			8			[Unknown]	
+    MEM_LOAD_RETIRED.L3_MISS		40,676,598			8			[Unknown]	
+
+COPY:
+Hardware Events
+    Hardware Event Type			Hardware Event Count	Hardware Event Sample Count	Events Per Sample	Precise
+    BR_INST_RETIRED.ALL_BRANCHES	116,884,644,270			8			[Unknown]	
+    BR_MISP_RETIRED.ALL_BRANCHES	687,131,186			8			[Unknown]	
+    MEM_LOAD_RETIRED.L1_HIT		79,305,423,244			8			[Unknown]	
+    MEM_LOAD_RETIRED.L1_MISS		8,137,886,972			8			[Unknown]	
+    MEM_LOAD_RETIRED.L2_HIT		1,930,280,046			8			[Unknown]	
+    MEM_LOAD_RETIRED.L2_MISS		6,194,743,422			8			[Unknown]	
+    MEM_LOAD_RETIRED.L3_HIT		513,468,266			8			[Unknown]	
+    MEM_LOAD_RETIRED.L3_MISS		4,507,220,758			8			[Unknown]	
+	
+
