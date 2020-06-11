@@ -1,0 +1,24 @@
+.idea\ 		- директория Intellij IDEA
+theater_info_system.iml - проектный файл Intellij IDEA
+docs\ 		- директория с отчетами, рецензиями, изображениями из отчетов, проектным заданием, презетацией к коллоквиуму
+lib\ 		- директория с библиотекой для работы с БД(ojdbc)
+resources\ 	- директория со скриптами, .exe и .jar файлами для запуска приложения, а так же мета-информацией для сборки .exe файла. Номенклатура скриптов описана в отчете
+src\		- исходные коды приложения:
+
+src\main\java\ru\nsu\ActorsEditing.java	- код формы редактирования информации об актерах
+src\main\java\ru\nsu\ActorsInfo.java	- код формы получения информации об актерах
+src\main\java\ru\nsu\Authorization.java	- код формы аутентификации пользователя в системе
+src\main\java\ru\nsu\Authors.java	- код формы работы с информацией об авторах
+src\main\java\ru\nsu\DatabaseUtils.java	- код утилитных методов и классов, необходимых всем формам
+src\main\java\ru\nsu\Directors.java	- код формы работы с информацией о постановщиках
+src\main\java\ru\nsu\Employees.java	- код формы работы с информацией о работниках театра
+src\main\java\ru\nsu\Musicians.java	- код формы работы с информацией о музыкантах
+src\main\java\ru\nsu\ShowEditing.java	- код формы добавления и редактирования информации о спектаклях
+src\main\java\ru\nsu\ShowsInfo.java	- код формы получения информации о спектаклях
+src\main\java\ru\nsu\Statistics.java	- код формы получения статистики по работе театра
+src\main\java\ru\nsu\Theater.java	- код с кнопками перехода на подформы в зависимости от роли
+src\main\java\ru\nsu\TicketsAdding.java	- код формы добавления билетов
+src\main\java\ru\nsu\TicketsSelling.java- код формы продажи билетов
+src\main\java\ru\nsu\Tours.java		- код формы работы с информацией о гастролях
+src\main\java\ru\nsu\[название-формы].form - файлы Intellij IDEA для построения форм
+
