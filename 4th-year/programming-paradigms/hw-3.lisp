@@ -166,3 +166,28 @@
  (search_elem '(a b c (d e) l (m n (o p (d e)))) 'm)
  (search_elem '(a b c (d e) l (m n (o p (d e))) (o p (d e))) '(d e))
  (search_elem '(a b c (d e) l (m n (o p (d e))) (o p (d e))) '(o p (d e)))
+
+(defun insert_elem (l a e)
+    (
+        cond
+        (
+            (atom l)
+            l
+        )
+        (
+            (eq_lists (car l) a)
+            (append (append (list e) (list a)) (insert_elem (cdr l) a e))
+        )
+        (
+           (append (list (insert_elem (car l) a e)) (insert_elem (cdr l) a e))
+        )
+    )
+)
+
+
+(insert_elem '(1 2 3 2) '2 '0)
+(insert_elem '(1 (2 1) 3 (2 1)) '(2 1) '0)
+(insert_elem '(1 (2 1) 3 (2 1)) '(2 1) '(0))
+(insert_elem '(1 (2 1 (3)) 3 (2 1 (3)) (3)) '(3) '(5 2 8))
+(insert_elem '(1 (2 1 (3)) 3 (2 1 (3 0 (1))) (3)) '(3 0 (1)) '(5 2 8 (6)))
+(insert_elem '(1 (2 1 (3)) NIL (2 1 (3 0 (1))) (NIL)) '(3 0 (1)) '(5 2 8 (6)))
