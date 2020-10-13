@@ -149,10 +149,24 @@
                 )
                 (
                     (atom (car l))
-                    (append (search_elem (car l) a pos (append ans (list pos))) (search_elem (cdr l) a (+ 1 pos) ans))
+                    (
+                        cond
+                        (
+                            (eq (cdr l) 'NIL)
+                            (search_elem (car l) a pos (append ans (list pos)))
+                        )
+                        ((append (search_elem (car l) a pos (append ans (list pos))) (search_elem (cdr l) a (+ 1 pos) ans)))
+                    )
                 )
                 (
-                    (append (search_elem (car l) a 1 (append ans (list pos))) (search_elem (cdr l) a (+ 1 pos) ans))
+                    (
+                        cond
+                        (
+                            (eq (cdr l) 'NIL)
+                            (search_elem (car l) a 1 (append ans (list pos)))
+                        )
+                        ((append (search_elem (car l) a 1 (append ans (list pos))) (search_elem (cdr l) a (+ 1 pos) ans)))
+                    )
                 )
             )
         )
@@ -186,7 +200,8 @@
 
 
 (insert_elem '(1 2 3 2) '2 '0)
-(insert_elem '(1 (2 1) 3 (2 1)) '(2 1) '0)
+(insert_elem '(1 (2 1) 3 (2 1)) '(2 1) 'NIL)
+(insert_elem '(1 NIL 3 NIL) 'NIL '1)
 (insert_elem '(1 (2 1) 3 (2 1)) '(2 1) '(0))
 (insert_elem '(1 (2 1 (3)) 3 (2 1 (3)) (3)) '(3) '(5 2 8))
 (insert_elem '(1 (2 1 (3)) 3 (2 1 (3 0 (1))) (3)) '(3 0 (1)) '(5 2 8 (6)))
