@@ -22,6 +22,7 @@ target/
 /Release/
 x64
 *javagen*
+.vs
 
 # Ignore backup files
 .~*
