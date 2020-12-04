@@ -59,6 +59,12 @@ int main(int argc, char *argv[])
 			std::cout << "Enter a key length(in bytes):"
 				  << std::endl;
 			std::cin >> key_size;
+
+			if (key_size <= 0) {
+				std::cerr << "Key length must be > 0!"
+					  << std::endl;
+				return -1;
+			}
 		} else {
 			switch (aes_type) {
 			case AES128:
@@ -89,13 +95,15 @@ int main(int argc, char *argv[])
 
 		// RC4
 		if (rc4_chosen) {
+			std::cin.unsetf(std::ios::oct);
+			std::cin.unsetf(std::ios::hex);
+			std::cin.setf(std::ios::dec);
 			RC4 rc4(key);
 			if (code_chosen) {
 				std::cout
 					<< "Enter a text string. Enter Ctrl+D to stop. "
 					   "The coded text will be displayed as the digits "
-					   "between 0(0x00) and 255(0xFF) for every string:"
-					<< std::endl;
+					   "between 0(0x00) and 255(0xFF) for every string:";
 
 				int ch;
 				std::vector<unsigned int> coded_text;
