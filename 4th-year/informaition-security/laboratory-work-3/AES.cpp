@@ -207,3 +207,67 @@ std::vector<unsigned char> AES::decode(std::vector<unsigned char> state,
 
 	return state;
 }
+
+int AES::code_file(const std::string &in_file, const std::string &out_file)
+{
+	std::vector<unsigned char> in_buffer(BUFF_SIZE);
+	std::vector<unsigned char> out_buffer;
+
+	std::ifstream is(in_file, std::ios::binary);
+	std::ofstream os(out_file, std::ios::binary);
+	if (!is.is_open() || !os.is_open()) {
+		return -1;
+	}
+
+	size_t size;
+	while (!is.eof()) {
+		is.read(reinterpret_cast<char *>(in_buffer.data()), BUFF_SIZE);
+		size = is.gcount();
+		if (size != 0) {
+			out_buffer = code(in_buffer, size);
+			os.write(reinterpret_cast<const char *>(
+					 out_buffer.data()),
+				 BUFF_SIZE);
+		}
+		if (size != BUFF_SIZE) {
+			break;
+		}
+	}
+
+	is.close();
+	os.close();
+
+	return 0;
+}
+
+int AES::decode_file(const std::string &in_file, const std::string &out_file)
+{
+	std::vector<unsigned char> in_buffer(BUFF_SIZE);
+	std::vector<unsigned char> out_buffer;
+
+	std::ifstream is(in_file, std::ios::binary);
+	std::ofstream os(out_file, std::ios::binary);
+	if (!is.is_open() || !os.is_open()) {
+		return -1;
+	}
+
+	size_t size;
+	while (!is.eof()) {
+		is.read(reinterpret_cast<char *>(in_buffer.data()), BUFF_SIZE);
+		size = is.gcount();
+		if (size != 0) {
+			out_buffer = decode(in_buffer, size);
+			os.write(reinterpret_cast<const char *>(
+					 out_buffer.data()),
+				 BUFF_SIZE);
+		}
+		if (size != BUFF_SIZE) {
+			break;
+		}
+	}
+
+	is.close();
+	os.close();
+
+	return 0;
+}
