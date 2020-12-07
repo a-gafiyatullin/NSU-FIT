@@ -3,9 +3,10 @@
 
 int main(int argc, char *argv[])
 {
+	char error_msg[] =
+		"usage: hide-in-wave [-h (default) / -g] -d [dst file] -s [src file]";
 	if (argc < 2) {
-		fprintf(stderr, "usage: hide-in-wave [-h (default) / -g]"
-				" -d [dst file] -s [src file]");
+		fprintf(stderr, "%s\n", error_msg);
 		return -1;
 	}
 
@@ -28,25 +29,28 @@ int main(int argc, char *argv[])
 		case 'h':
 			break;
 		default:
-			perror("Unrecognized option!");
+			fprintf(stderr, "%s\n", error_msg);
 			return -1;
 		}
-	}
-
-	if (!dst_file_name || !src_file_name) {
-		fprintf(stderr, "usage: hide-in-wave [-h (default) / -g]"
-				" -d [dst file] -s [src file]");
-		return -1;
 	}
 
 	if (hide) {
+		if (!dst_file_name || !src_file_name) {
+			fprintf(stderr, "%s\n", error_msg);
+			return -1;
+		}
+
 		if (hide_src_in_dst(src_file_name, dst_file_name)) {
-			perror("Can't hide information!");
+			fprintf(stderr, "Can't hide information!\n");
 			return -1;
 		}
 	} else {
-		if (get_src_from_dst(dst_file_name) < 0) {
-			perror("Can't get information!");
+		if (!dst_file_name) {
+			fprintf(stderr, "%s\n", error_msg);
+			return -1;
+		}
+		if (get_src_from_dst(dst_file_name)) {
+			fprintf(stderr, "Can't get information!\n");
 			return -1;
 		}
 	}

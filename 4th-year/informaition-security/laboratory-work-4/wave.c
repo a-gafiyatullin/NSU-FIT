@@ -1,10 +1,8 @@
 #include "wave.h"
 
-#define DEBUG
-
 #ifdef DEBUG
 
-void debug_wave_header(const struct wave_header *header)
+void debug_wave_header(const struct wave_header *const header)
 {
 	printf("ID: ");
 	for (int i = 0; i < 4; i++) {
@@ -38,7 +36,7 @@ void debug_wave_header(const struct wave_header *header)
 	printf("\nBits per sample: %hu", header->bits_per_sample);
 }
 
-void debug_wave_chunk_header(const struct wave_chunk_header *header)
+void debug_wave_chunk_header(const struct wave_chunk_header *const header)
 {
 	printf("\nData chunk marker: ");
 	for (int i = 0; i < 4; i++) {
@@ -49,6 +47,8 @@ void debug_wave_chunk_header(const struct wave_chunk_header *header)
 }
 
 #endif
+
+// ------------------------- safe read and write functions ---------------------
 
 int safe_read(int fd, const uint8_t *buffer, const size_t num)
 {
@@ -69,7 +69,7 @@ int safe_read(int fd, const uint8_t *buffer, const size_t num)
 	return 0;
 }
 
-int safe_write(int fd, const uint8_t *buffer, const size_t num)
+int safe_write(int fd, const uint8_t *const buffer, const size_t num)
 {
 	ssize_t size = 0;
 	ssize_t curr_size = 0;
@@ -87,6 +87,8 @@ int safe_write(int fd, const uint8_t *buffer, const size_t num)
 
 	return 0;
 }
+
+// ---------------------------- read headers -----------------------------------
 
 int read_wave_header(int file, struct wave_header *header)
 {
@@ -126,47 +128,52 @@ int read_wave_chunk_header(int file, struct wave_chunk_header *header)
 	return 0;
 }
 
+// --------------------------- distribute and gather bits ----------------------
+
 int is_data_wave_chunk_header(const struct wave_chunk_header *header)
 {
 	return (*((uint32_t *)header->chunk_marker) == DATA);
 }
 
-void assign_bytes_to_dst_data(uint8_t *dst_data, const uint8_t *bytes,
-			      const size_t data_len, const size_t num_bits)
+void assign_bytes_to_dst_data(uint8_t *dst_data, const uint8_t *const bytes,
+			      const size_t data_len, const size_t bits_per_byte)
 {
-	const size_t dst_bytes_per_src_byte = CHAR_BIT / num_bits;
+	const size_t dst_bytes_per_src_byte = CHAR_BIT / bits_per_byte;
 
+	uint8_t mask = (1 << bits_per_byte) - 1;
 	for (size_t i = 0; i < data_len; i++) {
-		uint8_t mask = (1 << num_bits) - 1;
 		uint8_t data_mask = mask;
-		mask = ~mask;
 
 		for (int j = 0; j < dst_bytes_per_src_byte; j++) {
 			dst_data[(i * dst_bytes_per_src_byte) + j] =
 				(dst_data[(i * dst_bytes_per_src_byte) + j] &
-				 mask) |
-				((bytes[i] & data_mask)) >> j * num_bits;
-			data_mask <<= num_bits;
+				 ~mask) |
+				((bytes[i] & data_mask) >> j * bits_per_byte);
+			data_mask <<= bits_per_byte;
 		}
 	}
 }
 
-void gather_bits_to_bytes(const uint8_t *dst_data, uint8_t *bytes,
-			  const size_t data_len, const size_t num_bits)
+void gather_bits_to_bytes(const uint8_t *const dst_data, uint8_t *bytes,
+			  const size_t data_len, const size_t bits_per_byte)
 {
-	const size_t dst_bytes_per_src_byte = CHAR_BIT / num_bits;
+	const size_t dst_bytes_per_src_byte = CHAR_BIT / bits_per_byte;
 
+	uint8_t data_mask = (1 << bits_per_byte) - 1;
 	for (size_t i = 0; i < data_len; i++) {
-		uint8_t mask = 1;
+		uint8_t mask = data_mask;
 
 		for (int j = 0; j < dst_bytes_per_src_byte; j++) {
-			bytes[i] = (bytes[i] & (~mask)) |
-				   (dst_data[i * dst_bytes_per_src_byte + j] &
-				    1) << j;
-			mask <<= 1;
+			bytes[i] = (bytes[i] & ~mask) |
+				   ((dst_data[i * dst_bytes_per_src_byte + j] &
+				     data_mask)
+				    << j * bits_per_byte);
+			mask <<= bits_per_byte;
 		}
 	}
 }
+
+// --------------------------- main functions ----------------------------------
 
 int hide_src_in_dst(char *src_file_name, char *dst_file_name)
 {
@@ -183,7 +190,7 @@ int hide_src_in_dst(char *src_file_name, char *dst_file_name)
 
 	src_file = open(src_file_name, O_RDONLY);
 	if (src_file < 0) {
-		goto error;
+		goto exit;
 	}
 
 	// get file length in bytes
@@ -192,32 +199,32 @@ int hide_src_in_dst(char *src_file_name, char *dst_file_name)
 
 	dst_file = open(dst_file_name, O_RDONLY);
 	if (dst_file < 0) {
-		goto error;
+		goto exit;
 	}
 
 	out_file =
 		open(strcat(dst_file_name, ".out"), O_CREAT | O_WRONLY, 0644);
 	if (out_file < 0) {
-		goto error;
+		goto exit;
 	}
 
 	// allocate memory for WAVE headers
 	wave_hdr = malloc(sizeof(struct wave_header));
 	if (!wave_hdr) {
-		goto error;
+		goto exit;
 	}
 	wave_chunk_hdr = malloc(sizeof(struct wave_chunk_header));
 	if (!wave_chunk_hdr) {
-		goto error;
+		goto exit;
 	}
 
 	// get WAVE header and check it, then write to output
 	if (read_wave_header(dst_file, wave_hdr) < 0) {
-		goto error;
+		goto exit;
 	}
 	if (safe_write(out_file, (const uint8_t *)wave_hdr,
 		       sizeof(struct wave_header)) < 0) {
-		goto error;
+		goto exit;
 	}
 #ifdef DEBUG
 	debug_wave_header(wave_hdr);
@@ -227,11 +234,11 @@ int hide_src_in_dst(char *src_file_name, char *dst_file_name)
 	// search for data section
 	while (dst_buffer_size_curr < wave_hdr->size) {
 		if (read_wave_chunk_header(dst_file, wave_chunk_hdr) < 0) {
-			goto error;
+			goto exit;
 		}
 		if (safe_write(out_file, (const uint8_t *)wave_chunk_hdr,
 			       wave_chunk_header_size) < 0) {
-			goto error;
+			goto exit;
 		}
 
 #ifdef DEBUG
@@ -241,15 +248,15 @@ int hide_src_in_dst(char *src_file_name, char *dst_file_name)
 		if (!is_data_wave_chunk_header(wave_chunk_hdr)) {
 			dst_buffer = malloc(wave_chunk_hdr->chunk_length);
 			if (!dst_buffer) {
-				goto error;
+				goto exit;
 			}
 			if (safe_read(dst_file, dst_buffer,
 				      wave_chunk_hdr->chunk_length) < 0) {
-				goto error;
+				goto exit;
 			}
 			if (safe_write(out_file, dst_buffer,
 				       wave_chunk_hdr->chunk_length) < 0) {
-				goto error;
+				goto exit;
 			}
 			free(dst_buffer);
 			dst_buffer = NULL;
@@ -262,13 +269,17 @@ int hide_src_in_dst(char *src_file_name, char *dst_file_name)
 	size_t dst_buffer_size = wave_hdr->block_align * KB;
 	dst_buffer = malloc(dst_buffer_size);
 	if (!dst_buffer) {
-		goto error;
+		goto exit;
 	}
 
 	// choose two degree
 	size_t src_bits_per_dest_byte =
 		ceil((double)(CHAR_BIT * src_file_size) /
 		     wave_chunk_hdr->chunk_length);
+	if (src_bits_per_dest_byte > CHAR_BIT) {
+		errno = EAGAIN;
+		goto exit;
+	}
 	if (src_bits_per_dest_byte > 1) {
 		if (src_bits_per_dest_byte == 3) {
 			src_bits_per_dest_byte = 4;
@@ -280,48 +291,56 @@ int hide_src_in_dst(char *src_file_name, char *dst_file_name)
 
 	// hide source file length in the destination file
 	if (safe_read(dst_file, dst_buffer, sizeof(size_t) * CHAR_BIT) < 0) {
-		goto error;
+		goto exit;
 	}
 	assign_bytes_to_dst_data(dst_buffer, (const uint8_t *)&src_file_size,
-				 sizeof(size_t), src_bits_per_dest_byte);
+				 sizeof(size_t), 1);
 	if (safe_write(out_file, dst_buffer, sizeof(size_t) * CHAR_BIT) < 0) {
-		goto error;
+		goto exit;
 	}
 
 	// hide src content in the dst
-	src_buffer = malloc(4 * KB);
-	ssize_t src_buffer_size = read(src_file, src_buffer, 4 * KB);
+	src_buffer = malloc(FILE_BUFFER_SIZE);
+	ssize_t src_buffer_size = read(src_file, src_buffer, FILE_BUFFER_SIZE);
 	if (src_buffer_size < 0) {
-		goto error;
+		goto exit;
 	}
 	size_t src_buffer_size_curr = 0;
 
 	dst_buffer_size_curr = sizeof(size_t) * CHAR_BIT;
+	size_t dst_local_buffer_iter = 0;
 	while (dst_buffer_size_curr < wave_chunk_hdr->chunk_length) {
-		ssize_t size = read(dst_file, dst_buffer, dst_buffer_size);
+		ssize_t size =
+			read(dst_file, dst_buffer + dst_local_buffer_iter,
+			     dst_buffer_size - dst_local_buffer_iter);
 		if (size < 0) {
-			goto error;
+			goto exit;
 		}
 		dst_buffer_size_curr += size;
 
-		for (size_t i = 0; i < size;
-		     i += CHAR_BIT / src_bits_per_dest_byte) {
-			if (src_buffer_size <= 0) {
-				continue;
-			}
-			assign_bytes_to_dst_data(dst_buffer + i,
-						 src_buffer +
-							 src_buffer_size_curr,
-						 1, src_bits_per_dest_byte);
-			src_buffer_size_curr++;
-			if (src_buffer_size_curr == src_buffer_size) {
-				src_buffer_size =
-					read(src_file, src_buffer, 4 * KB);
+		size_t iter_num = size / (CHAR_BIT / src_bits_per_dest_byte);
+		if (iter_num > src_buffer_size - src_buffer_size_curr) {
+			iter_num = src_buffer_size - src_buffer_size_curr;
+		}
+		assign_bytes_to_dst_data(dst_buffer + dst_local_buffer_iter,
+					 src_buffer + src_buffer_size_curr,
+					 iter_num, src_bits_per_dest_byte);
+		if (safe_write(out_file, dst_buffer + dst_local_buffer_iter,
+			       size) < 0) {
+			goto exit;
+		}
+		src_buffer_size_curr += iter_num;
+		dst_local_buffer_iter +=
+			iter_num * CHAR_BIT / src_bits_per_dest_byte;
+		if (src_buffer_size_curr == src_buffer_size) {
+			src_buffer_size =
+				read(src_file, src_buffer, FILE_BUFFER_SIZE);
+			src_buffer_size_curr = 0;
+			if (src_buffer_size < 0) {
+				break;
 			}
 		}
-		if (safe_write(out_file, dst_buffer, size) < 0) {
-			goto error;
-		}
+		dst_local_buffer_iter = dst_local_buffer_iter % dst_buffer_size;
 	}
 
 	// copy tail of the src
@@ -331,11 +350,11 @@ int hide_src_in_dst(char *src_file_name, char *dst_file_name)
 			break;
 		}
 		if (safe_write(out_file, dst_buffer, size) < 0) {
-			goto error;
+			goto exit;
 		}
 	}
 
-error:
+exit:
 	free(wave_hdr);
 	free(wave_chunk_hdr);
 	free(dst_buffer);
@@ -361,28 +380,28 @@ int get_src_from_dst(char *dst_file_name)
 
 	dst_file = open(dst_file_name, O_RDONLY);
 	if (dst_file < 0) {
-		goto error;
+		goto exit;
 	}
 
 	src_file =
 		open(strcat(dst_file_name, ".out"), O_CREAT | O_WRONLY, 0644);
 	if (src_file < 0) {
-		goto error;
+		goto exit;
 	}
 
 	// allocate memory for WAVE headers
 	wave_hdr = malloc(sizeof(struct wave_header));
 	if (!wave_hdr) {
-		goto error;
+		goto exit;
 	}
 	wave_chunk_hdr = malloc(sizeof(struct wave_chunk_header));
 	if (!wave_chunk_hdr) {
-		goto error;
+		goto exit;
 	}
 
 	// get WAVE header and check it
 	if (read_wave_header(dst_file, wave_hdr) < 0) {
-		goto error;
+		goto exit;
 	}
 #ifdef DEBUG
 	debug_wave_header(wave_hdr);
@@ -392,7 +411,7 @@ int get_src_from_dst(char *dst_file_name)
 	// search for data section
 	while (dst_buffer_size_curr < wave_hdr->size) {
 		if (read_wave_chunk_header(dst_file, wave_chunk_hdr) < 0) {
-			goto error;
+			goto exit;
 		}
 #ifdef DEBUG
 		debug_wave_chunk_header(wave_chunk_hdr);
@@ -401,7 +420,7 @@ int get_src_from_dst(char *dst_file_name)
 		if (!is_data_wave_chunk_header(wave_chunk_hdr)) {
 			if (lseek(dst_file, wave_chunk_hdr->chunk_length,
 				  SEEK_CUR) < 0) {
-				goto error;
+				goto exit;
 			}
 		} else {
 			break;
@@ -412,12 +431,12 @@ int get_src_from_dst(char *dst_file_name)
 	size_t dst_buffer_size = wave_hdr->block_align * KB;
 	dst_buffer = malloc(dst_buffer_size);
 	if (!dst_buffer) {
-		goto error;
+		goto exit;
 	}
 
 	// get file length
 	if (safe_read(dst_file, dst_buffer, sizeof(size_t) * CHAR_BIT) < 0) {
-		goto error;
+		goto exit;
 	}
 	size_t src_file_size = 0;
 	gather_bits_to_bytes(dst_buffer, (uint8_t *)&src_file_size,
@@ -437,36 +456,42 @@ int get_src_from_dst(char *dst_file_name)
 	}
 
 	// get source file from the destination file
-	src_buffer = malloc(4 * KB);
-	size_t current_src_length = 0;
+	src_buffer = malloc(FILE_BUFFER_SIZE);
+	size_t src_buffer_total_size = 0;
 
 	dst_buffer_size_curr = sizeof(size_t) * CHAR_BIT;
+	size_t dst_local_buffer_iter = 0;
+
 	while (dst_buffer_size_curr < wave_chunk_hdr->chunk_length) {
-		ssize_t size = read(dst_file, dst_buffer, dst_buffer_size);
+		ssize_t size =
+			read(dst_file, dst_buffer + dst_local_buffer_iter,
+			     dst_buffer_size - dst_local_buffer_iter);
 		if (size < 0) {
-			goto error;
+			goto exit;
 		}
 		dst_buffer_size_curr += size;
 
-		for (size_t i = 0; i < size;
-		     i += CHAR_BIT / src_bits_per_dest_byte) {
-			char symbol = 0;
-			gather_bits_to_bytes(dst_buffer + i, &symbol, 1,
-					     src_bits_per_dest_byte);
-			current_src_length++;
-			if (current_src_length == src_file_size) {
-				break;
-			}
-			if (safe_write(src_file, &symbol, 1) < 0) {
-				goto error;
-			}
+		size_t iter_num = size / (CHAR_BIT / src_bits_per_dest_byte);
+		if (iter_num > src_file_size - src_buffer_total_size) {
+			iter_num = src_file_size - src_buffer_total_size;
 		}
-		if (current_src_length == src_file_size) {
+		gather_bits_to_bytes(dst_buffer + dst_local_buffer_iter,
+				     src_buffer, iter_num,
+				     src_bits_per_dest_byte);
+		dst_local_buffer_iter +=
+			iter_num * CHAR_BIT / src_bits_per_dest_byte;
+		dst_local_buffer_iter = dst_local_buffer_iter % dst_buffer_size;
+
+		if (safe_write(src_file, src_buffer, iter_num) < 0) {
+			goto exit;
+		}
+		src_buffer_total_size += iter_num;
+		if (src_buffer_total_size == src_file_size) {
 			break;
 		}
 	}
 
-error:
+exit:
 	free(wave_hdr);
 	free(wave_chunk_hdr);
 	free(dst_buffer);

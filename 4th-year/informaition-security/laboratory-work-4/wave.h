@@ -4,22 +4,25 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
-#include <stdio.h>
 #include <math.h>
 #include <stdint.h>
 #include <limits.h>
 #include <string.h>
 #include <stdlib.h>
 
+#ifdef DEBUG
+#include <stdio.h>
+#endif
+
 // x86_64 ARCHITECTURE ONLY!!!
 #ifdef __x86_64__
-
 #define RIFF 0x46464952
 #define WAVE 0x45564157
 #define DATA 0x61746164
 #define KB 1024
-
 #endif
+
+#define FILE_BUFFER_SIZE 4096
 
 struct wave_header {
 	uint8_t id[4]; // RIFF
