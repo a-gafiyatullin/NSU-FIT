@@ -136,39 +136,48 @@ int is_data_wave_chunk_header(const struct wave_chunk_header *header)
 }
 
 void assign_bytes_to_dst_data(uint8_t *dst_data, const uint8_t *const bytes,
-			      const size_t data_len, const size_t bits_per_byte)
+			      const size_t data_len,
+			      const size_t bits_per_sample,
+			      const size_t bytes_in_sample)
 {
-	const size_t dst_bytes_per_src_byte = CHAR_BIT / bits_per_byte;
+	const size_t dst_bytes_per_src_byte =
+		bytes_in_sample * CHAR_BIT / bits_per_sample;
 
-	uint8_t mask = (1 << bits_per_byte) - 1;
+	uint8_t mask = (1 << bits_per_sample) - 1;
 	for (size_t i = 0; i < data_len; i++) {
 		uint8_t data_mask = mask;
 
-		for (int j = 0; j < dst_bytes_per_src_byte; j++) {
+		for (int j = 0; j < dst_bytes_per_src_byte;
+		     j += bytes_in_sample) {
 			dst_data[(i * dst_bytes_per_src_byte) + j] =
 				(dst_data[(i * dst_bytes_per_src_byte) + j] &
 				 ~mask) |
-				((bytes[i] & data_mask) >> j * bits_per_byte);
-			data_mask <<= bits_per_byte;
+				((bytes[i] & data_mask) >>
+				 (j / bytes_in_sample) * bits_per_sample);
+			data_mask <<= bits_per_sample;
 		}
 	}
 }
 
 void gather_bits_to_bytes(const uint8_t *const dst_data, uint8_t *bytes,
-			  const size_t data_len, const size_t bits_per_byte)
+			  const size_t data_len, const size_t bits_per_sample,
+			  const size_t bytes_in_sample)
 {
-	const size_t dst_bytes_per_src_byte = CHAR_BIT / bits_per_byte;
+	const size_t dst_bytes_per_src_byte =
+		bytes_in_sample * CHAR_BIT / bits_per_sample;
 
-	uint8_t data_mask = (1 << bits_per_byte) - 1;
+	uint8_t data_mask = (1 << bits_per_sample) - 1;
 	for (size_t i = 0; i < data_len; i++) {
 		uint8_t mask = data_mask;
 
-		for (int j = 0; j < dst_bytes_per_src_byte; j++) {
-			bytes[i] = (bytes[i] & ~mask) |
-				   ((dst_data[i * dst_bytes_per_src_byte + j] &
-				     data_mask)
-				    << j * bits_per_byte);
-			mask <<= bits_per_byte;
+		for (int j = 0; j < dst_bytes_per_src_byte;
+		     j += bytes_in_sample) {
+			bytes[i] =
+				(bytes[i] & ~mask) |
+				((dst_data[i * dst_bytes_per_src_byte + j] &
+				  data_mask)
+				 << ((j / bytes_in_sample) * bits_per_sample));
+			mask <<= bits_per_sample;
 		}
 	}
 }
@@ -273,29 +282,32 @@ int hide_src_in_dst(char *src_file_name, char *dst_file_name)
 	}
 
 	// choose two degree
-	size_t src_bits_per_dest_byte =
+	int bytes_per_sample = wave_hdr->block_align / wave_hdr->num_channels;
+	size_t src_bits_per_dst_sample =
 		ceil((double)(CHAR_BIT * src_file_size) /
-		     wave_chunk_hdr->chunk_length);
-	if (src_bits_per_dest_byte > CHAR_BIT) {
+		     (wave_chunk_hdr->chunk_length / bytes_per_sample));
+	if (src_bits_per_dst_sample > CHAR_BIT) {
 		errno = EAGAIN;
 		goto exit;
 	}
-	if (src_bits_per_dest_byte > 1) {
-		if (src_bits_per_dest_byte == 3) {
-			src_bits_per_dest_byte = 4;
-		} else if (src_bits_per_dest_byte > 4 &&
-			   src_bits_per_dest_byte < 8) {
-			src_bits_per_dest_byte = 8;
+	if (src_bits_per_dst_sample > 1) {
+		if (src_bits_per_dst_sample == 3) {
+			src_bits_per_dst_sample = 4;
+		} else if (src_bits_per_dst_sample > 4 &&
+			   src_bits_per_dst_sample < 8) {
+			src_bits_per_dst_sample = 8;
 		}
 	}
 
 	// hide source file length in the destination file
-	if (safe_read(dst_file, dst_buffer, sizeof(size_t) * CHAR_BIT) < 0) {
+	if (safe_read(dst_file, dst_buffer,
+		      sizeof(size_t) * CHAR_BIT * bytes_per_sample) < 0) {
 		goto exit;
 	}
 	assign_bytes_to_dst_data(dst_buffer, (const uint8_t *)&src_file_size,
-				 sizeof(size_t), 1);
-	if (safe_write(out_file, dst_buffer, sizeof(size_t) * CHAR_BIT) < 0) {
+				 sizeof(size_t), 1, bytes_per_sample);
+	if (safe_write(out_file, dst_buffer,
+		       sizeof(size_t) * CHAR_BIT * bytes_per_sample) < 0) {
 		goto exit;
 	}
 
@@ -318,25 +330,28 @@ int hide_src_in_dst(char *src_file_name, char *dst_file_name)
 		}
 		dst_buffer_size_curr += size;
 
-		size_t iter_num = size / (CHAR_BIT / src_bits_per_dest_byte);
+		size_t iter_num = size / (bytes_per_sample * CHAR_BIT /
+					  src_bits_per_dst_sample);
 		if (iter_num > src_buffer_size - src_buffer_size_curr) {
 			iter_num = src_buffer_size - src_buffer_size_curr;
 		}
 		assign_bytes_to_dst_data(dst_buffer + dst_local_buffer_iter,
 					 src_buffer + src_buffer_size_curr,
-					 iter_num, src_bits_per_dest_byte);
+					 iter_num, src_bits_per_dst_sample,
+					 bytes_per_sample);
 		if (safe_write(out_file, dst_buffer + dst_local_buffer_iter,
 			       size) < 0) {
 			goto exit;
 		}
 		src_buffer_size_curr += iter_num;
 		dst_local_buffer_iter +=
-			iter_num * CHAR_BIT / src_bits_per_dest_byte;
+			iter_num *
+			(bytes_per_sample * CHAR_BIT / src_bits_per_dst_sample);
 		if (src_buffer_size_curr == src_buffer_size) {
 			src_buffer_size =
 				read(src_file, src_buffer, FILE_BUFFER_SIZE);
 			src_buffer_size_curr = 0;
-			if (src_buffer_size < 0) {
+			if (src_buffer_size <= 0) {
 				break;
 			}
 		}
@@ -434,24 +449,26 @@ int get_src_from_dst(char *dst_file_name)
 		goto exit;
 	}
 
+	int bytes_per_sample = wave_hdr->block_align / wave_hdr->num_channels;
 	// get file length
-	if (safe_read(dst_file, dst_buffer, sizeof(size_t) * CHAR_BIT) < 0) {
+	if (safe_read(dst_file, dst_buffer,
+		      sizeof(size_t) * CHAR_BIT * bytes_per_sample) < 0) {
 		goto exit;
 	}
 	size_t src_file_size = 0;
 	gather_bits_to_bytes(dst_buffer, (uint8_t *)&src_file_size,
-			     sizeof(size_t), 1);
+			     sizeof(size_t), 1, bytes_per_sample);
 
 	// choose two degree
-	size_t src_bits_per_dest_byte =
+	size_t src_bits_per_dest_sample =
 		ceil((double)(CHAR_BIT * src_file_size) /
-		     wave_chunk_hdr->chunk_length);
-	if (src_bits_per_dest_byte > 1) {
-		if (src_bits_per_dest_byte == 3) {
-			src_bits_per_dest_byte = 4;
-		} else if (src_bits_per_dest_byte > 4 &&
-			   src_bits_per_dest_byte < 8) {
-			src_bits_per_dest_byte = 8;
+		     (wave_chunk_hdr->chunk_length / bytes_per_sample));
+	if (src_bits_per_dest_sample > 1) {
+		if (src_bits_per_dest_sample == 3) {
+			src_bits_per_dest_sample = 4;
+		} else if (src_bits_per_dest_sample > 4 &&
+			   src_bits_per_dest_sample < 8) {
+			src_bits_per_dest_sample = 8;
 		}
 	}
 
@@ -471,15 +488,17 @@ int get_src_from_dst(char *dst_file_name)
 		}
 		dst_buffer_size_curr += size;
 
-		size_t iter_num = size / (CHAR_BIT / src_bits_per_dest_byte);
+		size_t iter_num = size / (bytes_per_sample * CHAR_BIT /
+					  src_bits_per_dest_sample);
 		if (iter_num > src_file_size - src_buffer_total_size) {
 			iter_num = src_file_size - src_buffer_total_size;
 		}
 		gather_bits_to_bytes(dst_buffer + dst_local_buffer_iter,
 				     src_buffer, iter_num,
-				     src_bits_per_dest_byte);
-		dst_local_buffer_iter +=
-			iter_num * CHAR_BIT / src_bits_per_dest_byte;
+				     src_bits_per_dest_sample,
+				     bytes_per_sample);
+		dst_local_buffer_iter += iter_num * bytes_per_sample *
+					 CHAR_BIT / src_bits_per_dest_sample;
 		dst_local_buffer_iter = dst_local_buffer_iter % dst_buffer_size;
 
 		if (safe_write(src_file, src_buffer, iter_num) < 0) {
