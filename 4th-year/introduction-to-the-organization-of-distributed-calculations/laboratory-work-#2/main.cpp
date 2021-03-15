@@ -22,18 +22,19 @@ int main(int argc, char *argv[]) {
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 	// memory to test the critical section
+	MPI_Comm node_comm;
+	MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL, &node_comm);
 	MPI_Win win;
-	MPI_Aint mem_size = 1;
+	int mem_size = (rank == 0) ? 1 : 0;
 	int *shared;
+	MPI_Win_allocate_shared(mem_size, 1, MPI_INFO_NULL,
+				MPI_COMM_WORLD, &shared, &win);
 	if (rank == 0) {
-		MPI_Win_allocate_shared(mem_size, sizeof(int), MPI_INFO_NULL,
-					MPI_COMM_WORLD, &shared, &win);
 		(*shared) = 0;
 	} else {
+		MPI_Aint size;
 		int disp_unit;
-		MPI_Win_allocate_shared(0, sizeof(int), MPI_INFO_NULL,
-					MPI_COMM_WORLD, &shared, &win);
-		MPI_Win_shared_query(win, 0, &mem_size, &disp_unit, &shared);
+		MPI_Win_shared_query(win, 0, &size, &disp_unit, &shared);
 	}
 	MPI_Barrier(MPI_COMM_WORLD);
 
