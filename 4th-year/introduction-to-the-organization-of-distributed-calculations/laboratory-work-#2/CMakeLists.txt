@@ -6,4 +6,4 @@ set(CMAKE_CXX_COMPILER /usr/bin/mpicxx)
 
 include_directories(/usr/include/mpi/)
 
-add_executable(laboratory_work__2 main.cpp)
+add_executable(laboratory_work__2 main.cpp Synchro/Synchro.cpp)
