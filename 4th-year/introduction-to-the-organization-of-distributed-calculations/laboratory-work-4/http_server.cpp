@@ -4,14 +4,6 @@
 #include <iostream>
 #endif
 
-std::string HTTP_Server::_response = "HTTP/1.1 200 OK\r\n"
-"Content-Type: text/html; charset=UTF-8\r\n\r\n"
-"<!DOCTYPE html><html><head><title>Bye-bye baby bye-bye</title>"
-"<style>body { background-color: #111 }"
-"h1 { font-size:4cm; text-align: center; color: black;"
-" text-shadow: 0 0 2mm red}</style></head>"
-"<body><h1>Hello, world!</h1></body></html>\r\n";
-
 HTTP_Server* HTTP_Server::_server = nullptr;
 
 HTTP_Server::HTTP_Server(const int &threads_num) :
@@ -93,7 +85,6 @@ void HTTP_Server::_response_thread() {
   static const int BUFFSZIE = 8192;
   static const std::string GET_REQ = "GET";
   static const int GET_REQ_LEN = 3;
-  static const int RESPONSE_LEN = _response.length();
   char buffer[BUFFSZIE];
 
   while(true) {
@@ -135,14 +126,25 @@ void HTTP_Server::_response_thread() {
 
     if(get_req) {
 
-#ifdef WORK
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      char buffer[4096];
+      std::string result = "";
+      FILE* pipe = popen("php -r 'phpinfo();'", "r");
+      if (!pipe) throw std::runtime_error("popen() failed!");
+      while (fgets(buffer, sizeof buffer, pipe) != NULL) {
+        result += buffer;
+      }
+      pclose(pipe);
+
+      int result_len = result.length();
+
+#ifdef DEBUG
+    std::cout << "Result: " << result_len << std::endl;
 #endif
 
       len = 0;
       total_len = 0;
-      while(total_len < RESPONSE_LEN) {
-        len = write(client_fd, _response.c_str() + total_len, RESPONSE_LEN - total_len);
+      while(total_len < result_len) {
+        len = write(client_fd, result.c_str() + total_len, result_len - total_len);
         if(len <= 0) {
           break;
         }

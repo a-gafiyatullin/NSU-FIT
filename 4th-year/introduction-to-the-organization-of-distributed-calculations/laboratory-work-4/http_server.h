@@ -13,8 +13,6 @@
 
 class HTTP_Server {
   private:
-    static std::string _response;
-
     HTTP_Server(const int &threads_num);
     ~HTTP_Server();
 

@@ -14,7 +14,7 @@
 # Ignore IDE and build systems files
 *.idea*
 *.iml
-*-build-*
+*build*
 .project
 .cproject
 target/
@@ -23,7 +23,7 @@ target/
 x64
 *javagen*
 .vs
-
+*.user
 # Ignore backup files
 .~*
 
