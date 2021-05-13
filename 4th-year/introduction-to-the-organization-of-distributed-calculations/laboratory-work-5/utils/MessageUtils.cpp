@@ -1,5 +1,5 @@
 #include "MessageUtils.h"
-#include "Node.h"
+#include "../dht/Node.h"
 
 MessageUtils* MessageUtils::_instance = nullptr;
 std::string   MessageUtils::_send_commands[] = {"SEND_PING", "SEND_STOR", "SEND_FVAL", "SEND_FNOD" };

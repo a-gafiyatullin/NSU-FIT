@@ -66,7 +66,9 @@ class NodeTable {
 
     std::list<std::shared_ptr<Node>> node_lookup(const node_id &id);
 
-    NodeTable(const int &port);
+    NodeTable(const int &port
+              , const node_id &bootstrap_node
+              , const std::string &bootstrap_addr, const in_port_t &bootstrap_port);
 
     std::mutex    _service_loop_lock;
     volatile bool _stop;
@@ -77,7 +79,9 @@ class NodeTable {
     void service_send_msg(const Message &msg);
   public:
     // ---------------- Kademlia protocol ----------------
-    static NodeTable *init(const int &port);
+    static NodeTable *init(const int &port
+                           , const node_id &bootstrap_node
+                           , const std::string &bootstrap_addr, const in_port_t &bootstrap_port);
     static NodeTable *instance();
 
     void store(const value_hash &hash, const void *buf, const size_t &size);

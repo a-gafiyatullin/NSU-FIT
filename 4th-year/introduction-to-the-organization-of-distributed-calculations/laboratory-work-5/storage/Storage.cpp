@@ -8,10 +8,13 @@ void Storage::thread_loop() {
     struct sockaddr_in cli_addr;
     socklen_t sin_len = sizeof(cli_addr);
 
-    int client_fd = accept(_server_socket, (struct sockaddr *) &cli_addr, &sin_len);
+    int client_fd = accept(_server_socket, (struct sockaddr*)&cli_addr, &sin_len);
     if(client_fd < 0) {
       continue;
     }
+#ifdef DEBUG
+    std::cerr << "thread_loop: new connection!" << std::endl;
+#endif
 
     value_hash hash(SHA_DIGEST_LENGTH);
     int len = read(client_fd, hash.data(), SHA_DIGEST_LENGTH);
@@ -20,11 +23,19 @@ void Storage::thread_loop() {
       continue;
     }
 
+#ifdef DEBUG
+    dump_hash(std::cerr, "thread_loop: got hash", hash);
+#endif
+
     std::ifstream src(_resources[hash]);
     if(!src.is_open()) {
       close(client_fd);
       continue;
     }
+
+#ifdef DEBUG
+    std::cerr << "thread_loop: opened file: " << _resources[hash] << std::endl;
+#endif
 
     char buffer[BUFSIZ];
     while(!src.eof()) {
@@ -53,12 +64,11 @@ Storage::Storage(const in_port_t &port) {
     throw std::runtime_error("Storage::Storage: can't set the socket to non-blocking mode!");
   }
 
-  struct sockaddr_in svr_addr;
-  svr_addr.sin_family = AF_INET;
-  svr_addr.sin_addr.s_addr = INADDR_ANY;
-  svr_addr.sin_port = htons(port);
+  _addr.sin_family = AF_INET;
+  _addr.sin_addr.s_addr = INADDR_ANY;
+  _addr.sin_port = htons(port);
 
-  if (bind(_server_socket, (struct sockaddr *) &svr_addr, sizeof(svr_addr)) == -1) {
+  if (bind(_server_socket, (struct sockaddr*)&_addr, sizeof(_addr)) == -1) {
     close(_server_socket);
     throw std::runtime_error("Storage::Storage: can't bind the socket!");
   }
@@ -90,18 +100,31 @@ std::pair<bool, Storage::info> Storage::get_value(const value_hash &hash) {
     return std::make_pair(false, info{0, 0});
   }
 
+#ifdef DEBUG
+  dump_hash(std::cout, "get_value found", hash);
+#endif
   return std::make_pair(true, val->second);
 }
 
 void Storage::add_resource(const std::string &name, const std::string &path) {
   value_hash hash = calc_hash(name);
+#ifdef DEBUG
+  dump_hash(std::cout, "add_resource", hash);
+#endif
 
-  _resources.insert(std::make_pair(hash, path));
-  _sources.insert(std::make_pair(hash, info{0, _addr.sin_port}));
+  auto iter = _resources.find(hash);
+
+  if(iter == _resources.end()) {
+    _resources.insert(std::make_pair(hash, add_fs_delimeter_if_required(name, path)));
+    _sources.insert(std::make_pair(hash, info{0, _addr.sin_port}));
+  }
 }
 
 bool Storage::download_resource(const std::string &name, const std::string &dst) {
   value_hash hash = calc_hash(name);
+#ifdef DEBUG
+  dump_hash(std::cout, "download_resource", hash);
+#endif
 
   auto info = get_value(hash);
   if(info.first) {
@@ -110,13 +133,19 @@ bool Storage::download_resource(const std::string &name, const std::string &dst)
     addr.sin_addr.s_addr = info.second._addr;
     addr.sin_port = info.second._port;
 
-    if(connect(_client_socket, (sockaddr *)&addr, sizeof (addr)) != 0) {
+    if(connect(_client_socket, (sockaddr *)&addr, sizeof (addr)) < 0) {
+#ifdef DEBUG
+      dump_hash(std::cout, "download_resource: can not connect to download", hash);
+#endif
       return false;
     }
 
-    std::string path = dst + "/" + name;
+    std::string path = add_fs_delimeter_if_required(name, dst);
     std::ofstream dst_file(path);
     if(!dst_file.is_open()) {
+#ifdef DEBUG
+      dump_hash(std::cout, "download_resource: can not open the dst file to download", hash);
+#endif
       return false;
     }
 
@@ -124,15 +153,27 @@ bool Storage::download_resource(const std::string &name, const std::string &dst)
     int len = 0;
 
     if(write(_client_socket, hash.data(), SHA_DIGEST_LENGTH) != SHA_DIGEST_LENGTH) {
+#ifdef DEBUG
+      dump_hash(std::cout, "download_resource: can not sent the requeried hash to download", hash);
+#endif
       return false;
     }
 
     while((len = read(_client_socket, buffer, BUFSIZ)) > 0) {
       dst_file.write(buffer, len);
+      if(dst_file.bad()) {
+#ifdef DEBUG
+        dump_hash(std::cout, "download_resource: can not write buffer to the dst file to download", hash);
+#endif
+        return false;
+      }
     }
 
+#ifdef DEBUG
+    dump_hash(std::cout, "download_resource: download complete for", hash);
+#endif
     dst_file.close();
-    _resources.insert(std::make_pair(hash, path));
+    add_resource(name, dst);
 
     return true;
   } else {

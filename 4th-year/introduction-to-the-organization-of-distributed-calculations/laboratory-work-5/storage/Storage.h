@@ -1,10 +1,15 @@
 #pragma once
 
-#include "../dht/HashUtils.h"
+#include "../utils/HashUtils.h"
 #include <arpa/inet.h>
 #include <map>
 #include <thread>
 #include <fstream>
+#include "../utils/FileSystemUtils.h"
+
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 class Storage {
   protected:

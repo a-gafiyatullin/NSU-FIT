@@ -8,8 +8,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(laboratory-work-5 main.cpp
   dht/NodeTable.cpp dht/NodeTable.h
   dht/Node.cpp dht/Node.h
-  dht/MessageUtils.cpp dht/MessageUtils.h
-  dht/HashUtils.cpp dht/HashUtils.h
-  storage/Storage.cpp storage/Storage.h)
+  utils/MessageUtils.cpp utils/MessageUtils.h
+  utils/HashUtils.cpp utils/HashUtils.h
+  storage/Storage.cpp storage/Storage.h
+  utils/FileSystemUtils.h utils/FileSystemUtils.cpp)
 
 target_link_libraries(laboratory-work-5 pthread -lssl -lcrypto)

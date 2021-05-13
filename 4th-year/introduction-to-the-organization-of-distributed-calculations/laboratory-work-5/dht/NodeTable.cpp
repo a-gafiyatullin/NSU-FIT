@@ -3,13 +3,27 @@
 NodeTable::Message NodeTable::Message::NO_MESSAGE = { ParsedMessage::NO_PARSED_MESSAGE, nullptr, {}, 0 };
 NodeTable*          NodeTable::_instance = nullptr;
 
-NodeTable::NodeTable(const int &port)
+NodeTable::NodeTable(const int &port
+                     , const node_id &bootstrap_node
+                     , const std::string &bootstrap_addr, const in_port_t &bootstrap_port)
   : _replace_tasks(SHA_BITS)
   , _table(SHA_BITS)
   , _stop(false) {
 
-  _socket = socket(AF_INET, SOCK_DGRAM, 0);
+  if(bootstrap_node.size() != 0) {
+    sockaddr_in bootstrap_addr_struct;
+    bootstrap_addr_struct.sin_family = AF_INET;
+    if(inet_pton(AF_INET, bootstrap_addr.c_str(), &(bootstrap_addr_struct.sin_addr)) < 0) {
+      throw std::runtime_error("NodeTable::NodeTable: can't add the boostrap node!");
+    }
+    bootstrap_addr_struct.sin_port = htons(bootstrap_port);
+#ifdef DEBUG
+    dump_hash(std::cerr, "NodeTable bootstrap", bootstrap_node);
+#endif
+    update_k_bucket(bootstrap_node, (sockaddr*)&bootstrap_addr_struct, sizeof (bootstrap_addr_struct));
+  }
 
+  _socket = socket(AF_INET, SOCK_DGRAM, 0);
   if(_socket < 0) {
     throw std::runtime_error("NodeTable::NodeTable: can't open a socket!");
   }
@@ -33,8 +47,9 @@ NodeTable::NodeTable(const int &port)
 
   ulli t = time(nullptr);
   srand(time(nullptr));
-  _self = std::make_shared<Node>(t, (sockaddr *)&svr_addr, sizeof (svr_addr),
-                                 calc_hash(std::to_string(port) + std::to_string(t) + std::to_string(rand())));
+  node_id id = calc_hash(std::to_string(port) + std::to_string(t) + std::to_string(rand()));
+  _self = std::make_shared<Node>(t, (sockaddr *)&svr_addr, sizeof (svr_addr), id);
+  dump_hash(std::cout, "Local node id", id);
 
   _service_thread = std::thread(&NodeTable::service_loop, this);
 }
@@ -115,12 +130,21 @@ void NodeTable::service_send_msg(const NodeTable::Message &msg) {
   case SEND_FIND_VALUE: {
     auto info = Storage::instance()->get_value(msg._msg._hash);
 
+#ifdef DEBUG
+    dump_hash(std::cerr, "service_send_msg find_value", msg._msg._hash);
+    std::cerr << "service_send_msg find_value " << (info.first ? "found" : "not found") << std::endl;
+#endif
+
     size_t size = 0;
     void *buf;
     if(info.first) {
       char *buffer = new char[sizeof (uint32_t) + sizeof (in_port_t)];
       memcpy(buffer, &info.second._addr, sizeof (uint32_t));
       memcpy(buffer + sizeof (uint32_t), &info.second._port, sizeof (in_port_t));
+
+#ifdef DEBUG
+      std::cerr << "service_send_msg port: " << info.second._port << std::endl;
+#endif
 
       buf = MessageUtils::instance()->gen_find_val_msg_to_node(size, buffer, sizeof (u_int32_t) + sizeof (in_port_t), _self->id());
     } else {
@@ -130,22 +154,28 @@ void NodeTable::service_send_msg(const NodeTable::Message &msg) {
     }
 
     if(size > 0) {
-      sendto(_socket, buf, size, 0, (sockaddr*)&msg._addr, msg._len);
+      if(sendto(_socket, buf, size, 0, (sockaddr*)&msg._addr, msg._len) < 0) {
+#ifdef DEBUG
+    dump_hash(std::cerr, "service_send_msg error during send", msg._msg._hash);
+#endif
+      }
       delete[] (char*)buf;
     }
   }
   }
 }
 
-NodeTable *NodeTable::init(const int &port) {
-  return (_instance == nullptr ? (_instance = new NodeTable(port)) : _instance);
+NodeTable *NodeTable::init(const int &port
+                           , const node_id &bootstrap_node
+                           , const std::string &bootstrap_addr, const in_port_t &bootstrap_port) {
+  return (_instance == nullptr ? (_instance = new NodeTable(port, bootstrap_node, bootstrap_addr, bootstrap_port)) : _instance);
 }
 
 NodeTable *NodeTable::instance() {
   return _instance;
 }
 
-void NodeTable::store(const value_hash &hash, const void *buf, const size_t &size) {
+void NodeTable::NodeTable::store(const value_hash &hash, const void *buf, const size_t &size) {
   auto nodes = node_lookup(hash);
 
   for(auto node = nodes.begin(); node != nodes.end(); node++) {
@@ -161,15 +191,23 @@ bool NodeTable::value_lookup(const value_hash &hash) {
   int start_order = order;
   std::list<std::shared_ptr<Node>> nearest_nodes;
 
+#ifdef DEBUG
+  std::cerr << "value lookup for order: " << order << std::endl;
+  dump_hash(std::cerr, "value lookup", hash);
+#endif
+
   int required_nodes_num = 0;
   do {
     for(auto node = _table[order].begin(); node != _table[order].end() && required_nodes_num != K_BUCKET_SIZE; node++) {
       required_nodes_num++;
       nearest_nodes.push_back(*node);
+#ifdef DEBUG
+      dump_hash(std::cerr, "value_lookup to neareast node", (*node)->id());
+#endif
     }
 
-    order++;
-  } while (required_nodes_num != K_BUCKET_SIZE || start_order == order);
+    order = (order + 1) % SHA_BITS;
+  } while (required_nodes_num != K_BUCKET_SIZE && start_order != order);
 
   nearest_nodes.sort([hash](const std::shared_ptr<Node> &l, const std::shared_ptr<Node> &r) {return l->id() - hash < r->id() - hash; });
 
@@ -178,6 +216,9 @@ bool NodeTable::value_lookup(const value_hash &hash) {
   while(time(nullptr) - curr_time < LOOKUP_TIME) {
     int lookup_start = 0;
     int lookup_end = ALPHA;
+    if(lookup_end > (int)nearest_nodes.size()) {
+      lookup_end = nearest_nodes.size();
+    }
 
     if(!found) {
       lookup_start = ALPHA;
@@ -186,6 +227,7 @@ bool NodeTable::value_lookup(const value_hash &hash) {
     }
 
     for(auto node = nearest_nodes.begin(); lookup_start < lookup_end; node++, lookup_start++) {
+      dump_hash(std::cerr, "value_lookup  send find_value to node", (*node)->id());
       (*node)->find_value(hash, _socket, _self->id());
     }
 
@@ -194,6 +236,10 @@ bool NodeTable::value_lookup(const value_hash &hash) {
     if(Message::is_no_message(msg)) {
       continue;
     }
+
+#ifdef DEBUG
+      dump_hash(std::cerr, "value_lookup answer from node", msg._msg._id);
+#endif
 
     if(msg._msg._buf_size != 0 && msg._msg._buf != nullptr) {
       uint32_t addr = (*(uint32_t*)msg._msg._buf);
@@ -204,6 +250,10 @@ bool NodeTable::value_lookup(const value_hash &hash) {
       }
       Storage::instance()->add_key_value(msg._msg._hash, addr, port);
       update_k_bucket(msg._msg._id, (sockaddr*)&msg._addr, msg._len);
+
+#ifdef DEBUG
+      std::cerr << "value_lookup found value: " << port;
+#endif
 
       delete[] (char*)msg._buf;
       _service_loop_lock.unlock();
@@ -392,6 +442,10 @@ NodeTable::Message NodeTable::filtered_recv(const std::vector<ANS_MSG_TYPES> &de
   }
 
   msg._msg = MessageUtils::instance()->parse_recved_msg(msg._buf, BUFF_SIZE);
+#ifdef DEBUG
+  dump_hash(std::cerr, "filtered_recv from", msg._msg._id);
+  std::cerr << "filtered_recv msg type: " << msg._msg._ans_type << msg._msg._send_type << std::endl;
+#endif
   if(ParsedMessage::is_no_parsed_msg(msg._msg)) {
     return Message::NO_MESSAGE;
   }

@@ -33,3 +33,13 @@ value_hash calc_hash(const std::string &seed) {
 
   return id;
 }
+
+#ifdef DEBUG
+void dump_hash(std::ostream &s, const std::string &str, const value_hash_or_node_id &data) {
+  s << str << ": ";
+  for(size_t i = 0; i < data.size(); i++) {
+    s << (unsigned int)data[i] << " ";
+  }
+  s << std::endl;
+}
+#endif
