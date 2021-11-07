@@ -40,3 +40,23 @@
              )
            f)
   )
+
+(def h2 0.001)
+
+(defn part_sum_seq [f]
+  (iterate
+   (fn [[i, value]] (list
+                     (inc i)
+                     (+ value (term f (* i h2) (* (inc i) h2)))
+                     )
+     )
+   (list 0 0.0)
+   )
+  )
+
+(defn make-lazy-integral-func [f]
+  (let [part-sums (part_sum_seq f)]
+    (fn [x]
+      (let [step (int (/ x h2))]
+        (+ (nth (nth part-sums step) 1)
+           (term f (* step h2) x))))))

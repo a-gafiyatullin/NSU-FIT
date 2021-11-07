@@ -1,0 +1,15 @@
+/target
+/classes
+/checkouts
+profiles.clj
+pom.xml
+.clj-kondo/
+.lsp/
+.calva/
+pom.xml.asc
+*.jar
+*.class
+/.lein-*
+/.nrepl-port
+.hgignore
+.hg/

@@ -26,6 +26,14 @@
     )
   )
 
+(deftest lazy-integral-result-const
+  (let [integral (make-lazy-integral-func (fn [x] 1))]
+    (is (= (integral 100.0) 100.0))))
+
+(deftest lazy-integral-result-x
+  (let [integral (make-lazy-integral-func (fn [x] x))]
+    (is (< (- (integral 100.0) 5000.0) 0.1))))
+
 (deftest non-memoized-integral
   (let [integral (make-usual-integral-func (fn [x] (Math/sin x)))]
     (time (integral 100.0))
@@ -39,3 +47,9 @@
     (time (integral 120.0))
     )
   )
+
+(deftest lazy-integral
+  (let [integral (make-lazy-integral-func (fn [x] (Math/cos x)))]
+    (time (integral 100.0))
+    (time (integral 100.0))
+    (time (integral 120.0))))
