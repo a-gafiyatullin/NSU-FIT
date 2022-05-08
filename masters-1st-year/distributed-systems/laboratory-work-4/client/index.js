@@ -15,7 +15,7 @@ new Promise(function(resolve, reject) {
             reject(err);
         } else {
             console.log("\nREPOS BEFORE:");
-            console.dir(JSON.parse(data), {depth: null, colors: true})
+            console.dir(JSON.parse(data), {depth: null, colors: true});
             resolve(data);
         }
     });
@@ -25,6 +25,8 @@ new Promise(function(resolve, reject) {
             if (err) {
                 reject(err);
             } else {
+                console.log("\nCREATE REPO:");
+                console.dir(JSON.parse(data), {depth: null, colors: true});
                 resolve(data);
             }
         });
@@ -37,6 +39,8 @@ new Promise(function(resolve, reject) {
             if (err) {
                 reject(err);
             } else {
+                console.log("\nCREATE DB:");
+                console.dir(JSON.parse(data), {depth: null, colors: true});
                 resolve(data);
             }
         });
@@ -49,6 +53,8 @@ new Promise(function(resolve, reject) {
             if (err) {
                 reject(err);
             } else {
+                console.log("\nCREATE STORAGE:");
+                console.dir(JSON.parse(data), {depth: null, colors: true});
                 resolve(data);
             }
         });
@@ -61,6 +67,8 @@ new Promise(function(resolve, reject) {
             if (err) {
                 reject(err);
             } else {
+                console.log("\nUPDATE DB:");
+                console.dir(JSON.parse(data), {depth: null, colors: true});
                 resolve(data);
             }
         });
@@ -72,7 +80,7 @@ new Promise(function(resolve, reject) {
                 reject(err);
             } else {
                 console.log("\nSEARCH RESULT:");
-                console.dir(JSON.parse(data), {depth: null, colors: true})
+                console.dir(JSON.parse(data), {depth: null, colors: true});
                 resolve(data);
             }
         });
@@ -84,7 +92,7 @@ new Promise(function(resolve, reject) {
                 reject(err);
             } else {
                 console.log("\nSCAN RESULT:");
-                console.dir(JSON.parse(data), {depth: null, colors: true})
+                console.dir(JSON.parse(data), {depth: null, colors: true});
                 resolve(data);
             }
         });
@@ -95,6 +103,8 @@ new Promise(function(resolve, reject) {
             if (err) {
                 reject(err);
             } else {
+                console.log("\nDELETE STORAGE:");
+                console.dir(JSON.parse(data), {depth: null, colors: true});
                 resolve(data);
             }
         });
@@ -105,6 +115,8 @@ new Promise(function(resolve, reject) {
             if (err) {
                 reject(err);
             } else {
+                console.log("\nDELETE DB:");
+                console.dir(JSON.parse(data), {depth: null, colors: true});
                 resolve(data);
             }
         });
@@ -115,6 +127,8 @@ new Promise(function(resolve, reject) {
             if (err) {
                 reject(err);
             } else {
+                console.log("\nDELETE REPO:");
+                console.dir(JSON.parse(data), {depth: null, colors: true});
                 resolve(data);
             }
         });
