@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dc:collection xmlns="http://fit.nsu.ru/ds"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:sys="http://fit.nsu.ru/sys/1.0/">
+    <dc:metadata>
+        <dc:identifier>https://www.nsu.ru</dc:identifier>
+        <dc:title>Новосибирский государственный университет</dc:title>
+        <dc:title>НГУ</dc:title>
+        <sys:created-at>19700101</sys:created-at>
+        <sys:updated-at>20220419</sys:updated-at>
+    </dc:metadata>
+</dc:collection>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dc:collection xmlns="http://fit.nsu.ru/ds"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:sys="http://fit.nsu.ru/sys/1.0/">
+    <dc:metadata>
+        <dc:identifier>https://www.nsu.ru/n/information-technologies-department/</dc:identifier>
+        <dc:title>
+            Факультет информационных технологий Новосибирского государственного университета
+        </dc:title>
+        <dc:title>ФИТ НГУ</dc:title>
+        <sys:created-at>20220420</sys:created-at>
+        <sys:updated-at>20220420</sys:updated-at>
+    </dc:metadata>
+</dc:collection>
