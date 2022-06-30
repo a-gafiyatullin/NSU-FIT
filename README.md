@@ -73,3 +73,16 @@
     </ul>
 </li>
 </ul>
+
+### <strong>1st year master:</strong><br>
+<ul>
+<li>Distributed systems.<br></li>
+<li>Modern programming approaches.<br>
+    <ul>
+    <li><strong>Basic operations with data structures </strong>(laboratory work №1)</li>
+    <li><strong>Numerical integration </strong>(laboratory work №2)</li>
+    <li><strong>Parallel sequences processing </strong>(laboratory work №3)</li>
+    <li><strong>DNF </strong>(laboratory work №4)</li>
+    </ul>
+</li>
+</ul>

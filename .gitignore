@@ -14,7 +14,7 @@
 # Ignore IDE and build systems files
 *.idea*
 *.iml
-*build*
+*build
 .project
 .cproject
 target/
