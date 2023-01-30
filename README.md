@@ -86,3 +86,15 @@
     </ul>
 </li>
 </ul>
+
+### <strong>2nd year master:</strong><br>
+<ul>
+<li>Neural Networks and Machine Learning.<br>
+    <ul>
+    <li><strong>KNN </strong>(laboratory work №1, 2)</li>
+    <li><strong>Polynomial regression </strong>(laboratory work №3, 4)</li>
+    <li><strong>Elementary perceptron </strong>(laboratory work №5)</li>
+    <li><strong>Multilayer perceptron </strong>(laboratory work №5, 6)</li>
+    </ul>
+</li>
+</ul>
